@@ -1,5 +1,5 @@
 {
-  "name": "contracts-atonomi-project",
+  "name": "atonomi-smart-contracts",
   "version": "0.1.0",
   "license": "MIT",
   "main": "lib/index.js",
@@ -9,7 +9,7 @@
     "src"
   ],
   "dependencies": {
-    "moment": "^2.22.0",
+    "moment": "^2.22.1",
     "truffle-blockchain-utils": "^0.0.3",
     "truffle-hdwallet-provider": "^0.0.3",
     "zeppelin-solidity": "^1.8.0"
@@ -32,20 +32,25 @@
     "solhint": "^1.1.10",
     "solidity-coverage": "^0.4.15",
     "standard": "^10.0.3",
-    "truffle": "^4.1.5",
-    "truffle-contract": "^3.0.4",
-    "truffle-ext": "0.1.8"
+    "truffle": "^4.1.6",
+    "truffle-contract": "^3.0.5",
+    "truffle-ext": "0.1.8",
+    "truffle-flattener": "^1.2.5"
   },
   "scripts": {
     "compile": "truffle compile --all",
-    "ganache-cli": "ganache-cli -p 8546 -e 1000 -a 15",
+    "ganache-cli": "ganache-cli -p 8546 -e 1000 -a 15 -l 990000000000000",
     "deploy": "truffle migrate --reset",
-    "test": "(npm run compile) && (npm run ganache-cli > /dev/null & truffle test) && (kill -9 $(lsof -ti :8546))",
-    "test:coverage": "touch allFiredEvents && (SOLIDITY_COVERAGE=true solidity-coverage)",
+    "test": "(npm run compile) && (ganache-cli -p 8546 -e 1000 -a 15 > /dev/null & truffle test) && (kill -9 $(lsof -ti :8546))",
+    "test:coverage": "(npm run compile) && touch allFiredEvents && (SOLIDITY_COVERAGE=true solidity-coverage)",
     "lint": "standard --verbose | snazzy",
-    "lint:sol": "solhint contracts/*.sol contracts/**/*.sol"
+    "lint:sol": "solhint contracts/*.sol contracts/**/*.sol",
+    "etherscan:ATMI": "truffle-flattener contracts/tokenmarket/AMLToken.sol"
   },
   "standard": {
+    "ignore": [
+      "deploy/scripts/*.js"
+    ],
     "globals": [
       "web3",
       "artifacts",

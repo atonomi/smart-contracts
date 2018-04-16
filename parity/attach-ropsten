@@ -1,7 +1,0 @@
-#!/bin/bash
-#set -e
-#set -o pipefail
-
-ATONOMI_NODE=http://test.parity.atonomi.io:8545
-
-geth attach $ATONOMI_NODE

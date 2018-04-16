@@ -1,16 +1,13 @@
 import truffleContract from 'truffle-contract'
 import truffleExt from 'truffle-ext'
 import { web3, web3Provider } from './w3'
-import AtonomiTokenJSON from '../../build/contracts/AtonomiToken.json'
 
-export const AtonomiToken = getContract(AtonomiTokenJSON)
-
-function getContract (contractAbi) {
+export function getContract (contractAbi) {
   const { requireContract } = truffleExt(web3)
   return requireContract(getTruffleContract(contractAbi))
 }
 
-function getTruffleContract (contractAbi) {
+export function getTruffleContract (contractAbi) {
   const contract = truffleContract(contractAbi)
   contract.setProvider(web3Provider)
   contract.defaults({

@@ -1,37 +1,95 @@
 # Atonomi Ethereum Smart Contracts
-TBD.. (put contract addresses for Ropsten and Mainnet here)
+
+### Ropsten Contracts
+
+| Contract  | Address |
+| ------------- | ------------- |
+| SafeMathLib  | [0x32050f78221d61f8b7641aa11eca0a76d8a0954f](https://ropsten.etherscan.io/address/0x32050f78221d61f8b7641aa11eca0a76d8a0954f#code)  |
+
 
 ### Setup
 
-Make sure you have the following installed globally:
+Downlaod and install the latest version of Solidity here: https://solidity.readthedocs.io/en/v0.4.22/installing-solidity.html (use Homebrew)
+Download and install the latest LTS version of `Node.js` here: https://nodejs.org/en/
 
-node 8
+Also have `truffle` and `ganache-cli` installed globally
 
-Then run `npm install`
+```
+$ npm install -g truffle
+$ npm install -g ganache-cli
+```
+
+Then run: 
+
+```
+$ npm install
+```
 
 ### Compile
 
-Recompile contracts and build artifacts.
+To re-compile contracts and build artifacts:
 
 ```
 $ npm run compile
 ```
 
-### Deploy
+### Linting
 
-Deploy contracts to RPC provider at port `8546`.
+To validate linters for JS and SOL files:
+
+```
+$ npm run lint
+$ npm run lint:sol
+```
+
+### Deploy to local Ganache
+
+To deploy contracts to a local Ganche RPC provider at port `8546`:
 
 ```
 $ npm run ganache-cli
 $ npm run deploy
 ```
 
-### Test
+### Deploy to Atonomi Ropsten test node
+
+Make sure you have the latest version of `geth` installed: https://github.com/ethereum/go-ethereum/wiki/Installing-Geth
+Then change into the deploy directory:
+
+```
+$ cd deploy
+```
+
+Then attach to the Atonomi Ropsten Test node (this is internal to Atonomi Network)
+If you need Ropsten Test Ether, go here: http://faucet.ropsten.be:3001/ or https://faucet.metamask.io/
+
+```
+$ export PARITY_NODE=http://test.parity.atonomi.io:8545
+$ export ETHER_ADDR=0xe9a3f9d5e08bce9a8bbe8d00fcc4c1c30019f678
+$ export SAFEMATHLIB_ADDR=0x32050f78221d61f8b7641aa11eca0a76d8a0954f
+$ ./geth-attach.sh
+```
+
+This will drop you into a geth console that will have preloaded the Atonomi constants and abi needed for contract deployment.
+
+To deploy the mock ATMI token contract
+
+```
+> loadScript('scripts/deploy-atmi-token.js')
+```
+
+### Unit Tests
+
+To execute the full unit test truffle suite: 
 
 ```
 $ npm test
 ```
 
-### Test Coverage
+### Unit Test Coverage Report
 
-Run `npm run test:coverage` to run with coverage reporting
+To execute the full unit test truffle suite and generate test coverage report:
+
+```
+$ npm run test:coverage
+```

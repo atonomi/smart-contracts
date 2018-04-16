@@ -1,16 +1,17 @@
 import { expect } from 'chai'
 import expectRevert from './helpers/expectRevert'
-const AtonomiToken = artifacts.require('AtonomiToken')
+const AtonomiToken = artifacts.require('AMLToken')
 const MockContractReceiver = artifacts.require('MockContractReceiver')
 const ethjsABI = require('ethjs-abi')
-const abiHelper = require('./helpers/abi')
+// const abiHelper = require('./helpers/abi')
 
-contract('AtonomiToken', accounts => {
+contract('ATMI ERC Compliance', accounts => {
   const ctx = {
     actors: {
       owner: accounts[0],
       alice: accounts[1],
-      bob: accounts[2]
+      bob: accounts[2],
+      releaseAgent: accounts[3]
     },
     contracts: {
       atonomi: null,
@@ -18,46 +19,56 @@ contract('AtonomiToken', accounts => {
     }
   }
 
-  const multiplier = 10 ** 18
+  const tokenName = 'Atonomi Token'
+  const tokenSymbol = 'ATMI'
+  const tokenDecimals = 18
+  const multiplier = 10 ** tokenDecimals
   const initalSupply = 1000000000 * multiplier
 
   beforeEach(async () => {
-    ctx.contracts.atonomi = await AtonomiToken.new({from: ctx.actors.owner})
-    const receipt = web3.eth.getTransactionReceipt(ctx.contracts.atonomi.transactionHash)
-    expect(receipt.logs.length).to.be.equal(1)
-    const decoder = ethjsABI.logDecoder(ctx.contracts.atonomi.abi)
-    const tokenEvents = decoder(receipt.logs)
-    const log = tokenEvents[0]
-    expect(log._eventName).to.be.equal('Transfer')
-    expect(log.from).to.be.equal('0x0000000000000000000000000000000000000000')
-    expect(log.to).to.be.equal(ctx.actors.owner)
-    expect(log.value.toString(10)).to.be.equal('1000000000000000000000000000')
+    ctx.contracts.atonomi = await AtonomiToken.new(
+      tokenName, tokenSymbol, initalSupply, tokenDecimals, false,
+      {from: ctx.actors.owner})
+
+    ctx.contracts.atonomi.setReleaseAgent(ctx.actors.releaseAgent, {from: ctx.actors.owner})
+    ctx.contracts.atonomi.releaseTokenTransfer({from: ctx.actors.releaseAgent})
 
     ctx.contracts.receiverMock = await MockContractReceiver.new({from: ctx.actors.owner})
   })
 
   describe('initialized', () => {
-    it('name', async () => {
+    it('has name: ' + tokenName, async () => {
       const name = await ctx.contracts.atonomi.name.call()
-      expect(name).to.equal('Atonomi Token')
+      expect(name).to.equal(tokenName)
     })
 
-    it('symbol', async () => {
+    it('has symbol: ' + tokenSymbol, async () => {
       const symbol = await ctx.contracts.atonomi.symbol.call()
-      expect(symbol).to.equal('ATMI')
+      expect(symbol).to.equal(tokenSymbol)
     })
 
-    it('decimals', async () => {
+    it('has decimals: ' + tokenDecimals, async () => {
       const decimals = await ctx.contracts.atonomi.decimals.call()
-      expect(decimals.toNumber()).to.equal(18)
+      expect(decimals.toNumber()).to.equal(tokenDecimals)
     })
 
-    it('totalSupply', async () => {
+    it('has minted: ' + (initalSupply / multiplier).toLocaleString(), async () => {
+      const receipt = web3.eth.getTransactionReceipt(ctx.contracts.atonomi.transactionHash)
+      expect(receipt.logs.length).to.be.equal(1)
+      const decoder = ethjsABI.logDecoder(ctx.contracts.atonomi.abi)
+      const tokenEvents = decoder(receipt.logs)
+      const log = tokenEvents[0]
+      expect(log._eventName).to.be.equal('Minted')
+      expect(log.receiver).to.be.equal(ctx.actors.owner)
+      expect(log.amount.toString(10)).to.be.equal('1000000000000000000000000000')
+    })
+
+    it('has totalSupply: ' + (initalSupply / multiplier).toLocaleString(), async () => {
       const totalSupply = await ctx.contracts.atonomi.totalSupply.call()
       expect(totalSupply.toNumber()).to.equal(initalSupply)
     })
 
-    it('balanceOf', async () => {
+    it('can get balanceOf token owner', async () => {
       const ownerBalance = await ctx.contracts.atonomi.balanceOf.call(ctx.actors.owner)
       expect(ownerBalance.toNumber()).to.equal(initalSupply)
     })
@@ -66,7 +77,7 @@ contract('AtonomiToken', accounts => {
   describe('transfer', () => {
     const transferAmount = 1 * multiplier
 
-    it('can transfer', async () => {
+    it('can transfer 1 token', async () => {
       const success = await ctx.contracts.atonomi.transfer.call(ctx.actors.alice, transferAmount, { from: ctx.actors.owner })
       expect(success).to.be.equal(true)
 
@@ -86,7 +97,7 @@ contract('AtonomiToken', accounts => {
       expect(balances.alice.toNumber()).to.be.equal(transferAmount)
     })
 
-    it('can transfer zero value', async () => {
+    it('can transfer zero token', async () => {
       const transferZero = 0
       const success = await ctx.contracts.atonomi.transfer.call(ctx.actors.alice, transferZero, { from: ctx.actors.owner })
       expect(success).to.be.equal(true)
@@ -107,7 +118,7 @@ contract('AtonomiToken', accounts => {
       expect(balances.alice.toNumber()).to.be.equal(transferZero)
     })
 
-    it('can not transfer with insufficient funds', async () => {
+    it('can not transfer with insufficient tokens', async () => {
       const aliceBalance = await ctx.contracts.atonomi.balanceOf.call(ctx.actors.alice)
       expect(aliceBalance.toNumber()).to.be.lessThan(transferAmount)
       const fn = ctx.contracts.atonomi.transfer(ctx.actors.bob, transferAmount, { from: ctx.actors.alice })
@@ -115,10 +126,11 @@ contract('AtonomiToken', accounts => {
     })
   })
 
-  describe('transfer with data', () => {
+  /* TODO: uncomment when ERC827 implementation is released
+  describe('transfer 1 token with function callback', () => {
     const transferAmount = 1 * multiplier
 
-    it('can transfer', async () => {
+    it('can transfer 1 token', async () => {
       const testNumber = 24
       const callbackData = ctx.contracts.receiverMock.contract.onTokenTransfer.getData(testNumber)
       const abiMethod = abiHelper.findMethod(ctx.contracts.atonomi.abi, 'transfer', 'address,uint256,bytes')
@@ -146,7 +158,7 @@ contract('AtonomiToken', accounts => {
       expect(balances.receiverMock.toNumber()).to.be.equal(transferAmount)
     })
 
-    it('can transfer zero value', async () => {
+    it('can transfer zero token', async () => {
       const transferZero = 0
 
       const testNumber = 24
@@ -189,11 +201,12 @@ contract('AtonomiToken', accounts => {
       await expectRevert(fn)
     })
   })
+  */
 
   describe('approve', () => {
     const transferAmount = 1 * multiplier
 
-    it('can approve', async () => {
+    it('can approve a transfer', async () => {
       const success = await ctx.contracts.atonomi.approve.call(ctx.actors.alice, transferAmount, { from: ctx.actors.owner })
       expect(success).to.be.equal(true)
 
@@ -214,11 +227,8 @@ contract('AtonomiToken', accounts => {
       const intialAllowance = transferAmount
       await ctx.contracts.atonomi.approve(ctx.actors.alice, intialAllowance, { from: ctx.actors.owner })
 
-      // UI should first set to 0 before changing the value
-      await ctx.contracts.atonomi.approve(ctx.actors.alice, 0, { from: ctx.actors.owner })
-
       const increasedAllowance = transferAmount * 2
-      await ctx.contracts.atonomi.approve(ctx.actors.alice, increasedAllowance, { from: ctx.actors.owner })
+      await ctx.contracts.atonomi.increaseApproval(ctx.actors.alice, transferAmount, { from: ctx.actors.owner })
 
       const allowance = await ctx.contracts.atonomi.allowance.call(ctx.actors.owner, ctx.actors.alice)
       expect(allowance.toNumber()).to.be.equal(increasedAllowance)
@@ -228,21 +238,19 @@ contract('AtonomiToken', accounts => {
       const intialAllowance = transferAmount
       await ctx.contracts.atonomi.approve(ctx.actors.alice, intialAllowance, { from: ctx.actors.owner })
 
-      // UI should first set to 0 before changing the value
-      await ctx.contracts.atonomi.approve(ctx.actors.alice, 0, { from: ctx.actors.owner })
-
       const decreasedAllowance = transferAmount / 2
-      await ctx.contracts.atonomi.approve(ctx.actors.alice, decreasedAllowance, { from: ctx.actors.owner })
+      await ctx.contracts.atonomi.decreaseApproval(ctx.actors.alice, transferAmount / 2, { from: ctx.actors.owner })
 
       const allowance = await ctx.contracts.atonomi.allowance.call(ctx.actors.owner, ctx.actors.alice)
       expect(allowance.toNumber()).to.be.equal(decreasedAllowance)
     })
   })
 
-  describe('approve with data', () => {
+  /* TODO: uncomment when ERC827 implementation is released
+  describe('approve a transfer with function callback', () => {
     const transferAmount = 1 * multiplier
 
-    it('can approve', async () => {
+    it('can approve a transfer', async () => {
       const testNumber = 8
       const callbackData = ctx.contracts.receiverMock.contract.onTokenApprove.getData(testNumber)
       const abiMethod = abiHelper.findMethod(ctx.contracts.atonomi.abi, 'approve', 'address,uint256,bytes')
@@ -275,18 +283,11 @@ contract('AtonomiToken', accounts => {
       let approveData = ethjsABI.encodeMethod(abiMethod, [ctx.contracts.receiverMock.contract.address, intialAllowance, callbackData])
       await ctx.contracts.atonomi.sendTransaction({ from: ctx.actors.owner, data: approveData })
 
-      // UI should first set to 0 before changing the value
-      testNumber = 8 * 3
-      callbackData = ctx.contracts.receiverMock.contract.onTokenApprove.getData(testNumber)
-      abiMethod = abiHelper.findMethod(ctx.contracts.atonomi.abi, 'approve', 'address,uint256,bytes')
-      approveData = ethjsABI.encodeMethod(abiMethod, [ctx.contracts.receiverMock.contract.address, 0, callbackData])
-      await ctx.contracts.atonomi.sendTransaction({ from: ctx.actors.owner, data: approveData })
-
       const increasedAllowance = transferAmount * 2
       testNumber = 8 * 2
       callbackData = ctx.contracts.receiverMock.contract.onTokenApprove.getData(testNumber)
-      abiMethod = abiHelper.findMethod(ctx.contracts.atonomi.abi, 'approve', 'address,uint256,bytes')
-      approveData = ethjsABI.encodeMethod(abiMethod, [ctx.contracts.receiverMock.contract.address, increasedAllowance, callbackData])
+      abiMethod = abiHelper.findMethod(ctx.contracts.atonomi.abi, 'increaseApproval', 'address,uint256,bytes')
+      approveData = ethjsABI.encodeMethod(abiMethod, [ctx.contracts.receiverMock.contract.address, transferAmount, callbackData])
       await ctx.contracts.atonomi.sendTransaction({ from: ctx.actors.owner, data: approveData })
 
       const allowance = await ctx.contracts.atonomi.allowance.call(ctx.actors.owner, ctx.contracts.receiverMock.address)
@@ -301,29 +302,23 @@ contract('AtonomiToken', accounts => {
       let approveData = ethjsABI.encodeMethod(abiMethod, [ctx.contracts.receiverMock.contract.address, intialAllowance, callbackData])
       await ctx.contracts.atonomi.sendTransaction({ from: ctx.actors.owner, data: approveData })
 
-      // UI should first set to 0 before changing the value
-      testNumber = 8 * 3
-      callbackData = ctx.contracts.receiverMock.contract.onTokenApprove.getData(testNumber)
-      abiMethod = abiHelper.findMethod(ctx.contracts.atonomi.abi, 'approve', 'address,uint256,bytes')
-      approveData = ethjsABI.encodeMethod(abiMethod, [ctx.contracts.receiverMock.contract.address, 0, callbackData])
-      await ctx.contracts.atonomi.sendTransaction({ from: ctx.actors.owner, data: approveData })
-
       const decreasedAllowance = transferAmount / 2
       testNumber = 8 / 2
       callbackData = ctx.contracts.receiverMock.contract.onTokenApprove.getData(testNumber)
-      abiMethod = abiHelper.findMethod(ctx.contracts.atonomi.abi, 'approve', 'address,uint256,bytes')
-      approveData = ethjsABI.encodeMethod(abiMethod, [ctx.contracts.receiverMock.contract.address, decreasedAllowance, callbackData])
+      abiMethod = abiHelper.findMethod(ctx.contracts.atonomi.abi, 'decreaseApproval', 'address,uint256,bytes')
+      approveData = ethjsABI.encodeMethod(abiMethod, [ctx.contracts.receiverMock.contract.address, transferAmount / 2, callbackData])
       await ctx.contracts.atonomi.sendTransaction({ from: ctx.actors.owner, data: approveData })
 
       const allowance = await ctx.contracts.atonomi.allowance.call(ctx.actors.owner, ctx.contracts.receiverMock.address)
       expect(allowance.toNumber()).to.be.equal(decreasedAllowance)
     })
   })
+  */
 
   describe('transferFrom', () => {
     const transferAmount = 1 * multiplier
 
-    it('can transfer with approval', async () => {
+    it('can transfer 1 token with approval', async () => {
       await ctx.contracts.atonomi.approve(ctx.actors.alice, transferAmount, { from: ctx.actors.owner })
 
       const success = await ctx.contracts.atonomi.transferFrom.call(ctx.actors.owner, ctx.actors.bob, transferAmount, { from: ctx.actors.alice })
@@ -347,7 +342,7 @@ contract('AtonomiToken', accounts => {
       expect(balances.bob.toNumber()).to.be.equal(transferAmount)
     })
 
-    it('can transfer zero value with approval', async () => {
+    it('can transfer zero token with approval', async () => {
       const transferZero = 0
       await ctx.contracts.atonomi.approve(ctx.actors.alice, transferAmount, { from: ctx.actors.owner })
 
@@ -402,10 +397,11 @@ contract('AtonomiToken', accounts => {
     })
   })
 
-  describe('transferFrom with data', () => {
+  /* TODO: uncomment when ERC827 implementation is released
+  describe('transferFrom with function callback', () => {
     const transferAmount = 1 * multiplier
 
-    it('can transfer with approval', async () => {
+    it('can transfer 1 token with approval', async () => {
       await ctx.contracts.atonomi.approve(ctx.actors.alice, transferAmount, { from: ctx.actors.owner })
 
       const testNumber = 241
@@ -435,7 +431,7 @@ contract('AtonomiToken', accounts => {
       expect(balances.receiverMock.toNumber()).to.be.equal(transferAmount)
     })
 
-    it('can transfer zero value with approval', async () => {
+    it('can transfer zero token with approval', async () => {
       const transferZero = 0
       await ctx.contracts.atonomi.approve(ctx.actors.alice, transferAmount, { from: ctx.actors.owner })
 
@@ -509,4 +505,5 @@ contract('AtonomiToken', accounts => {
       await expectRevert(fn)
     })
   })
+  */
 })

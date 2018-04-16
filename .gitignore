@@ -7,4 +7,6 @@ coverage.json
 allFiredEvents
 scTopics
 coverageEnv
+deploy/scripts/atonomi-abis.js
+deploy/scripts/atonomi-consts.js
 .DS_Store
