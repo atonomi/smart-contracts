@@ -1,0 +1,59 @@
+{
+  "name": "contracts-atonomi-project",
+  "version": "0.1.0",
+  "license": "MIT",
+  "main": "lib/index.js",
+  "files": [
+    "build",
+    "lib",
+    "src"
+  ],
+  "dependencies": {
+    "moment": "^2.22.0",
+    "truffle-blockchain-utils": "^0.0.3",
+    "truffle-hdwallet-provider": "^0.0.3",
+    "zeppelin-solidity": "^1.8.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.24.1",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-stage-0": "^6.24.1",
+    "babel-register": "^6.26.0",
+    "chai": "^4.1.2",
+    "coveralls": "^3.0.0",
+    "cross-env": "^5.1.4",
+    "ethjs-abi": "^0.2.1",
+    "ganache-cli": "^6.1.0",
+    "lk-test-helpers": "^0.1.4",
+    "snazzy": "^7.1.1",
+    "solhint": "^1.1.10",
+    "solidity-coverage": "^0.4.15",
+    "standard": "^10.0.3",
+    "truffle": "^4.1.5",
+    "truffle-contract": "^3.0.4",
+    "truffle-ext": "0.1.8"
+  },
+  "scripts": {
+    "compile": "truffle compile --all",
+    "ganache-cli": "ganache-cli -p 8546 -e 1000 -a 15",
+    "deploy": "truffle migrate --reset",
+    "test": "(npm run compile) && (npm run ganache-cli > /dev/null & truffle test) && (kill -9 $(lsof -ti :8546))",
+    "test:coverage": "touch allFiredEvents && (SOLIDITY_COVERAGE=true solidity-coverage)",
+    "lint": "standard --verbose | snazzy",
+    "lint:sol": "solhint contracts/*.sol contracts/**/*.sol"
+  },
+  "standard": {
+    "globals": [
+      "web3",
+      "artifacts",
+      "describe",
+      "it",
+      "beforeEach",
+      "contract",
+      "_"
+    ]
+  }
+}
