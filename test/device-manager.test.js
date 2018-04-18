@@ -63,6 +63,23 @@ contract('Atonomi Device Manager', accounts => {
     })
   })
 
+  describe('bulk registration', () => {
+    it('can set bulk registration contract', async () => {
+    })
+
+    it('can not set 0x0', async () => {
+    })
+
+    it('mfg can bulk register devices', async () => {
+    })
+
+    it('can bulk register with some failures', async () => {
+    })
+
+    it('external accounts can not bulk register devices', async () => {
+    })
+  })
+
   describe('register device', () => {
     it('mfg can register', async () => {
     })
