@@ -5,12 +5,10 @@ function waitForTransactionReceipt (hash, callback) {
   if (receipt === null) {
       setTimeout(function () {
         console.log('retry after 5 seconds...')
-        waitForTransactionReceipt(hash)
+        waitForTransactionReceipt(hash, callback)
       }, 5000)
   } else {
-      if(callback) {
-        console.log('mined!')
-        callback(receipt)
-      }
+    console.log('mined!')
+    callback(receipt)
   }
 }
