@@ -3,7 +3,7 @@ import expectRevert from './helpers/expectRevert'
 const AtonomiToken = artifacts.require('AMLToken')
 const MockContractReceiver = artifacts.require('MockContractReceiver')
 const ethjsABI = require('ethjs-abi')
-// const abiHelper = require('./helpers/abi')
+const abiHelper = require('./helpers/abi')
 
 contract('ATMI ERC Compliance', accounts => {
   const ctx = {
@@ -126,7 +126,6 @@ contract('ATMI ERC Compliance', accounts => {
     })
   })
 
-  /* TODO: uncomment when ERC827 implementation is released
   describe('transfer 1 token with function callback', () => {
     const transferAmount = 1 * multiplier
 
@@ -201,7 +200,6 @@ contract('ATMI ERC Compliance', accounts => {
       await expectRevert(fn)
     })
   })
-  */
 
   describe('approve', () => {
     const transferAmount = 1 * multiplier
@@ -224,19 +222,20 @@ contract('ATMI ERC Compliance', accounts => {
     })
 
     it('can increase approval allowance', async () => {
-      const intialAllowance = transferAmount
-      await ctx.contracts.atonomi.approve(ctx.actors.alice, intialAllowance, { from: ctx.actors.owner })
+      const initialAllowance = transferAmount
+      await ctx.contracts.atonomi.approve(ctx.actors.alice, initialAllowance, { from: ctx.actors.owner })
 
       const increasedAllowance = transferAmount * 2
-      await ctx.contracts.atonomi.increaseApproval(ctx.actors.alice, transferAmount, { from: ctx.actors.owner })
+      // TruffleContract is currently bugged, having issues with function overloads, need to call it this way
+      await ctx.contracts.atonomi.contract.increaseApproval['address,uint256'].sendTransaction(ctx.actors.alice, transferAmount, { from: ctx.actors.owner })
 
       const allowance = await ctx.contracts.atonomi.allowance.call(ctx.actors.owner, ctx.actors.alice)
       expect(allowance.toNumber()).to.be.equal(increasedAllowance)
     })
 
     it('can decrease approval allowance', async () => {
-      const intialAllowance = transferAmount
-      await ctx.contracts.atonomi.approve(ctx.actors.alice, intialAllowance, { from: ctx.actors.owner })
+      const initialAllowance = transferAmount
+      await ctx.contracts.atonomi.approve(ctx.actors.alice, initialAllowance, { from: ctx.actors.owner })
 
       const decreasedAllowance = transferAmount / 2
       await ctx.contracts.atonomi.decreaseApproval(ctx.actors.alice, transferAmount / 2, { from: ctx.actors.owner })
@@ -246,7 +245,6 @@ contract('ATMI ERC Compliance', accounts => {
     })
   })
 
-  /* TODO: uncomment when ERC827 implementation is released
   describe('approve a transfer with function callback', () => {
     const transferAmount = 1 * multiplier
 
@@ -313,7 +311,6 @@ contract('ATMI ERC Compliance', accounts => {
       expect(allowance.toNumber()).to.be.equal(decreasedAllowance)
     })
   })
-  */
 
   describe('transferFrom', () => {
     const transferAmount = 1 * multiplier
@@ -397,7 +394,6 @@ contract('ATMI ERC Compliance', accounts => {
     })
   })
 
-  /* TODO: uncomment when ERC827 implementation is released
   describe('transferFrom with function callback', () => {
     const transferAmount = 1 * multiplier
 
@@ -505,5 +501,4 @@ contract('ATMI ERC Compliance', accounts => {
       await expectRevert(fn)
     })
   })
-  */
 })

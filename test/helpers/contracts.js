@@ -7,7 +7,7 @@ export function getContract (contractAbi) {
   return requireContract(getTruffleContract(contractAbi))
 }
 
-export function getTruffleContract (contractAbi) {
+function getTruffleContract (contractAbi) {
   const contract = truffleContract(contractAbi)
   contract.setProvider(web3Provider)
   contract.defaults({
