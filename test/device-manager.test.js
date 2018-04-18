@@ -52,6 +52,17 @@ contract('Atonomi Device Manager', accounts => {
     })
   })
 
+  describe('tokens', () => {
+    it('owner can withdraw any erc token', async () => {
+    })
+
+    it('external accounts can not withdraw', async () => {
+    })
+
+    it('anyone can deposit tokens', async () => {
+    })
+  })
+
   describe('register device', () => {
     it('mfg can register', async () => {
     })
