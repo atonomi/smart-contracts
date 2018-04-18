@@ -1,18 +1,13 @@
 import { expect } from 'chai'
-import expectRevert from './helpers/expectRevert'
-const AtonomiToken = artifacts.require('AMLToken')
+const errors = require('./helpers/errors')
 const MockContractReceiver = artifacts.require('MockContractReceiver')
 const ethjsABI = require('ethjs-abi')
 const abiHelper = require('./helpers/abi')
+const init = require('./helpers/init')
 
 contract('ATMI ERC Compliance', accounts => {
   const ctx = {
-    actors: {
-      owner: accounts[0],
-      alice: accounts[1],
-      bob: accounts[2],
-      releaseAgent: accounts[3]
-    },
+    actors: init.getTestActorsContext(accounts),
     contracts: {
       atonomi: null,
       receiverMock: null
@@ -26,13 +21,7 @@ contract('ATMI ERC Compliance', accounts => {
   const initalSupply = 1000000000 * multiplier
 
   beforeEach(async () => {
-    ctx.contracts.atonomi = await AtonomiToken.new(
-      tokenName, tokenSymbol, initalSupply, tokenDecimals, false,
-      {from: ctx.actors.owner})
-
-    ctx.contracts.atonomi.setReleaseAgent(ctx.actors.releaseAgent, {from: ctx.actors.owner})
-    ctx.contracts.atonomi.releaseTokenTransfer({from: ctx.actors.releaseAgent})
-
+    ctx.contracts.atonomi = await init.getAtonomiTokenContract(ctx.actors.owner, ctx.actors.releaseAgent)
     ctx.contracts.receiverMock = await MockContractReceiver.new({from: ctx.actors.owner})
   })
 
@@ -122,7 +111,7 @@ contract('ATMI ERC Compliance', accounts => {
       const aliceBalance = await ctx.contracts.atonomi.balanceOf.call(ctx.actors.alice)
       expect(aliceBalance.toNumber()).to.be.lessThan(transferAmount)
       const fn = ctx.contracts.atonomi.transfer(ctx.actors.bob, transferAmount, { from: ctx.actors.alice })
-      await expectRevert(fn)
+      await errors.expectRevert(fn)
     })
   })
 
@@ -197,7 +186,7 @@ contract('ATMI ERC Compliance', accounts => {
       const transferData = ethjsABI.encodeMethod(abiMethod, [ctx.contracts.receiverMock.contract.address, transferAmount, callbackData])
 
       const fn = ctx.contracts.atonomi.sendTransaction({from: ctx.actors.alice, data: transferData})
-      await expectRevert(fn)
+      await errors.expectRevert(fn)
     })
   })
 
@@ -369,7 +358,7 @@ contract('ATMI ERC Compliance', accounts => {
       expect(allowance.toNumber()).to.be.equal(0)
 
       const fn = ctx.contracts.atonomi.transferFrom(ctx.actors.owner, ctx.actors.bob, transferAmount, { from: ctx.actors.alice })
-      await expectRevert(fn)
+      await errors.expectRevert(fn)
     })
 
     it('can not transfer more than allowed', async () => {
@@ -380,7 +369,7 @@ contract('ATMI ERC Compliance', accounts => {
       expect(allowance.toNumber()).to.be.lessThan(badAmount)
 
       const fn = ctx.contracts.atonomi.transferFrom(ctx.actors.owner, ctx.actors.bob, badAmount, { from: ctx.actors.alice })
-      await expectRevert(fn)
+      await errors.expectRevert(fn)
     })
 
     it('can not transfer with insufficient funds', async () => {
@@ -390,7 +379,7 @@ contract('ATMI ERC Compliance', accounts => {
       expect(balance.toNumber()).to.be.lessThan(transferAmount)
 
       const fn = ctx.contracts.atonomi.transferFrom(ctx.actors.alice, ctx.actors.bob, transferAmount, { from: ctx.actors.bob })
-      await expectRevert(fn)
+      await errors.expectRevert(fn)
     })
   })
 
@@ -468,7 +457,7 @@ contract('ATMI ERC Compliance', accounts => {
       const transferData = ethjsABI.encodeMethod(abiMethod, [ctx.actors.owner, ctx.contracts.receiverMock.contract.address, transferAmount, callbackData])
 
       const fn = ctx.contracts.atonomi.sendTransaction({from: ctx.actors.alice, data: transferData})
-      await expectRevert(fn)
+      await errors.expectRevert(fn)
     })
 
     it('can not transfer more than allowed', async () => {
@@ -484,7 +473,7 @@ contract('ATMI ERC Compliance', accounts => {
       const transferData = ethjsABI.encodeMethod(abiMethod, [ctx.actors.owner, ctx.contracts.receiverMock.contract.address, badAmount, callbackData])
 
       const fn = ctx.contracts.atonomi.sendTransaction({from: ctx.actors.alice, data: transferData})
-      await expectRevert(fn)
+      await errors.expectRevert(fn)
     })
 
     it('can not transfer with insufficient funds', async () => {
@@ -498,7 +487,7 @@ contract('ATMI ERC Compliance', accounts => {
       const transferData = ethjsABI.encodeMethod(abiMethod, [ctx.actors.alice, ctx.contracts.receiverMock.contract.address, transferAmount, callbackData])
 
       const fn = ctx.contracts.atonomi.sendTransaction({from: ctx.actors.bob, data: transferData})
-      await expectRevert(fn)
+      await errors.expectRevert(fn)
     })
   })
 })
