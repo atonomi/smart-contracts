@@ -4,10 +4,13 @@ function waitForTransactionReceipt (hash, callback) {
   var receipt = web3.eth.getTransactionReceipt(hash)
   if (receipt === null) {
       setTimeout(function () {
-      console.log('retry after 5 seconds...')
-      waitForTransactionReceipt(hash, callback)
+        console.log('retry after 5 seconds...')
+        waitForTransactionReceipt(hash)
       }, 5000)
   } else {
-      callback(receipt)
+      if(callback) {
+        console.log('mined!')
+        callback(receipt)
+      }
   }
 }
