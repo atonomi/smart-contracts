@@ -3,6 +3,7 @@ pragma solidity ^0.4.21;
 import "zeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import "zeppelin-solidity/contracts/Ownership/Ownable.sol";
 
+
 /**
  * @title ERC827 interface, an extension of ERC20 token standard
  *
@@ -23,46 +24,37 @@ contract ERC827 is ERC20 {
 * @dev exposes state and functions of devices
 * @dev ownable by the Parity/IRN node that write it
 */
-contract Atonomi is Ownable{
-
-
+contract Atonomi is Ownable {
     /*
-    * STATE VARIABLES
-    */
-
+     * STATE VARIABLES
+     */
     uint256 public activationFee;
-
     uint256 public registrationFee;
-
     uint256 public reputationReward;
-
     ERC827 public token;
-    
 
     /*
-    * STORAGE MAPPINGS 
-    */
+     * STORAGE MAPPINGS 
+     */
 
     /* 
-    * @dev key: deviceId hash, value: Device Struct
-    */
+     * @dev key: deviceId hash, value: Device Struct
+     */
     mapping (bytes32 => Device) registeredDevices;
 
     /* 
-    * @dev key: deviceId (in the clear), value: Device Struct
-    */
+     * @dev key: deviceId (in the clear), value: Device Struct
+     */
     mapping (bytes32 => Device) activatedDevices;
     
     /*
-    * @dev key: address, value: WhitelistMember Struct
-    */
+     * @dev key: address, value: WhitelistMember Struct
+     */
     mapping (address => WhitelistMember) whitelist;
 
-
     /*
-    * TYPES 
-    */
-
+     * TYPES 
+     */
     struct Device {
         bytes32 hardwarePublicKey;
         bytes32 manufacturerId;
@@ -79,15 +71,12 @@ contract Atonomi is Ownable{
         bytes32 memberId;
     }
 
-    
     /*
-    * MODIFIERS 
-    */
-
+     * MODIFIERS 
+     */
     /*
-    * @dev Throw if called by any account that's not whitelisted under the respective flag.
-    */
-
+     * @dev Throw if called by any account that's not whitelisted under the respective flag.
+     */
     modifier onlyManufacturer() {
         require(whitelist[msg.sender].isManufacturer);
         _;
@@ -104,15 +93,15 @@ contract Atonomi is Ownable{
     }
 
     /*
-    * CONSTRUCTOR
-    *
-    * @dev initializes a device management contract to manage ATMI transactions across devices
-    * @param atonomi token address
-    * @param registration fee
-    * @param activation fee
-    */
-    function Atonomi (address _token, uint256 _activationFee, uint256 _registrationFee, uint256 _reputationReward) public {
-
+     * CONSTRUCTOR
+     * @dev initializes a device management contract to manage ATMI transactions across devices
+     * @param atonomi token address
+     * @param registration fee
+     * @param activation fee
+     */
+    function Atonomi (address _token, uint256 _registrationFee, uint256 _activationFee, uint256 _reputationReward)
+        public 
+    {
         require(_token != address(0));
         require(_activationFee > 0);
         require(_registrationFee > 0);
@@ -122,8 +111,6 @@ contract Atonomi is Ownable{
         activationFee = _activationFee;
         registrationFee = _registrationFee;
         reputationReward = _reputationReward;
-
-        whitelist[msg.sender] = WhitelistMember(true, false, true, "");
     }
 
 
