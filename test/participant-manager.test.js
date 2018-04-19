@@ -44,6 +44,28 @@ contract('Atonomi Network Participant Manager', accounts => {
     })
   })
 
+  describe('add IRN node', () => {
+    it('owner can add', async () => {
+    })
+
+    it('irn admin can add', async () => {
+    })
+
+    it('external accounts can not add', async () => {
+    })
+  })
+
+  describe('remove IRN node', () => {
+    it('owner can remove', async () => {
+    })
+
+    it('irn admin can remove', async () => {
+    })
+
+    it('external accounts can not remove', async () => {
+    })
+  })
+
   describe('add MFG', () => {
     it('owner can add', async () => {
     })
@@ -79,14 +101,11 @@ contract('Atonomi Network Participant Manager', accounts => {
     it('IRN admin can reputation reward set fee', async () => {})
   })
 
-  describe('tokens', () => {
-    it('owner can withdraw any erc token', async () => {
+  describe('token management', () => {
+    it('IRN Node can withdraw tokens from their own balance', async () => {
     })
 
-    it('external accounts can not withdraw', async () => {
-    })
-
-    it('anyone can deposit tokens', async () => {
+    it('external accounts can not withdraw from token pool', async () => {
     })
   })
 })
