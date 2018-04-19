@@ -62,6 +62,10 @@ contract('Atonomi Network Participant Manager', accounts => {
     it('IRN admin can remove', async () => {
     })
 
+    it('IRN admin can change address', async() => {
+      // this test might not be needed if UI can simply do a remove and add
+    })
+
     it('external accounts can not remove', async () => {
     })
   })
