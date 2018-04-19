@@ -7,6 +7,7 @@ function waitForTransactionReceipt (tag, hash) {
         waitForTransactionReceipt(tag, hash)
       }, 10000)
   } else {
-    console.log(tag, receipt)
+    console.log('Mined', tag)
+    console.log(receipt)
   }
 }
