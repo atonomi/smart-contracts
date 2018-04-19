@@ -1,14 +1,12 @@
 // helper function to wait for mining times
-function waitForTransactionReceipt (hash, callback) {
-  console.log('waiting for txn to be mined...')
+function waitForTransactionReceipt (tag, hash) {
   var receipt = web3.eth.getTransactionReceipt(hash)
   if (receipt === null) {
+    console.log('retry after 10 seconds...')
       setTimeout(function () {
-        console.log('retry after 5 seconds...')
-        waitForTransactionReceipt(hash, callback)
-      }, 5000)
+        waitForTransactionReceipt(tag, hash)
+      }, 10000)
   } else {
-    console.log('mined!')
-    callback(receipt)
+    console.log(tag, receipt)
   }
 }
