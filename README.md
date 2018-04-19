@@ -74,7 +74,8 @@ $ ./geth-attach.sh
 
 This will drop you into a geth console that will have preloaded the Atonomi constants and abi needed for contract deployment.
 
-To deploy the mock ATMI token contract
+To deploy the ATMI token contract run the following: 
+NOTE: if ATMI_ADDR is set, it will connect to the existing contract at that address.  (Same with SAFEMATHLIB_ADDR)
 
 ```
 > loadScript('scripts/deploy-atmi-token.js')
