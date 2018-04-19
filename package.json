@@ -46,6 +46,7 @@
     "test:coverage": "(npm run compile) && touch allFiredEvents && (SOLIDITY_COVERAGE=true solidity-coverage)",
     "lint": "standard --verbose | snazzy",
     "lint:sol": "solhint contracts/*.sol contracts/**/*.sol",
+    "etherscan:SafeMathLib": "truffle-flattener contracts/tokenmarket/SafeMathLib.sol",
     "etherscan:ATMI": "truffle-flattener contracts/tokenmarket/AMLToken.sol"
   },
   "standard": {
