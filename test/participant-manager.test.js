@@ -78,4 +78,15 @@ contract('Atonomi Network Participant Manager', accounts => {
     it('owner can set reputation reward fee', async () => {})
     it('IRN admin can reputation reward set fee', async () => {})
   })
+
+  describe('tokens', () => {
+    it('owner can withdraw any erc token', async () => {
+    })
+
+    it('external accounts can not withdraw', async () => {
+    })
+
+    it('anyone can deposit tokens', async () => {
+    })
+  })
 })
