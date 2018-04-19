@@ -69,4 +69,13 @@ contract('Atonomi Network Participant Manager', accounts => {
     it('external accounts can not remove', async () => {
     })
   })
+
+  describe('fee management', () => {
+    it('owner can set registration fee', async () => {})
+    it('IRN admin can registration set fee', async () => {})
+    it('owner can set activation fee', async () => {})
+    it('IRN admin can activation set fee', async () => {})
+    it('owner can set reputation reward fee', async () => {})
+    it('IRN admin can reputation reward set fee', async () => {})
+  })
 })
