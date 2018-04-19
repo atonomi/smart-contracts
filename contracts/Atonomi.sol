@@ -3,17 +3,20 @@ pragma solidity ^0.4.21;
 import "zeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import "zeppelin-solidity/contracts/Ownership/Ownable.sol";
 
-/**
- * @title ERC827 interface, an extension of ERC20 token standard
- *
- * @dev Interface of a ERC827 token, following the ERC20 standard with extra
- * @dev methods to transfer value and data and execute calls in transfers and
- * @dev approvals.
- */
-contract ERC827 is ERC20 {
-  function approve(address _spender, uint256 _value, bytes _data) public returns (bool);
-  function transfer(address _to, uint256 _value, bytes _data) public returns (bool);
-  function transferFrom(address _from, address _to, uint256 _value, bytes _data) public returns (bool);
+// ----------------------------------------------------------------------------
+// ERC Token Standard #20 Interface
+// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
+// ----------------------------------------------------------------------------
+contract ERC20Interface {
+    function totalSupply() public constant returns (uint);
+    function balanceOf(address tokenOwner) public constant returns (uint balance);
+    function allowance(address tokenOwner, address spender) public constant returns (uint remaining);
+    function transfer(address to, uint tokens) public returns (bool success);
+    function approve(address spender, uint tokens) public returns (bool success);
+    function transferFrom(address from, address to, uint tokens) public returns (bool success);
+
+    event Transfer(address indexed from, address indexed to, uint tokens);
+    event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
 }
 
 
@@ -25,7 +28,6 @@ contract ERC827 is ERC20 {
 */
 contract Atonomi is Ownable{
 
-
     /*
     * STATE VARIABLES
     */
@@ -36,7 +38,7 @@ contract Atonomi is Ownable{
 
     uint256 public reputationReward;
 
-    ERC827 public token;
+    ERC20 public token;
     
 
     /*
@@ -47,6 +49,11 @@ contract Atonomi is Ownable{
     * @dev key: deviceId hash, value: Device Struct
     */
     mapping (bytes32 => Device) registeredDevices;
+
+    /* 
+    * @dev key: deviceId (hahsed with msg.sender), value: Device Struct
+    */
+    mapping (bytes32 => Device) activationPool;
 
     /* 
     * @dev key: deviceId (in the clear), value: Device Struct
@@ -67,15 +74,14 @@ contract Atonomi is Ownable{
         bytes32 hardwarePublicKey;
         bytes32 manufacturerId;
         bool registered;
-        bool readyToActivate;
         bool activated;
         bytes reputation;
     }
 
     struct WhitelistMember {
-        bool isIRN;
+        bool isIRNAdmin;
         bool isManufacturer;
-        bool isReputationManager;
+        bool isIRNNode;
         bytes32 memberId;
     }
 
@@ -94,12 +100,12 @@ contract Atonomi is Ownable{
     }
 
     modifier onlyIRN() {
-        require(whitelist[msg.sender].isIRN);
+        require(whitelist[msg.sender].isIRNAdmin);
         _;
     }
 
     modifier onlyReputationManager() {
-        require(whitelist[msg.sender].isReputationManager);
+        require(whitelist[msg.sender].isIRNNode);
         _;
     }
 
@@ -118,7 +124,7 @@ contract Atonomi is Ownable{
         require(_registrationFee > 0);
         require(_reputationReward > 0);
 
-        token = ERC827(_token);
+        token = ERC20(_token);
         activationFee = _activationFee;
         registrationFee = _registrationFee;
         reputationReward = _reputationReward;
@@ -135,39 +141,39 @@ contract Atonomi is Ownable{
     * @dev on activation hash
     * @param deviceId
     */
-    event ActivationPaid(bytes32 deviceHashKey, address _sender);
+    event ActivationPaid(address indexed _sender, bytes32 indexed deviceHashKey);
 
     /* 
     * @dev on activation commit
     * @param deviceId
     */
-    event ActivationComplete(bytes32 deviceId, address _sender);
+    event ActivationComplete(address indexed _sender, bytes32 indexed deviceId);
 
     /*
     * @dev on successful registration
     * @param deviceId
     */
-    event RegistrationComplete(bytes32 deviceHashKey, address _sender);
+    event RegistrationComplete(address indexed _sender, bytes32 indexed deviceHashKey);
 
     /*
     * TODO natspec
     */
-    event WhitelistMemberAdded(address _address, bytes32 _memberId, address _sender);
+    event WhitelistMemberAdded(address indexed _sender, address indexed _member, bytes32 indexed _memberId);
 
     /*
     * TODO natspec
     */
-    event WhitelistMemberRemoved(address _address, bytes32 _memberId, address _sender);
+    event WhitelistMemberRemoved(address indexed _sender, address indexed _member, bytes32 indexed _memberId);
     
     /*
     * TODO natspec
     */
-    event Withdrawal(address _address, uint256 _amount);
+    event Withdrawal(address _sender, uint256 _amount);
     
      /*
     * TODO natspec
     */
-    event ReputationUpdated(bytes32 _deviceId, bytes _newScore, address _spender);
+    event ReputationUpdated( address indexed _sender, bytes32 indexed _deviceId, bytes _newScore);
     
     
     /*
@@ -179,17 +185,20 @@ contract Atonomi is Ownable{
     */
     function registerDevice (bytes32 _deviceIdHash, bytes32 _hardwarePublicKey, bytes32 _manufacturerId) onlyManufacturer public {
 
+        require(_deviceIdHash != 0);
+        require(_hardwarePublicKey != 0);
+        
         require(whitelist[msg.sender].memberId == _manufacturerId);
 
-        Device memory device = Device(_hardwarePublicKey, _manufacturerId, true, false, false, "");
+        Device memory device = Device(_hardwarePublicKey, _manufacturerId, true, false, "");
 
         bytes32 deviceHashKey = keccak256(_deviceIdHash);
 
         registeredDevices[deviceHashKey] = device;
 
-        emit RegistrationComplete(deviceHashKey, msg.sender);
+        require(token.transferFrom(msg.sender, address(this), registrationFee));
 
-        token.transferFrom(msg.sender, address(this), registrationFee);
+        emit RegistrationComplete(msg.sender, deviceHashKey);
     }
 
     /*
@@ -201,11 +210,11 @@ contract Atonomi is Ownable{
         
         bytes32 deviceHashKey = keccak256(_deviceId, msg.sender);
 
-        registeredDevices[keccak256(_deviceId)].readyToActivate = true;
+        activationPool[deviceHashKey] = registeredDevices[deviceHashKey];
 
-        token.transferFrom(msg.sender, address(this), activationFee);
+        require(token.transferFrom(msg.sender, address(this), activationFee));
 
-        emit ActivationPaid(deviceHashKey, msg.sender);
+        emit ActivationPaid(msg.sender, deviceHashKey);
     }
 
     /*
@@ -215,15 +224,13 @@ contract Atonomi is Ownable{
 
         bytes32 deviceHashKey = keccak256(_deviceId, msg.sender);
         
-        require(registeredDevices[keccak256(_deviceId)].readyToActivate == true);
-        
-        require(activatedDevices[deviceHashKey].activated);
+        require(activationPool[deviceHashKey].registered == true);
 
-        activatedDevices[_deviceId] = registeredDevices[deviceHashKey];
+        activatedDevices[_deviceId] = activationPool[deviceHashKey];
 
         activatedDevices[_deviceId].activated = true;
 
-        emit ActivationComplete(_deviceId, msg.sender);
+        emit ActivationComplete(msg.sender, _deviceId);
     }
 
 
@@ -237,17 +244,19 @@ contract Atonomi is Ownable{
         require(_hardwarePublicKey[0] != 0);
         require(_manufacturerId[0] != 0);
 
-        Device memory device = Device(_hardwarePublicKey, _manufacturerId, true, true, true, "");
+        Device memory device = Device(_hardwarePublicKey, _manufacturerId, true, true, "");
 
         bytes32 deviceHashKey = keccak256(_deviceId);
 
         registeredDevices[deviceHashKey] = device;
-        emit RegistrationComplete(deviceHashKey, msg.sender);
+        
+        emit RegistrationComplete(msg.sender, deviceHashKey);
 
         activatedDevices[_deviceId] = device;
-        emit ActivationComplete(_deviceId, msg.sender);
 
-        token.transferFrom(msg.sender, address(this), registrationFee + activationFee);
+        require(token.transferFrom(msg.sender, address(this), registrationFee + activationFee));
+
+        emit ActivationComplete(msg.sender, _deviceId);
     }
 
 
@@ -265,9 +274,9 @@ contract Atonomi is Ownable{
 
         activatedDevices[_deviceId].reputation = _reputationScore;
 
-        token.transferFrom(msg.sender, address(this), reputationReward);
+        require(token.transferFrom(msg.sender, address(this), reputationReward));
         
-        emit ReputationUpdated(_deviceId, _reputationScore, msg.sender);
+        emit ReputationUpdated(msg.sender, _deviceId, _reputationScore);
     }
 
 
@@ -278,20 +287,22 @@ contract Atonomi is Ownable{
     /**
      * @dev add a member to the whitelist
      * @param _address address
-     * @param _isIRN bool
+     * @param _isIRNAdmin bool
      * @param _isManufacturer bool
      * @param _memberId bytes32
      * @return true if the address was added to the whitelist, false if the address was already in the whitelist
     */ 
-    function addWhitelistMember(address _address, bool _isIRN, bool _isManufacturer, bool _isReputationManager, bytes32 _memberId) onlyIRN public returns(bool success) {   
+    function addWhitelistMember(address _address, bool _isIRNAdmin, bool _isManufacturer, bool _isIRNNode, bytes32 _memberId) onlyIRN public returns(bool success) {   
       
-      require(!whitelist[_address].isIRN && !whitelist[_address].isManufacturer && !whitelist[_address].isReputationManager);
+      require(!whitelist[_address].isIRNAdmin);
+      require(!whitelist[_address].isManufacturer);
+      require(!whitelist[_address].isIRNNode);
       
-      WhitelistMember memory whitelistMember = WhitelistMember(_isIRN, _isManufacturer, _isReputationManager, _memberId);
+      WhitelistMember memory whitelistMember = WhitelistMember(_isIRNAdmin, _isManufacturer, _isIRNNode, _memberId);
 
       whitelist[_address] = whitelistMember;
 
-      emit WhitelistMemberAdded(_address, _memberId, msg.sender);
+      emit WhitelistMemberAdded(msg.sender, _address, _memberId);
 
       success = true;
     }   
@@ -308,7 +319,7 @@ contract Atonomi is Ownable{
 
       delete whitelist[_address];
 
-      emit WhitelistMemberRemoved(_address, memberId, msg.sender);
+      emit WhitelistMemberRemoved(msg.sender, _address, memberId);
 
       success = true;
     }
@@ -318,8 +329,8 @@ contract Atonomi is Ownable{
     */
     function withdraw(uint256 _amount) onlyOwner public{
 
+        require(token.transferFrom(msg.sender, address(this), _amount));
+        
         emit Withdrawal(msg.sender, _amount);
-
-        token.transferFrom(address(this), msg.sender, _amount);
     }
 }
