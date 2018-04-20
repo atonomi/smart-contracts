@@ -62,13 +62,6 @@ contract Atonomi is Ownable{
     */
     mapping (address => WhitelistMember) whitelist;
 
-
-    /*
-    * BALANCE MAPPING 
-    * TODO NATSPEC
-    */
-    mapping (address => uint256) balances;
-
     /*
      * TYPES 
      */
@@ -194,8 +187,6 @@ contract Atonomi is Ownable{
         registeredDevices[deviceHashKey] = device;
 
         require(token.transferFrom(msg.sender, address(this), registrationFee));
-
-        balances(msg.sender) += registrationFee;
 
         emit RegistrationComplete(msg.sender, deviceHashKey);
     }
@@ -323,7 +314,7 @@ contract Atonomi is Ownable{
       success = true;
     }
 
-    /* 
+    /*
     * TODO natspec
     */
     function withdraw(uint256 _amount) onlyOwner public{
