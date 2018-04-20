@@ -1,5 +1,6 @@
 pragma solidity ^0.4.21;
 
+import "zeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import "zeppelin-solidity/contracts/Ownership/Ownable.sol";
 
 // ----------------------------------------------------------------------------
@@ -25,7 +26,8 @@ contract ERC20Interface {
 * @dev exposes state and functions of devices
 * @dev ownable by the Parity/IRN node that write it
 */
-contract Atonomi is Ownable {
+contract Atonomi is Ownable{
+
     /*
      * STATE VARIABLES
      */
@@ -33,7 +35,7 @@ contract Atonomi is Ownable {
     uint256 public registrationFee;
     uint256 public reputationReward;
 
-    ERC20Interface public token;
+    ERC20 public token;
     
 
     /*
@@ -56,9 +58,16 @@ contract Atonomi is Ownable {
     mapping (bytes32 => Device) activatedDevices;
     
     /*
-     * @dev key: address, value: WhitelistMember Struct
-     */
+    * @dev key: address, value: WhitelistMember Struct
+    */
     mapping (address => WhitelistMember) whitelist;
+
+
+    /*
+    * BALANCE MAPPING 
+    * TODO NATSPEC
+    */
+    mapping (address => uint256) balances;
 
     /*
      * TYPES 
@@ -114,7 +123,7 @@ contract Atonomi is Ownable {
         require(_registrationFee > 0);
         require(_reputationReward > 0);
 
-        token = ERC20Interface(_token);
+        token = ERC20(_token);
         activationFee = _activationFee;
         registrationFee = _registrationFee;
         reputationReward = _reputationReward;
@@ -185,6 +194,8 @@ contract Atonomi is Ownable {
         registeredDevices[deviceHashKey] = device;
 
         require(token.transferFrom(msg.sender, address(this), registrationFee));
+
+        balances(msg.sender) += registrationFee;
 
         emit RegistrationComplete(msg.sender, deviceHashKey);
     }
@@ -267,9 +278,11 @@ contract Atonomi is Ownable {
         emit ReputationUpdated(msg.sender, _deviceId, _reputationScore);
     }
 
+
     /*
     * WHITELIST ADD/REMOVE LOGIC
     */
+
     /**
      * @dev add a member to the whitelist
      * @param _address address
