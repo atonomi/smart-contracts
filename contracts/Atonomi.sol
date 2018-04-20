@@ -3,7 +3,6 @@ pragma solidity ^0.4.21;
 import "zeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import "zeppelin-solidity/contracts/Ownership/Ownable.sol";
 
-<<<<<<< HEAD
 // ----------------------------------------------------------------------------
 // ERC Token Standard #20 Interface
 // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
@@ -18,20 +17,6 @@ contract ERC20Interface {
 
     event Transfer(address indexed from, address indexed to, uint tokens);
     event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
-=======
-
-/**
- * @title ERC827 interface, an extension of ERC20 token standard
- *
- * @dev Interface of a ERC827 token, following the ERC20 standard with extra
- * @dev methods to transfer value and data and execute calls in transfers and
- * @dev approvals.
- */
-contract ERC827 is ERC20 {
-  function approve(address _spender, uint256 _value, bytes _data) public returns (bool);
-  function transfer(address _to, uint256 _value, bytes _data) public returns (bool);
-  function transferFrom(address _from, address _to, uint256 _value, bytes _data) public returns (bool);
->>>>>>> 1e434ee3d7af1a7aee4e12dfba122f439ab2d116
 }
 
 
@@ -41,25 +26,17 @@ contract ERC827 is ERC20 {
 * @dev exposes state and functions of devices
 * @dev ownable by the Parity/IRN node that write it
 */
-<<<<<<< HEAD
 contract Atonomi is Ownable{
 
-=======
-contract Atonomi is Ownable {
->>>>>>> 1e434ee3d7af1a7aee4e12dfba122f439ab2d116
     /*
      * STATE VARIABLES
      */
     uint256 public activationFee;
     uint256 public registrationFee;
     uint256 public reputationReward;
-<<<<<<< HEAD
 
     ERC20 public token;
     
-=======
-    ERC827 public token;
->>>>>>> 1e434ee3d7af1a7aee4e12dfba122f439ab2d116
 
     /*
      * STORAGE MAPPINGS 
@@ -71,7 +48,6 @@ contract Atonomi is Ownable {
     mapping (bytes32 => Device) registeredDevices;
 
     /* 
-<<<<<<< HEAD
     * @dev key: deviceId (hahsed with msg.sender), value: Device Struct
     */
     mapping (bytes32 => Device) activationPool;
@@ -79,10 +55,6 @@ contract Atonomi is Ownable {
     /* 
     * @dev key: deviceId (in the clear), value: Device Struct
     */
-=======
-     * @dev key: deviceId (in the clear), value: Device Struct
-     */
->>>>>>> 1e434ee3d7af1a7aee4e12dfba122f439ab2d116
     mapping (bytes32 => Device) activatedDevices;
     
     /*
