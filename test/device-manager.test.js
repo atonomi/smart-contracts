@@ -3,7 +3,7 @@ const init = require('./helpers/init')
 const web3Utils = require('web3-utils')
 const MockSolHash = artifacts.require('MockSolHash')
 
-contract('Atonomi Device Manager', accounts => {
+contract('Device Management', accounts => {
   const ctx = {
     actors: init.getTestActorsContext(accounts),
     contracts: {
@@ -32,23 +32,6 @@ contract('Atonomi Device Manager', accounts => {
       const hash = web3Utils.soliditySha3({t: 'bytes', v: web3.fromAscii('test2')})
       const solHash = await ctx.contracts.mockSolHash.solHash.call('test')
       expect(hash).not.to.be.equal(solHash)
-    })
-  })
-
-  describe('initialized', () => {
-    it('has owner', async () => {
-    })
-
-    it('has ERC827 Token', async () => {
-    })
-
-    it('has activation fee', async () => {
-    })
-
-    it('has registration fee', async () => {
-    })
-
-    it('has reputation reward', async () => {
     })
   })
 
