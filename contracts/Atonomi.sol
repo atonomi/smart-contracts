@@ -324,8 +324,10 @@ contract Atonomi is Ownable{
       success = true;
     }
 
-    /*
-    * TODO natspec
+    /* 
+    * @notice withdraw fund accumulated in the contract to an Atonomi or partner IRN wallet
+    * @dev accessible tothe owner of the contract only
+    * @param _amount uint256 withdrawal amount
     */
     function withdraw(uint256 _amount) onlyOwner public{
         
