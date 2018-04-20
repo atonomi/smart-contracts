@@ -22,7 +22,7 @@ contract ERC20Interface {
 
 /* 
 * @title Atonomi Contract
-* @notice governs the activation and regsitration of devices, as well as whitelisting of IRN nodes and manufacturers.
+* @notice governs the activation and regsitration of devices, as well as networking of IRN nodes and manufacturers.
 * @dev exposes state and functions of devices
 * @dev ownable by the Parity/IRN node that write it
 */
@@ -58,9 +58,9 @@ contract Atonomi is Ownable{
     mapping (bytes32 => Device) activatedDevices;
     
     /*
-    * @dev key: address, value: WhitelistMember Struct
+    * @dev key: address, value: NetworkMember Struct
     */
-    mapping (address => WhitelistMember) whitelist;
+    mapping (address => NetworkMember) network;
 
     /*
      * TYPES 
@@ -73,31 +73,32 @@ contract Atonomi is Ownable{
         bytes reputation;
     }
 
-    struct WhitelistMember {
+    struct NetworkMember {
         bool isIRNAdmin;
         bool isManufacturer;
         bool isIRNNode;
         bytes32 memberId;
+        int256 balance;
     }
 
     /*
      * MODIFIERS 
      */
     /*
-     * @dev Throw if called by any account that's not whitelisted under the respective flag.
+     * @dev Throw if called by any account that's not networked under the respective flag.
      */
     modifier onlyManufacturer() {
-        require(whitelist[msg.sender].isManufacturer);
+        require(network[msg.sender].isManufacturer);
         _;
     }
 
     modifier onlyIRN() {
-        require(whitelist[msg.sender].isIRNAdmin);
+        require(network[msg.sender].isIRNAdmin);
         _;
     }
 
     modifier onlyReputationManager() {
-        require(whitelist[msg.sender].isIRNNode);
+        require(network[msg.sender].isIRNNode);
         _;
     }
 
@@ -148,12 +149,12 @@ contract Atonomi is Ownable{
     /*
     * TODO natspec
     */
-    event WhitelistMemberAdded(address indexed _sender, address indexed _member, bytes32 indexed _memberId);
+    event NetworkMemberAdded(address indexed _sender, address indexed _member, bytes32 indexed _memberId);
 
     /*
     * TODO natspec
     */
-    event WhitelistMemberRemoved(address indexed _sender, address indexed _member, bytes32 indexed _memberId);
+    event NetworkMemberRemoved(address indexed _sender, address indexed _member, bytes32 indexed _memberId);
     
     /*
     * TODO natspec
@@ -178,13 +179,15 @@ contract Atonomi is Ownable{
         require(_deviceIdHash != 0);
         require(_hardwarePublicKey != 0);
         
-        require(whitelist[msg.sender].memberId == _manufacturerId);
+        require(network[msg.sender].memberId == _manufacturerId);
 
         Device memory device = Device(_hardwarePublicKey, _manufacturerId, true, false, "");
 
         bytes32 deviceHashKey = keccak256(_deviceIdHash);
 
         registeredDevices[deviceHashKey] = device;
+
+        network[msg.sender].balance -= registrationFee;
 
         require(token.transferFrom(msg.sender, address(this), registrationFee));
 
@@ -202,6 +205,8 @@ contract Atonomi is Ownable{
 
         activationPool[deviceHashKey] = registeredDevices[deviceHashKey];
 
+        network[msg.sender].balance -= activationFee;
+        
         require(token.transferFrom(msg.sender, address(this), activationFee));
 
         emit ActivationPaid(msg.sender, deviceHashKey);
@@ -244,6 +249,8 @@ contract Atonomi is Ownable{
 
         activatedDevices[_deviceId] = device;
 
+        network[msg.sender].balance -= (registrationFee + activationFee);
+
         require(token.transferFrom(msg.sender, address(this), registrationFee + activationFee));
 
         emit ActivationComplete(msg.sender, _deviceId);
@@ -275,41 +282,41 @@ contract Atonomi is Ownable{
     */
 
     /**
-     * @dev add a member to the whitelist
+     * @dev add a member to the network
      * @param _address address
      * @param _isIRNAdmin bool
      * @param _isManufacturer bool
      * @param _memberId bytes32
-     * @return true if the address was added to the whitelist, false if the address was already in the whitelist
+     * @return true if the address was added to the network, false if the address was already in the network
     */ 
-    function addWhitelistMember(address _address, bool _isIRNAdmin, bool _isManufacturer, bool _isIRNNode, bytes32 _memberId) onlyIRN public returns(bool success) {   
+    function addNetworkMember(address _address, bool _isIRNAdmin, bool _isManufacturer, bool _isIRNNode, bytes32 _memberId) onlyIRN public returns(bool success) {   
       
-      require(!whitelist[_address].isIRNAdmin);
-      require(!whitelist[_address].isManufacturer);
-      require(!whitelist[_address].isIRNNode);
+      require(!network[_address].isIRNAdmin);
+      require(!network[_address].isManufacturer);
+      require(!network[_address].isIRNNode);
       
-      WhitelistMember memory whitelistMember = WhitelistMember(_isIRNAdmin, _isManufacturer, _isIRNNode, _memberId);
+      NetworkMember memory networkMember = NetworkMember(_isIRNAdmin, _isManufacturer, _isIRNNode, _memberId, 0);
 
-      whitelist[_address] = whitelistMember;
+      network[_address] = networkMember;
 
-      emit WhitelistMemberAdded(msg.sender, _address, _memberId);
+      emit NetworkMemberAdded(msg.sender, _address, _memberId);
 
       success = true;
     }   
 
     /**
-     * @dev remove a member from the whitelist
+     * @dev remove a member from the network
      * @param _address address
-     * @return true if the address was removed from the whitelist,
-     * false if the address wasn't in the whitelist in the first place
+     * @return true if the address was removed from the network,
+     * false if the address wasn't in the network in the first place
      */ 
-    function removeWhitelistMember(address _address) onlyIRN public returns(bool success) {
+    function removeNetworkMember(address _address) onlyIRN public returns(bool success) {
 
-      bytes32 memberId = whitelist[_address].memberId;
+      bytes32 memberId = network[_address].memberId;
 
-      delete whitelist[_address];
+      delete network[_address];
 
-      emit WhitelistMemberRemoved(msg.sender, _address, memberId);
+      emit NetworkMemberRemoved(msg.sender, _address, memberId);
 
       success = true;
     }
@@ -318,6 +325,9 @@ contract Atonomi is Ownable{
     * TODO natspec
     */
     function withdraw(uint256 _amount) onlyOwner public{
+        
+        require(network[msg.sender].isIRNNode);
+        require(network[msg.sender].balance <= _amount);
 
         require(token.transferFrom(msg.sender, address(this), _amount));
         
