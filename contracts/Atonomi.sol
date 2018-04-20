@@ -58,7 +58,7 @@ contract Atonomi is Ownable {
     /*
      * @dev key: address, value: WhitelistMember Struct
      */
-    mapping (address => WhitelistMember) whitelist;
+    mapping (address => WhitelistMember) public whitelist;
 
     /*
      * TYPES 
@@ -85,17 +85,17 @@ contract Atonomi is Ownable {
      * @dev Throw if called by any account that's not whitelisted under the respective flag.
      */
     modifier onlyManufacturer() {
-        require(whitelist[msg.sender].isManufacturer);
+        require(msg.sender == owner || whitelist[msg.sender].isManufacturer);
         _;
     }
 
     modifier onlyIRN() {
-        require(whitelist[msg.sender].isIRNAdmin);
+        require(msg.sender == owner || whitelist[msg.sender].isIRNAdmin);
         _;
     }
 
     modifier onlyReputationManager() {
-        require(whitelist[msg.sender].isIRNNode);
+        require(msg.sender == owner || whitelist[msg.sender].isIRNNode);
         _;
     }
 
@@ -268,30 +268,32 @@ contract Atonomi is Ownable {
     }
 
     /*
-    * WHITELIST ADD/REMOVE LOGIC
-    */
+     * WHITELIST ADD/REMOVE LOGIC
+     */
     /**
      * @dev add a member to the whitelist
-     * @param _address address
+     * @param _member address
      * @param _isIRNAdmin bool
      * @param _isManufacturer bool
-     * @param _memberId bytes32
-     * @return true if the address was added to the whitelist, false if the address was already in the whitelist
-    */ 
-    function addWhitelistMember(address _address, bool _isIRNAdmin, bool _isManufacturer, bool _isIRNNode, bytes32 _memberId) onlyIRN public returns(bool success) {   
-      
-      require(!whitelist[_address].isIRNAdmin);
-      require(!whitelist[_address].isManufacturer);
-      require(!whitelist[_address].isIRNNode);
-      
-      WhitelistMember memory whitelistMember = WhitelistMember(_isIRNAdmin, _isManufacturer, _isIRNNode, _memberId);
+     * @param _isIRNAdmin bool
+     * @param _memberId bytes32 (i.e., manufacturer id, otherwise empty string)
+     * @return true if the address was added to the whitelist, otherwise false
+     */
+    function addWhitelistMember(address _member, bool _isIRNAdmin, bool _isManufacturer,
+        bool _isIRNNode, bytes32 _memberId) public onlyIRN returns(bool success)
+    {
+        require(_member != address(0));
+        require(_member != msg.sender);
+        require(!whitelist[_member].isIRNAdmin);
+        require(!whitelist[_member].isManufacturer);
+        require(!whitelist[_member].isIRNNode);
+        require(whitelist[_member].memberId == 0);
 
-      whitelist[_address] = whitelistMember;
+        whitelist[_member] = WhitelistMember(_isIRNAdmin, _isManufacturer, _isIRNNode, _memberId);
+        emit WhitelistMemberAdded(msg.sender, _member, _memberId);
 
-      emit WhitelistMemberAdded(msg.sender, _address, _memberId);
-
-      success = true;
-    }   
+        success = true;
+    }
 
     /**
      * @dev remove a member from the whitelist
