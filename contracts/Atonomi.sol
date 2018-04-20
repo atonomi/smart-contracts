@@ -121,11 +121,9 @@ contract Atonomi is Ownable {
         reputationReward = _reputationReward;
     }
 
-
     /*
     * EVENTS 
     */
-
     /*
     * @dev on successful registration
     * @param _sender manufacturer paying for registration
@@ -185,17 +183,15 @@ contract Atonomi is Ownable {
     * @param _manufacturerId  manufacturer id
     */
     event ManufacturerMapped(address indexed _sender, address indexed _irnNode, bytes32 indexed _manufacturerId);
-    
 
     /*
     * STATE VARIABLE SETTERS
     */
-
     /*
     * @dev sets the global activation fee
     * @param _activationFee
     */
-    function setActivationFee (uint256 _activationFee) onlyIRNorOwner public {
+    function setActivationFee (uint256 _activationFee) public onlyIRNorOwner {
         require(_activationFee > 0);
         activationFee = _activationFee;
     }
@@ -204,7 +200,7 @@ contract Atonomi is Ownable {
     * @dev sets the global registration fee
     * @param _registrationFee
     */
-    function setRegistrationFee (uint256 _registrationFee) onlyIRNorOwner public {
+    function setRegistrationFee (uint256 _registrationFee) public onlyIRNorOwner {
         require(_registrationFee > 0);
         registrationFee = _registrationFee;
     }
@@ -213,17 +209,14 @@ contract Atonomi is Ownable {
     * @dev sets the global reputation reward to be paid out for a submitted reputation score
     * @param _reputationReward
     */
-    function setReputationReward (uint256 _reputationReward) onlyIRNorOwner public {
+    function setReputationReward (uint256 _reputationReward) public onlyIRNorOwner {
         require(_reputationReward > 0);
         reputationReward = _reputationReward;
     }
 
-
-
     /*
     * DEVICE LOGIC
     */
-
     /*
     * @dev registers device with Atonomi by initialized the device and storing it on chain
     * @param _deviceIdHash keccak256 hash of the device's id
@@ -257,7 +250,9 @@ contract Atonomi is Ownable {
     * @param _deviceIdHashes array of keccak256 hashed ID's of each device
     * @param _hardwarePublicKeys arrauy of public keys of each physical device
     */
-    function registerDevices  (bytes32[] _deviceIdHashes, bytes32[] _hardwarePublicKeys) public onlyManufacturer returns (bool) {
+    function registerDevices  (bytes32[] _deviceIdHashes, bytes32[] _hardwarePublicKeys)
+        public onlyManufacturer returns (bool)
+    {
         require(_deviceIdHashes.length == _hardwarePublicKeys.length);
 
         uint256 runningBalance = 0;
@@ -267,14 +262,14 @@ contract Atonomi is Ownable {
             bytes32 deviceIdHash = _deviceIdHashes[i];
             bytes32 hardwarePublicKey = _hardwarePublicKeys[i];
 
-            if (deviceIdHash != 0 || hardwarePublicKey != 0){
+            if (deviceIdHash != 0 || hardwarePublicKey != 0) {
                 emit DeviceRegistrationFailed(msg.sender, deviceIdHash);
                 continue;
             }
 
             bytes32 manufacturerId = network[msg.sender].memberId;
             address irnAddress = iRNLookup[manufacturerId];
-            if(irnAddress != address(0)) {
+            if (irnAddress != address(0)) {
                 emit DeviceRegistrationFailed(msg.sender, deviceIdHash);
                 continue;
             }
