@@ -164,7 +164,7 @@ contract('Device Management', accounts => {
   })
 
   describe('reputation', () => {
-    it('IRN admin can set', async () => {
+    it('IRN node can set', async () => {
     })
 
     it('external accounts can not set', async () => {

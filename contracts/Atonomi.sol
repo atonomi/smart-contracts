@@ -95,7 +95,7 @@ contract Atonomi is Ownable {
     }
 
     modifier onlyReputationManager() {
-        require(msg.sender == owner || whitelist[msg.sender].isIRNNode);
+        require(whitelist[msg.sender].isIRNNode);
         _;
     }
 
