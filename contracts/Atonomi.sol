@@ -189,16 +189,18 @@ contract Atonomi is Ownable{
         require(_deviceIdHash != 0);
         require(_hardwarePublicKey != 0);
         
-        require(network[msg.sender].memberId == _manufacturerId);
+        bytes32 manufacturerId = network[msg.sender].memberId;
 
-        Device memory device = Device(_hardwarePublicKey, _manufacturerId, true, false, "");
+        require(network[msg.sender].memberId == manufacturerId);
+
+        Device memory device = Device(_hardwarePublicKey, manufacturerId, true, false, "");
 
         bytes32 deviceHashKey = keccak256(_deviceIdHash);
 
-        registeredDevices[_deviceIdHash] = Device(_hardwarePublicKey, whitelist[msg.sender].memberId, true, false, "");
+        registeredDevices[_deviceIdHash] = Device(_hardwarePublicKey, network[msg.sender].memberId, true, false, "");
         emit RegistrationComplete(msg.sender, _deviceIdHash);
 
-        network[iRNLookup[_manufacturerId]].balance  += registrationFee;
+        network[iRNLookup[manufacturerId]].balance  += registrationFee;
 
         require(token.transferFrom(msg.sender, address(this), registrationFee));
         return true;
