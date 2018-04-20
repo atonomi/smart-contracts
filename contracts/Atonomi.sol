@@ -88,17 +88,17 @@ contract Atonomi is Ownable{
      * @dev Throw if called by any account that's not networked under the respective flag.
      */
     modifier onlyManufacturer() {
-        require(network[msg.sender].isManufacturer);
+        require(msg.sender == owner || whitelist[msg.sender].isManufacturer);
         _;
     }
 
     modifier onlyIRN() {
-        require(network[msg.sender].isIRNAdmin);
+        require(msg.sender == owner || whitelist[msg.sender].isIRNAdmin);
         _;
     }
 
     modifier onlyReputationManager() {
-        require(network[msg.sender].isIRNNode);
+        require(msg.sender == owner || whitelist[msg.sender].isIRNNode);
         _;
     }
 
@@ -301,8 +301,8 @@ contract Atonomi is Ownable{
 
       emit NetworkMemberAdded(msg.sender, _address, _memberId);
 
-      success = true;
-    }   
+        success = true;
+    }
 
     /**
      * @dev remove a member from the network

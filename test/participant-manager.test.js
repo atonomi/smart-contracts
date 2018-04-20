@@ -72,12 +72,104 @@ contract('Participant Management', accounts => {
 
   describe('add IRN admin', () => {
     it('owner can add', async () => {
+      const isIrnAdmin = true
+      const isMFG = false
+      const isIrnNode = false
+      const memberId = ''
+
+      const success = await ctx.contracts.atonomi.addWhitelistMember.call(
+        ctx.actors.admin,
+        isIrnAdmin,
+        isMFG,
+        isIrnNode,
+        memberId,
+        { from: ctx.actors.owner })
+      expect(success).to.be.equal(true)
+
+      const tx = await ctx.contracts.atonomi.addWhitelistMember(
+        ctx.actors.admin,
+        isIrnAdmin,
+        isMFG,
+        isIrnNode,
+        memberId,
+        { from: ctx.actors.owner })
+
+      expect(tx.logs.length).to.be.equal(1)
+      const log = tx.logs[0]
+      expect(log.event).to.be.equal('WhitelistMemberAdded')
+      expect(log.args._sender).to.be.equal(ctx.actors.owner)
+      expect(log.args._member).to.be.equal(ctx.actors.admin)
+      expect(log.args._memberId).to.be.equal('0x0000000000000000000000000000000000000000000000000000000000000000')
+
+      const m = await ctx.contracts.atonomi.whitelist(ctx.actors.admin)
+      expect(m[0]).to.be.equal(isIrnAdmin)
+      expect(m[1]).to.be.equal(isMFG)
+      expect(m[2]).to.be.equal(isIrnNode)
+      expect(m[3]).to.be.equal('0x0000000000000000000000000000000000000000000000000000000000000000')
     })
 
     it('irn admin can add', async () => {
+      const owner = await ctx.contracts.atonomi.owner.call()
+      expect(ctx.actors.admin).not.to.be.equal(owner)
+      await ctx.contracts.atonomi.addWhitelistMember(ctx.actors.admin, true, false, false, '', {from: ctx.actors.owner})
+
+      const isIrnAdmin = true
+      const isMFG = false
+      const isIrnNode = false
+      const memberId = ''
+
+      const success = await ctx.contracts.atonomi.addWhitelistMember.call(
+        ctx.actors.alice,
+        isIrnAdmin,
+        isMFG,
+        isIrnNode,
+        memberId,
+        { from: ctx.actors.admin })
+      expect(success).to.be.equal(true)
+
+      const tx = await ctx.contracts.atonomi.addWhitelistMember(
+        ctx.actors.alice,
+        isIrnAdmin,
+        isMFG,
+        isIrnNode,
+        memberId,
+        { from: ctx.actors.admin })
+
+      expect(tx.logs.length).to.be.equal(1)
+      const log = tx.logs[0]
+      expect(log.event).to.be.equal('WhitelistMemberAdded')
+      expect(log.args._sender).to.be.equal(ctx.actors.admin)
+      expect(log.args._member).to.be.equal(ctx.actors.alice)
+      expect(log.args._memberId).to.be.equal('0x0000000000000000000000000000000000000000000000000000000000000000')
+
+      const m = await ctx.contracts.atonomi.whitelist(ctx.actors.alice)
+      expect(m[0]).to.be.equal(isIrnAdmin)
+      expect(m[1]).to.be.equal(isMFG)
+      expect(m[2]).to.be.equal(isIrnNode)
+      expect(m[3]).to.be.equal('0x0000000000000000000000000000000000000000000000000000000000000000')
     })
 
     it('external accounts can not add', async () => {
+      const owner = await ctx.contracts.atonomi.owner.call()
+      expect(ctx.actors.bob).not.to.be.equal(owner)
+
+      const m = await ctx.contracts.atonomi.whitelist(ctx.actors.bob)
+      expect(m[0]).not.to.equal(true)
+
+      const fn = ctx.contracts.atonomi.addWhitelistMember(ctx.actors.alice, true, false, false, '', {from: ctx.actors.bob})
+      await errors.expectRevert(fn)
+    })
+
+    it('owner can not add themselves', async () => {
+      const fn = ctx.contracts.atonomi.addWhitelistMember(ctx.actors.owner, true, false, false, '', {from: ctx.actors.owner})
+      await errors.expectRevert(fn)
+    })
+
+    it('irn admin can not add themselves', async () => {
+      ctx.contracts.atonomi.addWhitelistMember(ctx.actors.admin, true, false, false, '', {from: ctx.actors.owner})
+
+      const fn = ctx.contracts.atonomi.addWhitelistMember(ctx.actors.admin, true, false, false, '', {from: ctx.actors.admin})
+      await errors.expectRevert(fn)
     })
   })
 

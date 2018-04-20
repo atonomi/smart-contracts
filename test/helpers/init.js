@@ -3,7 +3,8 @@ export function getTestActorsContext (accounts) {
     owner: accounts[0],
     alice: accounts[1],
     bob: accounts[2],
-    releaseAgent: accounts[3]
+    releaseAgent: accounts[3],
+    admin: accounts[4]
   }
 }
 
