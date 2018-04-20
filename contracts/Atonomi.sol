@@ -43,7 +43,7 @@ contract Atonomi is Ownable {
     /* 
      * @dev key: deviceId hash, value: Device Struct
      */
-    mapping (bytes32 => Device) registeredDevices;
+    mapping (bytes32 => Device) public registeredDevices;
 
     /* 
     * @dev key: deviceId (hahsed with msg.sender), value: Device Struct
@@ -141,7 +141,7 @@ contract Atonomi is Ownable {
     * @dev on successful registration
     * @param deviceId
     */
-    event RegistrationComplete(address indexed _sender, bytes32 indexed deviceHashKey);
+    event RegistrationComplete(address indexed _sender, bytes32 indexed _deviceHashKey);
 
     /*
     * TODO natspec
@@ -171,22 +171,22 @@ contract Atonomi is Ownable {
     /*
     * TODO natspec
     */
-    function registerDevice (bytes32 _deviceIdHash, bytes32 _hardwarePublicKey, bytes32 _manufacturerId) onlyManufacturer public {
+    function registerDevice (bytes32 _deviceIdHash, bytes32 _hardwarePublicKey, bytes32 _manufacturerId) public onlyManufacturer returns (bool) {
+        // TODO: ERC827 approve implementation fails, when registerDevice is called
+        // msg.sender becomes the token contract. 
+        // potential solution, remove onlyManfucturer modifier, add require(msg.sender == address(token))
+        // and add whitelist[tx.origin].isManufacturer
+        // and replace msg.sender with tx.origin
 
         require(_deviceIdHash != 0);
         require(_hardwarePublicKey != 0);
-        
         require(whitelist[msg.sender].memberId == _manufacturerId);
 
-        Device memory device = Device(_hardwarePublicKey, _manufacturerId, true, false, "");
-
-        bytes32 deviceHashKey = keccak256(_deviceIdHash);
-
-        registeredDevices[deviceHashKey] = device;
+        registeredDevices[_deviceIdHash] = Device(_hardwarePublicKey, _manufacturerId, true, false, "");
+        emit RegistrationComplete(msg.sender, _deviceIdHash);
 
         require(token.transferFrom(msg.sender, address(this), registrationFee));
-
-        emit RegistrationComplete(msg.sender, deviceHashKey);
+        return true;
     }
 
     /*
@@ -198,6 +198,8 @@ contract Atonomi is Ownable {
         
         bytes32 deviceHashKey = keccak256(_deviceId, msg.sender);
 
+        // todo: key should be msg.sender
+        // activationPool[msg.sender][deviceid] = true
         activationPool[deviceHashKey] = registeredDevices[deviceHashKey];
 
         require(token.transferFrom(msg.sender, address(this), activationFee));
