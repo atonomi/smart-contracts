@@ -83,7 +83,7 @@ contract Atonomi is Ownable{
         bool isManufacturer;
         bool isIRNNode;
         bytes32 memberId;
-        int256 balance;
+        uint256 balance;
     }
 
     /*
@@ -93,17 +93,17 @@ contract Atonomi is Ownable{
      * @dev Throw if called by any account that's not networked under the respective flag.
      */
     modifier onlyManufacturer() {
-        require(msg.sender == owner || whitelist[msg.sender].isManufacturer);
+        require(msg.sender == owner || network[msg.sender].isManufacturer);
         _;
     }
 
     modifier onlyIRN() {
-        require(msg.sender == owner || whitelist[msg.sender].isIRNAdmin);
+        require(msg.sender == owner || network[msg.sender].isIRNAdmin);
         _;
     }
 
     modifier onlyReputationManager() {
-        require(msg.sender == owner || whitelist[msg.sender].isIRNNode);
+        require(msg.sender == owner || network[msg.sender].isIRNNode);
         _;
     }
 
@@ -192,7 +192,7 @@ contract Atonomi is Ownable{
 
         registeredDevices[deviceHashKey] = device;
 
-        network[iRNLookup[msg.sender]].balance  += registrationFee;
+        network[iRNLookup[_manufacturerId]].balance  += registrationFee;
 
         require(token.transferFrom(msg.sender, address(this), registrationFee));
 
@@ -210,7 +210,7 @@ contract Atonomi is Ownable{
 
         activationPool[deviceHashKey] = registeredDevices[deviceHashKey];
 
-        network[iRNLookup[msg.sender]].balance  += activationFee;
+        network[iRNLookup[activatedDevices[_deviceId].manufacturerId]].balance  += activationFee;
         
         require(token.transferFrom(msg.sender, address(this), activationFee));
 
@@ -254,7 +254,7 @@ contract Atonomi is Ownable{
 
         activatedDevices[_deviceId] = device;
 
-        network[iRNLookup[msg.sender]].balance += (registrationFee + activationFee);
+        network[iRNLookup[_manufacturerId]].balance += (registrationFee + activationFee);
 
         require(token.transferFrom(msg.sender, address(this), registrationFee + activationFee));
 
@@ -330,7 +330,7 @@ contract Atonomi is Ownable{
     function withdraw(uint256 _amount) onlyOwner public{
         
         require(network[msg.sender].isIRNNode);
-        require(network[iRNLookup[msg.sender]].balance >= _amount);
+        require(network[msg.sender].balance >= _amount);
 
         require(token.transferFrom(msg.sender, address(this), _amount));
         
