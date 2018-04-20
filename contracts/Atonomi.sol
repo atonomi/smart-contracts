@@ -63,6 +63,11 @@ contract Atonomi is Ownable{
     mapping (address => NetworkMember) network;
 
     /*
+    * @dev key: Manufacturer Id, value: address of the IRN
+    */
+    mapping (bytes32 => address) iRNLookup;
+
+    /*
      * TYPES 
      */
     struct Device {
@@ -187,7 +192,7 @@ contract Atonomi is Ownable{
 
         registeredDevices[deviceHashKey] = device;
 
-        network[msg.sender].balance -= registrationFee;
+        network[iRNLookup[msg.sender]].balance  += registrationFee;
 
         require(token.transferFrom(msg.sender, address(this), registrationFee));
 
@@ -205,7 +210,7 @@ contract Atonomi is Ownable{
 
         activationPool[deviceHashKey] = registeredDevices[deviceHashKey];
 
-        network[msg.sender].balance -= activationFee;
+        network[iRNLookup[msg.sender]].balance  += activationFee;
         
         require(token.transferFrom(msg.sender, address(this), activationFee));
 
@@ -249,7 +254,7 @@ contract Atonomi is Ownable{
 
         activatedDevices[_deviceId] = device;
 
-        network[msg.sender].balance -= (registrationFee + activationFee);
+        network[iRNLookup[msg.sender]].balance += (registrationFee + activationFee);
 
         require(token.transferFrom(msg.sender, address(this), registrationFee + activationFee));
 
@@ -268,8 +273,6 @@ contract Atonomi is Ownable{
 
         require(_reputationScore[0] != 0);
         require(activatedDevices[_deviceId].activated);
-
-        activatedDevices[_deviceId].reputation = _reputationScore;
 
         require(token.transferFrom(msg.sender, address(this), reputationReward));
         
@@ -327,7 +330,7 @@ contract Atonomi is Ownable{
     function withdraw(uint256 _amount) onlyOwner public{
         
         require(network[msg.sender].isIRNNode);
-        require(network[msg.sender].balance <= _amount);
+        require(network[iRNLookup[msg.sender]].balance >= _amount);
 
         require(token.transferFrom(msg.sender, address(this), _amount));
         
