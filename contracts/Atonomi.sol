@@ -85,7 +85,7 @@ contract Atonomi is Ownable {
      * @dev Throw if called by any account that's not whitelisted under the respective flag.
      */
     modifier onlyManufacturer() {
-        require(msg.sender == owner || whitelist[msg.sender].isManufacturer);
+        require(whitelist[msg.sender].isManufacturer);
         _;
     }
 
