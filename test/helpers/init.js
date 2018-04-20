@@ -4,7 +4,8 @@ export function getTestActorsContext (accounts) {
     alice: accounts[1],
     bob: accounts[2],
     releaseAgent: accounts[3],
-    admin: accounts[4]
+    admin: accounts[4],
+    mfg: accounts[5]
   }
 }
 
