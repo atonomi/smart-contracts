@@ -1,6 +1,5 @@
 pragma solidity ^0.4.21;
 
-import "zeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import "zeppelin-solidity/contracts/Ownership/Ownable.sol";
 
 // ----------------------------------------------------------------------------
@@ -34,7 +33,7 @@ contract Atonomi is Ownable {
     uint256 public registrationFee;
     uint256 public reputationReward;
 
-    ERC20 public token;
+    ERC20Interface public token;
     
 
     /*
@@ -115,7 +114,7 @@ contract Atonomi is Ownable {
         require(_registrationFee > 0);
         require(_reputationReward > 0);
 
-        token = ERC20(_token);
+        token = ERC20Interface(_token);
         activationFee = _activationFee;
         registrationFee = _registrationFee;
         reputationReward = _reputationReward;
