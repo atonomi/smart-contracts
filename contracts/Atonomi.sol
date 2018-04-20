@@ -257,11 +257,9 @@ contract Atonomi is Ownable {
         emit ReputationUpdated(_deviceId, _reputationScore, msg.sender);
     }
 
-
     /*
     * WHITELIST ADD/REMOVE LOGIC
     */
-
     /**
      * @dev add a member to the whitelist
      * @param _address address
@@ -269,19 +267,21 @@ contract Atonomi is Ownable {
      * @param _isManufacturer bool
      * @param _memberId bytes32
      * @return true if the address was added to the whitelist, false if the address was already in the whitelist
-    */ 
-    function addWhitelistMember(address _address, bool _isIRN, bool _isManufacturer, bool _isReputationManager, bytes32 _memberId) onlyIRN public returns(bool success) {   
-      
-      require(!whitelist[_address].isIRN && !whitelist[_address].isManufacturer && !whitelist[_address].isReputationManager);
-      
-      WhitelistMember memory whitelistMember = WhitelistMember(_isIRN, _isManufacturer, _isReputationManager, _memberId);
+     */ 
+    function addWhitelistMember(address _address, bool _isIRN, bool _isManufacturer, bool _isReputationManager,
+        bytes32 _memberId) public onlyIRN returns (bool success) {
+        require(!whitelist[_address].isIRN);
+        require(!whitelist[_address].isManufacturer)
+        require(!whitelist[_address].isReputationManager);
 
-      whitelist[_address] = whitelistMember;
+        WhitelistMember memory whitelistMember = WhitelistMember(
+            _isIRN, _isManufacturer, _isReputationManager, _memberId
+        );
+        whitelist[_address] = whitelistMember;
+        emit WhitelistMemberAdded(_address, _memberId, msg.sender);
 
-      emit WhitelistMemberAdded(_address, _memberId, msg.sender);
-
-      success = true;
-    }   
+        success = true;
+    }
 
     /**
      * @dev remove a member from the whitelist
