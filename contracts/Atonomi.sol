@@ -171,7 +171,7 @@ contract Atonomi is Ownable {
     /*
     * TODO natspec
     */
-    function registerDevice (bytes32 _deviceIdHash, bytes32 _hardwarePublicKey, bytes32 _manufacturerId) public onlyManufacturer returns (bool) {
+    function registerDevice (bytes32 _deviceIdHash, bytes32 _hardwarePublicKey) public onlyManufacturer returns (bool) {
         // TODO: ERC827 approve implementation fails, when registerDevice is called
         // msg.sender becomes the token contract. 
         // potential solution, remove onlyManfucturer modifier, add require(msg.sender == address(token))
@@ -180,9 +180,8 @@ contract Atonomi is Ownable {
 
         require(_deviceIdHash != 0);
         require(_hardwarePublicKey != 0);
-        require(whitelist[msg.sender].memberId == _manufacturerId);
 
-        registeredDevices[_deviceIdHash] = Device(_hardwarePublicKey, _manufacturerId, true, false, "");
+        registeredDevices[_deviceIdHash] = Device(_hardwarePublicKey, whitelist[msg.sender].memberId, true, false, "");
         emit RegistrationComplete(msg.sender, _deviceIdHash);
 
         require(token.transferFrom(msg.sender, address(this), registrationFee));

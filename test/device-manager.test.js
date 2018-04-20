@@ -65,10 +65,10 @@ contract('Device Management', accounts => {
       const tx = await ctx.contracts.token.sendTransaction({ from: ctx.actors.mfg, data: approveData })
       */
 
-      const success = await ctx.contracts.atonomi.registerDevice.call(deviceIdHash, hwPubKey, mfgId, {from: ctx.actors.mfg})
+      const success = await ctx.contracts.atonomi.registerDevice.call(deviceIdHash, hwPubKey, {from: ctx.actors.mfg})
       expect(success).to.be.equal(true)
 
-      const tx = await ctx.contracts.atonomi.registerDevice(deviceIdHash, hwPubKey, mfgId, {from: ctx.actors.mfg})
+      const tx = await ctx.contracts.atonomi.registerDevice(deviceIdHash, hwPubKey, {from: ctx.actors.mfg})
 
       expect(tx.logs.length).to.be.equal(1)
       const log = tx.logs[0]
