@@ -1,5 +1,6 @@
 import { expect } from 'chai'
 const init = require('./helpers/init')
+const errors = require('./helpers/errors')
 const web3Utils = require('web3-utils')
 const ethjsABI = require('ethjs-abi')
 const abiHelper = require('./helpers/abi')
@@ -21,15 +22,21 @@ contract('Device Management', accounts => {
   const actFee = 1 * multiplier
   const repReward = 1 * multiplier
 
+  const deviceId = 'apple-iphone1'
+  const deviceIdHash = web3Utils.soliditySha3({t: 'bytes32', v: web3.fromAscii(deviceId)})
+  const hwPubKey = 'somepubkey'
+  const mfgId = 'APPLE'
+
   beforeEach(async () => {
     ctx.contracts.mockSolHash = await MockSolHash.new({from: ctx.actors.owner})
     ctx.contracts.token = await init.getAtonomiTokenContract(ctx.actors.owner, ctx.actors.releaseAgent)
     ctx.contracts.atonomi = await init.getAtonomiContract(ctx.actors.owner, ctx.contracts.token.address)
 
+    await ctx.contracts.token.transfer(ctx.actors.deviceOwner, actFee, {from: ctx.actors.owner})
     await ctx.contracts.token.transfer(ctx.actors.mfg, regFee + actFee, {from: ctx.actors.owner})
-    await ctx.contracts.atonomi.addNetworkMember(ctx.actors.mfg, false, true, false, 'APPLE', {from: ctx.actors.owner})
+    await ctx.contracts.atonomi.addNetworkMember(ctx.actors.mfg, false, true, false, mfgId, {from: ctx.actors.owner})
     await ctx.contracts.atonomi.addNetworkMember(ctx.actors.irnNode, false, false, true, '', {from: ctx.actors.owner})
-    await ctx.contracts.atonomi.mapManufacturerToIRNNode(ctx.actors.irnNode, 'APPLE', {from: ctx.actors.owner})
+    await ctx.contracts.atonomi.mapManufacturerToIRNNode(ctx.actors.irnNode, mfgId, {from: ctx.actors.owner})
   })
 
   describe('hashing', () => {
@@ -53,25 +60,15 @@ contract('Device Management', accounts => {
   })
 
   describe('register device', () => {
-    it('mfg can register', async () => {
-      const irnNodeBefore = await ctx.contracts.atonomi.network(ctx.actors.irnNode)
-      const startingBalance = await ctx.contracts.token.balanceOf(ctx.actors.mfg)
+    let irnStartingBalance
+    let mfgStartingBalance
 
-      const deviceId = 'apple-iphone1'
-      const deviceIdHash = web3Utils.soliditySha3({t: 'bytes32', v: web3.fromAscii(deviceId)})
-      const hwPubKey = 'somepubkey'
-      const mfgId = 'APPLE'
+    beforeEach(async () => {
+      irnStartingBalance = await ctx.contracts.token.balanceOf(ctx.actors.irnNode)
+      mfgStartingBalance = await ctx.contracts.token.balanceOf(ctx.actors.mfg)
+    })
 
-      /* ERC 827
-      const callbackData = ctx.contracts.atonomi.contract.registerDevice.getData(deviceIdHash, hwPubKey)
-      const abiMethod = abiHelper.findMethod(ctx.contracts.token.abi, 'transfer', 'address,uint256,bytes')
-      const transferData = ethjsABI.encodeMethod(abiMethod, [ctx.contracts.atonomi.contract.address, regFee, callbackData])
-      const success = await ctx.contracts.token.sendTransaction.call({from: ctx.actors.mfg, data: transferData})
-      expect(success).to.be.equal(true)
-      const tx = await ctx.contracts.token.sendTransaction({from: ctx.actors.mfg, data: transferData})
-      */
-
-      // ERC 20
+    it('mfg can register (ERC20)', async () => {
       await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, regFee, { from: ctx.actors.mfg })
       const success = await ctx.contracts.atonomi.registerDevice.call(deviceIdHash, hwPubKey, {from: ctx.actors.mfg})
       expect(success).to.be.equal(true)
@@ -81,6 +78,7 @@ contract('Device Management', accounts => {
       const log = tx.logs[0]
       expect(log.event).to.be.equal('DeviceRegistered')
       expect(log.args._sender).to.be.equal(ctx.actors.mfg)
+      expect(log.args._beneficiary).to.be.equal(ctx.actors.irnNode)
       expect(log.args._deviceHashKey).to.be.equal(deviceIdHash)
 
       const device = await ctx.contracts.atonomi.devices(deviceIdHash)
@@ -96,55 +94,100 @@ contract('Device Management', accounts => {
       const tokenLog = tokenEvents[0]
       expect(tokenLog._eventName).to.be.equal('Transfer')
       expect(tokenLog.from).to.be.equal(ctx.actors.mfg)
-      expect(tokenLog.to).to.be.equal(ctx.contracts.atonomi.address)
+      expect(tokenLog.to).to.be.equal(ctx.actors.irnNode)
       expect(tokenLog.value.toString(10)).to.be.equal(regFee.toString(10))
 
-      const mfgBalance = await ctx.contracts.token.balanceOf(ctx.actors.mfg)
-      expect((startingBalance - mfgBalance).toString(10)).to.be.equal(regFee.toString(10))
+      const mfgEndingBalance = await ctx.contracts.token.balanceOf(ctx.actors.mfg)
+      expect((mfgStartingBalance - mfgEndingBalance).toString(10)).to.be.equal(regFee.toString(10))
 
-      const atmiBalance = await ctx.contracts.token.balanceOf(ctx.contracts.atonomi.address)
-      expect(atmiBalance.toString(10)).to.be.equal(regFee.toString(10))
+      const irnEndingBalance = await ctx.contracts.token.balanceOf(ctx.actors.irnNode)
+      expect((irnEndingBalance - irnStartingBalance).toString(10)).to.be.equal(regFee.toString(10))
+    })
 
-      const irnNodeAfter = await ctx.contracts.atonomi.network(ctx.actors.irnNode)
-      expect((irnNodeAfter[4] - irnNodeBefore[4]).toString(10)).to.be.equal(regFee.toString(10))
+    it('mfg can register (ERC827)', async () => {
+      const registerDeviceData = ctx.contracts.atonomi.contract.registerDevice827.getData(ctx.actors.mfg, deviceIdHash, hwPubKey)
+      const abiMethod = abiHelper.findMethod(ctx.contracts.token.abi, 'approve', 'address,uint256,bytes')
+      const tokenData = ethjsABI.encodeMethod(abiMethod, [ctx.contracts.atonomi.contract.address, regFee, registerDeviceData])
+      const tx = await ctx.contracts.token.sendTransaction({from: ctx.actors.mfg, data: tokenData})
+
+      expect(tx.logs.length).to.be.equal(2)
+      expect(tx.logs[0].event).to.be.equal('Approval')
+      expect(tx.logs[0].args.owner).to.be.equal(ctx.actors.mfg)
+      expect(tx.logs[0].args.spender).to.be.equal(ctx.contracts.atonomi.address)
+      expect(tx.logs[0].args.value.toString(10)).to.be.equal(regFee.toString(10))
+
+      expect(tx.logs[1].event).to.be.equal('Transfer')
+      expect(tx.logs[1].args.from).to.be.equal(ctx.actors.mfg)
+      expect(tx.logs[1].args.to).to.be.equal(ctx.actors.irnNode)
+      expect(tx.logs[1].args.value.toString(10)).to.be.equal(regFee.toString(10))
+
+      expect(tx.receipt.logs.length).to.be.equal(3)
+      const decoder = ethjsABI.logDecoder(ctx.contracts.atonomi.abi)
+      const regEvent = decoder(tx.receipt.logs)
+      expect(regEvent[0]._eventName).to.be.equal('DeviceRegistered')
+      expect(regEvent[0]._sender).to.be.equal(ctx.actors.mfg)
+      expect(regEvent[0]._beneficiary).to.be.equal(ctx.actors.irnNode)
+      expect(regEvent[0]._deviceHashKey).to.be.equal(deviceIdHash)
+
+      const device = await ctx.contracts.atonomi.devices(deviceIdHash)
+      expect(hwPubKey).to.be.equal(web3.toAscii(device[0]).replace(/\u0000/g, ''))
+      expect(mfgId).to.be.equal(web3.toAscii(device[1]).replace(/\u0000/g, ''))
+      expect(device[2]).to.be.equal(true)
+      expect(device[3]).to.be.equal(false)
+      expect('').to.be.equal(web3.toAscii(device[4]).replace(/\u0000/g, ''))
+
+      const mfgEndingBalance = await ctx.contracts.token.balanceOf(ctx.actors.mfg)
+      expect((mfgStartingBalance - mfgEndingBalance).toString(10)).to.be.equal(regFee.toString(10))
+
+      const irnEndingBalance = await ctx.contracts.token.balanceOf(ctx.actors.irnNode)
+      expect((irnEndingBalance - irnStartingBalance).toString(10)).to.be.equal(regFee.toString(10))
     })
 
     it('external accounts can not register', async () => {
+      const bads = [ctx.actors.alice, ctx.actors.owner, ctx.actors.admin, ctx.actors.irnNode]
+      for (let i = 0; i < bads.length; i++) {
+        const from = bads[i]
+        await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, regFee, {from: from})
+        const fn = ctx.contracts.atonomi.registerDevice(deviceIdHash, hwPubKey, {from: from})
+        await errors.expectRevert(fn)
+      }
     })
 
     it('can not register device that is already registered', async () => {
-    })
-
-    it('mfg can only register devices they make', async () => {
-    })
-
-    it('can not register with insufficent funds', async () => {
+      const from = ctx.actors.mfg
+      await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, 2 * regFee, {from: from})
+      await ctx.contracts.atonomi.registerDevice(deviceIdHash, hwPubKey, {from: from})
+      const fn = ctx.contracts.atonomi.registerDevice(deviceIdHash, hwPubKey, {from: from})
+      await errors.expectRevert(fn)
     })
   })
 
   describe('activate device', () => {
+    let irnStartingBalance
+    let mfgStartingBalance
+    let devOwnerStartingBalance
+
+    beforeEach(async () => {
+      devOwnerStartingBalance = await ctx.contracts.token.balanceOf(ctx.actors.deviceOwner)
+      irnStartingBalance = await ctx.contracts.token.balanceOf(ctx.actors.irnNode)
+      mfgStartingBalance = await ctx.contracts.token.balanceOf(ctx.actors.mfg)
+    })
+
     it('device owner can activate', async () => {
-      const irnNodeBefore = await ctx.contracts.atonomi.network(ctx.actors.irnNode)
-
-      const deviceId = 'apple-iphone1'
-      const deviceIdHash = web3Utils.soliditySha3({t: 'bytes32', v: web3.fromAscii(deviceId)})
-      const hwPubKey = 'somepubkey'
-      const mfgId = 'APPLE'
-      await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, regFee + actFee, { from: ctx.actors.mfg })
+      await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, regFee, { from: ctx.actors.mfg })
       await ctx.contracts.atonomi.registerDevice(deviceIdHash, hwPubKey, {from: ctx.actors.mfg})
-      const allowance = await ctx.contracts.token.allowance.call(ctx.actors.mfg, ctx.contracts.atonomi.address)
 
-      const startingBalance = await ctx.contracts.token.balanceOf(ctx.actors.mfg)
-      const success = await ctx.contracts.atonomi.activateDevice.call(deviceId, {from: ctx.actors.mfg})
+      await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, actFee, { from: ctx.actors.deviceOwner })
+      const success = await ctx.contracts.atonomi.activateDevice.call(deviceId, {from: ctx.actors.deviceOwner})
       expect(success).to.be.equal(true)
+      const tx = await ctx.contracts.atonomi.activateDevice(deviceId, {from: ctx.actors.deviceOwner})
 
-      const tx = await ctx.contracts.atonomi.activateDevice(deviceId, {from: ctx.actors.mfg})
-      
       expect(tx.logs.length).to.be.equal(1)
       const log = tx.logs[0]
       expect(log.event).to.be.equal('DeviceActivated')
-      expect(log.args._sender).to.be.equal(ctx.actors.mfg)
-      expect(web3.toAscii(log.args.deviceId).replace(/\u0000/g, '')).to.be.equal(deviceId)
+      expect(log.args._sender).to.be.equal(ctx.actors.deviceOwner)
+      expect(log.args._beneficiary).to.be.equal(ctx.actors.irnNode)
+      expect(web3.toAscii(log.args._deviceId).replace(/\u0000/g, '')).to.be.equal(deviceId)
 
       const device = await ctx.contracts.atonomi.devices(deviceIdHash)
       expect(hwPubKey).to.be.equal(web3.toAscii(device[0]).replace(/\u0000/g, ''))
@@ -158,72 +201,203 @@ contract('Device Management', accounts => {
       const tokenEvents = decoder(tx.receipt.logs)
       const tokenLog = tokenEvents[0]
       expect(tokenLog._eventName).to.be.equal('Transfer')
-      expect(tokenLog.from).to.be.equal(ctx.actors.mfg)
-      expect(tokenLog.to).to.be.equal(ctx.contracts.atonomi.address)
+      expect(tokenLog.from).to.be.equal(ctx.actors.deviceOwner)
+      expect(tokenLog.to).to.be.equal(ctx.actors.irnNode)
       expect(tokenLog.value.toString(10)).to.be.equal(actFee.toString(10))
 
-      const mfgBalance = await ctx.contracts.token.balanceOf(ctx.actors.mfg)
-      expect((startingBalance - mfgBalance).toString(10)).to.be.equal(actFee.toString(10))
+      const devOwnerEndingBalance = await ctx.contracts.token.balanceOf(ctx.actors.deviceOwner)
+      expect((devOwnerStartingBalance - devOwnerEndingBalance).toString(10)).to.be.equal(actFee.toString(10))
 
-      const atmiBalance = await ctx.contracts.token.balanceOf(ctx.contracts.atonomi.address)
-      expect(atmiBalance.toString(10)).to.be.equal((regFee + actFee).toString(10))
+      const mfgEndingBalance = await ctx.contracts.token.balanceOf(ctx.actors.mfg)
+      expect((mfgStartingBalance - mfgEndingBalance).toString(10)).to.be.equal(regFee.toString(10))
 
-      const irnNodeAfter = await ctx.contracts.atonomi.network(ctx.actors.irnNode)
-      expect((irnNodeAfter[4] - irnNodeBefore[4]).toString(10)).to.be.equal((regFee + actFee).toString(10))
+      const irnEndingBalance = await ctx.contracts.token.balanceOf(ctx.actors.irnNode)
+      expect((irnEndingBalance - irnStartingBalance).toString(10)).to.be.equal((regFee + actFee).toString(10))
     })
 
     it('persons without the device can not activate', async () => {
-    })
+      await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, regFee, { from: ctx.actors.mfg })
+      await ctx.contracts.atonomi.registerDevice(deviceIdHash, hwPubKey, {from: ctx.actors.mfg})
 
-    it('can not activate without payment', async () => {
+      const wrongDeviceId = 'samsung-microwave1'
+      await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, actFee, { from: ctx.actors.deviceOwner })
+      const fn = ctx.contracts.atonomi.activateDevice(wrongDeviceId, {from: ctx.actors.deviceOwner})
+      await errors.expectRevert(fn)
     })
 
     it('can not activate device that is not registered', async () => {
+      await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, actFee, { from: ctx.actors.deviceOwner })
+      const fn = ctx.contracts.atonomi.activateDevice(deviceId, {from: ctx.actors.deviceOwner})
+      await errors.expectRevert(fn)
     })
 
     it('can not activate device that is already activated', async () => {
+      await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, regFee, { from: ctx.actors.mfg })
+      await ctx.contracts.atonomi.registerDevice(deviceIdHash, hwPubKey, {from: ctx.actors.mfg})
+
+      await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, actFee, { from: ctx.actors.deviceOwner })
+      await ctx.contracts.atonomi.activateDevice(deviceId, {from: ctx.actors.deviceOwner})
+
+      await ctx.contracts.token.transfer(ctx.actors.deviceOwner, actFee, {from: ctx.actors.owner})
+      const fn = ctx.contracts.atonomi.activateDevice(deviceId, {from: ctx.actors.deviceOwner})
+      await errors.expectRevert(fn)
     })
   })
 
   describe('register and activate device', () => {
+    let irnStartingBalance
+    let mfgStartingBalance
+
+    beforeEach(async () => {
+      irnStartingBalance = await ctx.contracts.token.balanceOf(ctx.actors.irnNode)
+      mfgStartingBalance = await ctx.contracts.token.balanceOf(ctx.actors.mfg)
+    })
+
     it('mfg can register and activate device', async () => {
+      await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, (regFee + actFee), { from: ctx.actors.mfg })
+      const success = await ctx.contracts.atonomi.registerAndActivateDevice.call(deviceId, hwPubKey, {from: ctx.actors.mfg})
+      expect(success).to.be.equal(true)
+      const tx = await ctx.contracts.atonomi.registerAndActivateDevice(deviceId, hwPubKey, {from: ctx.actors.mfg})
+
+      expect(tx.logs.length).to.be.equal(2)
+      const log = tx.logs[0]
+      expect(log.event).to.be.equal('DeviceRegistered')
+      expect(log.args._sender).to.be.equal(ctx.actors.mfg)
+      expect(log.args._beneficiary).to.be.equal(ctx.actors.irnNode)
+      expect(log.args._deviceHashKey).to.be.equal(deviceIdHash)
+
+      const log1 = tx.logs[1]
+      expect(log1.event).to.be.equal('DeviceActivated')
+      expect(log1.args._sender).to.be.equal(ctx.actors.mfg)
+      expect(log1.args._beneficiary).to.be.equal(ctx.actors.irnNode)
+      expect(web3.toAscii(log1.args._deviceId).replace(/\u0000/g, '')).to.be.equal(deviceId)
+
+      const device = await ctx.contracts.atonomi.devices(deviceIdHash)
+      expect(hwPubKey).to.be.equal(web3.toAscii(device[0]).replace(/\u0000/g, ''))
+      expect(mfgId).to.be.equal(web3.toAscii(device[1]).replace(/\u0000/g, ''))
+      expect(device[2]).to.be.equal(true)
+      expect(device[3]).to.be.equal(true)
+      expect('').to.be.equal(web3.toAscii(device[4]).replace(/\u0000/g, ''))
+
+      expect(tx.receipt.logs.length).to.be.equal(3)
+      const decoder = ethjsABI.logDecoder(ctx.contracts.token.abi)
+      const tokenEvents = decoder(tx.receipt.logs)
+      const tokenLog = tokenEvents[0]
+      expect(tokenLog._eventName).to.be.equal('Transfer')
+      expect(tokenLog.from).to.be.equal(ctx.actors.mfg)
+      expect(tokenLog.to).to.be.equal(ctx.actors.irnNode)
+      expect(tokenLog.value.toString(10)).to.be.equal((regFee + actFee).toString(10))
+
+      const mfgEndingBalance = await ctx.contracts.token.balanceOf(ctx.actors.mfg)
+      expect((mfgStartingBalance - mfgEndingBalance).toString(10)).to.be.equal((regFee + actFee).toString(10))
+
+      const irnEndingBalance = await ctx.contracts.token.balanceOf(ctx.actors.irnNode)
+      expect((irnEndingBalance - irnStartingBalance).toString(10)).to.be.equal((regFee + actFee).toString(10))
     })
 
     it('external accounts can not register and activate device', async () => {
+      const bads = [ctx.actors.alice, ctx.actors.owner, ctx.actors.admin, ctx.actors.irnNode]
+      for (let i = 0; i < bads.length; i++) {
+        const from = bads[i]
+        await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, (regFee + actFee), {from: from})
+        const fn = ctx.contracts.atonomi.registerAndActivateDevice(deviceId, hwPubKey, {from: from})
+        await errors.expectRevert(fn)
+      }
     })
 
     it('can not register and activate device that is already registered', async () => {
-    })
-
-    it('can not register and activate device that is already activated', async () => {
+      const from = ctx.actors.mfg
+      await ctx.contracts.token.transfer(ctx.actors.mfg, 2 * (regFee + actFee), {from: ctx.actors.owner})
+      await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, 2 * (regFee + actFee), {from: from})
+      await ctx.contracts.atonomi.registerAndActivateDevice(deviceId, hwPubKey, {from: from})
+      const fn = ctx.contracts.atonomi.registerAndActivateDevice(deviceId, hwPubKey, {from: from})
+      await errors.expectRevert(fn)
     })
   })
 
-  describe('reputation', () => {
+  describe('reputation scores', () => {
+    let irnStartingBalance
+    let repAuditorStartingBalance
+    const score = 'somescore'
+
+    beforeEach(async () => {
+      irnStartingBalance = await ctx.contracts.token.balanceOf(ctx.actors.irnNode)
+      repAuditorStartingBalance = await ctx.contracts.token.balanceOf(ctx.actors.repAuditor)
+    })
+
     it('IRN node can set', async () => {
+      await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, regFee + actFee, {from: ctx.actors.mfg})
+      await ctx.contracts.atonomi.registerAndActivateDevice(deviceId, hwPubKey, {from: ctx.actors.mfg})
+
+      await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, repReward, {from: ctx.actors.irnNode})
+      const success = await ctx.contracts.atonomi.updateReputationScore.call(deviceId, score, ctx.actors.repAuditor, {from: ctx.actors.irnNode})
+      expect(success).to.be.equal(true)
+      const tx = await ctx.contracts.atonomi.updateReputationScore(deviceId, score, ctx.actors.repAuditor, {from: ctx.actors.irnNode})
+
+      expect(tx.logs.length).to.be.equal(1)
+      expect(tx.logs[0].event).to.be.equal('ReputationScoreUpdated')
+      expect(tx.logs[0].args._sender).to.be.equal(ctx.actors.irnNode)
+      expect(web3.toAscii(tx.logs[0].args._deviceId).replace(/\u0000/g, '')).to.be.equal(deviceId)
+      expect(web3.toAscii(tx.logs[0].args._newScore).replace(/\u0000/g, '')).to.be.equal(score)
+      expect(tx.logs[0].args._beneficiary).to.be.equal(ctx.actors.repAuditor)
+
+      const device = await ctx.contracts.atonomi.devices(deviceIdHash)
+      expect(hwPubKey).to.be.equal(web3.toAscii(device[0]).replace(/\u0000/g, ''))
+      expect(mfgId).to.be.equal(web3.toAscii(device[1]).replace(/\u0000/g, ''))
+      expect(device[2]).to.be.equal(true)
+      expect(device[3]).to.be.equal(true)
+      expect(score).to.be.equal(web3.toAscii(device[4]).replace(/\u0000/g, ''))
+
+      expect(tx.receipt.logs.length).to.be.equal(2)
+      const decoder = ethjsABI.logDecoder(ctx.contracts.token.abi)
+      const tokenEvents = decoder(tx.receipt.logs)
+      const tokenLog = tokenEvents[0]
+      expect(tokenLog._eventName).to.be.equal('Transfer')
+      expect(tokenLog.from).to.be.equal(ctx.actors.irnNode)
+      expect(tokenLog.to).to.be.equal(ctx.actors.repAuditor)
+      expect(tokenLog.value.toString(10)).to.be.equal(repReward.toString(10))
+
+      const irnEndingBalance = await ctx.contracts.token.balanceOf(ctx.actors.irnNode)
+      expect((irnEndingBalance - irnStartingBalance).toString(10)).to.be.equal(repReward.toString(10))
+
+      const repAuditorEndingBalance = await ctx.contracts.token.balanceOf(ctx.actors.repAuditor)
+      expect((repAuditorEndingBalance - repAuditorStartingBalance).toString(10)).to.be.equal(repReward.toString(10))
+    })
+
+    it('can not set score for device that is not activated', async () => {
+      await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, regFee, {from: ctx.actors.mfg})
+      await ctx.contracts.atonomi.registerDevice(deviceId, hwPubKey, {from: ctx.actors.mfg})
+
+      await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, repReward, {from: ctx.actors.irnNode})
+      const fn = ctx.contracts.atonomi.updateReputationScore(deviceId, score, ctx.actors.repAuditor, {from: ctx.actors.irnNode})
+      await errors.expectRevert(fn)
     })
 
     it('external accounts can not set', async () => {
-    })
+      await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, regFee + actFee, {from: ctx.actors.mfg})
+      await ctx.contracts.atonomi.registerAndActivateDevice(deviceId, hwPubKey, {from: ctx.actors.mfg})
 
-    it('can not set with insufficent funds', async () => {
+      const bads = [ctx.actors.owner, ctx.actors.admin, ctx.actors.deviceOwner, ctx.actors.mfg, ctx.actors.alice]
+      for (let i = 0; i < bads.length; i++) {
+        const from = bads[i]
+        await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, repReward, {from: from})
+        const fn = ctx.contracts.atonomi.updateReputationScore(deviceId, score, ctx.actors.repAuditor, {from: from})
+        await errors.expectRevert(fn)
+      }
     })
   })
 
   describe('bulk registration', () => {
-    it('can set bulk registration contract', async () => {
-    })
-
-    it('can not set 0x0', async () => {
-    })
-
     it('mfg can bulk register devices', async () => {
+      // expect(true).to.be.equal(false)
     })
 
     it('can bulk register with some failures', async () => {
+      // expect(true).to.be.equal(false)
     })
 
     it('external accounts can not bulk register devices', async () => {
+      // expect(true).to.be.equal(false)
     })
   })
 })

@@ -6,7 +6,9 @@ export function getTestActorsContext (accounts) {
     releaseAgent: accounts[3],
     admin: accounts[4],
     mfg: accounts[5],
-    irnNode: accounts[6]
+    irnNode: accounts[6],
+    deviceOwner: accounts[7],
+    repAuditor: accounts[8]
   }
 }
 
