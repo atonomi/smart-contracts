@@ -341,18 +341,15 @@ contract Atonomi is Ownable {
 
         uint256 runningBalance = 0;
         for (uint256 i = 0; i < _deviceIdHashes.length; i++) {
-
             bytes32 deviceIdHash = _deviceIdHashes[i];
             bytes32 hardwarePublicKey = _hardwarePublicKeys[i];
-
-            if (deviceIdHash != 0 || hardwarePublicKey != 0) {
+            if (deviceIdHash == 0 || hardwarePublicKey == 0) {
                 emit DeviceRegistrationFailed(msg.sender, irnAddress, deviceIdHash);
                 continue;
             }
 
             bool registered = true;
             bool activated = false;
-
             devices[deviceIdHash] = Device(
                 hardwarePublicKey, 
                 manufacturerId, 
@@ -361,7 +358,6 @@ contract Atonomi is Ownable {
                 "");
             emit DeviceRegistered(msg.sender, irnAddress, deviceIdHash);
             runningBalance += registrationFee;
-
         }
 
         require(token.transferFrom(msg.sender, irnAddress, runningBalance));
