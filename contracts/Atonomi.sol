@@ -366,53 +366,6 @@ contract Atonomi is Ownable {
         return true;
     }
 
-    /// @notice registers and activates multiple devices on the Atonomi network
-    /// @param _deviceIds array of real device ids
-    /// @param _hardwarePublicKeys array of public keys of each physical device
-    /// @return true if successful, otherwise false
-    /// @dev msg.sender is expected to be the manufacturer
-    /// @dev tokens will be deducted from the manufacturer to the IRN Node they belong to
-    function registerAndActivateDevices(bytes32[] _deviceIds, bytes32[] _hardwarePublicKeys)
-        public onlyManufacturer returns (bool)
-    {
-        require(_deviceIds.length == _hardwarePublicKeys.length);
-
-        bytes32 manufacturerId = network[msg.sender].memberId;
-        address irnAddress = iRNLookup[manufacturerId];
-        require(irnAddress != address(0));
-
-        uint256 runningBalance = 0;
-        for (uint256 i = 0; i < _deviceIds.length; i++) {
-            bytes32 deviceId = _deviceIds[i];
-            bytes32 deviceIdHash = keccak256(deviceId);
-            bytes32 hardwarePublicKey = _hardwarePublicKeys[i];
-            if (deviceIdHash == 0 || hardwarePublicKey == 0) {
-                emit DeviceRegistrationFailed(msg.sender, irnAddress, deviceIdHash);
-                continue;
-            }
-
-            if(devices[deviceIdHash].activated) {
-                // TODO: emit log
-                continue;
-            }
-
-            bool registered = true;
-            bool activated = true;
-            devices[deviceIdHash] = Device(
-                hardwarePublicKey, 
-                manufacturerId, 
-                registered,
-                activated,
-                "");
-            emit DeviceRegistered(msg.sender, irnAddress, deviceIdHash);
-            emit DeviceActivated(msg.sender, irnAddress, deviceId);
-            runningBalance += registrationFee + activationFee;
-        }
-
-        require(token.transferFrom(msg.sender, irnAddress, runningBalance));
-        return true;
-    }
-
     /// @notice Activates the device
     /// @param _deviceId id of the real device id to be activated (not the has of the device id)
     /// @return true if successful, otherwise false
@@ -468,6 +421,53 @@ contract Atonomi is Ownable {
         emit DeviceActivated(msg.sender, irnAddress, _deviceId);
 
         require(token.transferFrom(msg.sender, irnAddress, registrationFee + activationFee));
+        return true;
+    }
+
+    /// @notice registers and activates multiple devices on the Atonomi network
+    /// @param _deviceIds array of real device ids
+    /// @param _hardwarePublicKeys array of public keys of each physical device
+    /// @return true if successful, otherwise false
+    /// @dev msg.sender is expected to be the manufacturer
+    /// @dev tokens will be deducted from the manufacturer to the IRN Node they belong to
+    function registerAndActivateDevices(bytes32[] _deviceIds, bytes32[] _hardwarePublicKeys)
+        public onlyManufacturer returns (bool)
+    {
+        require(_deviceIds.length == _hardwarePublicKeys.length);
+
+        bytes32 manufacturerId = network[msg.sender].memberId;
+        address irnAddress = iRNLookup[manufacturerId];
+        require(irnAddress != address(0));
+
+        uint256 runningBalance = 0;
+        for (uint256 i = 0; i < _deviceIds.length; i++) {
+            bytes32 deviceId = _deviceIds[i];
+            bytes32 deviceIdHash = keccak256(deviceId);
+            bytes32 hardwarePublicKey = _hardwarePublicKeys[i];
+            if (deviceIdHash == 0 || hardwarePublicKey == 0) {
+                emit DeviceRegistrationFailed(msg.sender, irnAddress, deviceIdHash);
+                continue;
+            }
+
+            if(devices[deviceIdHash].activated) {
+                // TODO: emit log
+                continue;
+            }
+
+            bool registered = true;
+            bool activated = true;
+            devices[deviceIdHash] = Device(
+                hardwarePublicKey, 
+                manufacturerId, 
+                registered,
+                activated,
+                "");
+            emit DeviceRegistered(msg.sender, irnAddress, deviceIdHash);
+            emit DeviceActivated(msg.sender, irnAddress, deviceId);
+            runningBalance += registrationFee + activationFee;
+        }
+
+        require(token.transferFrom(msg.sender, irnAddress, runningBalance));
         return true;
     }
 
