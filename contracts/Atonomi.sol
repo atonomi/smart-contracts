@@ -39,7 +39,7 @@ contract Atonomi is Ownable {
     uint256 public activationFee;
 
     /// @title Reputation Reward
-    /// @notice Repuation Auditor/Validator recieves token for contributing reputation score
+    /// @notice Repuation Auditor/Validator receives token for contributing reputation score
     /// @notice IRN Node of the manufacturer pays token to reward contributors
     uint256 public reputationReward;
 
@@ -61,7 +61,7 @@ contract Atonomi is Ownable {
     /// @title Atonomi Participant whitelist
     /// @notice Contains all the network participants
     /// @dev Atonomi Admins: Govern the access to manufacturers and IRN Nodes on the network
-    /// @dev IRN Nodes: Governs repuration score data of devices
+    /// @dev IRN Nodes: Governs reputation score data of devices
     /// @dev Manufacturers: Governs devices on the network
     /// @dev Key is ethereum account of the participant
     /// @dev Value is a struct that contains the role of the participant
