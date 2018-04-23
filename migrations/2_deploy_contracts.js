@@ -1,5 +1,3 @@
-/* global artifacts */
-
 const AtonomiToken = artifacts.require('AMLToken')
 const SafeMathLib = artifacts.require('SafeMathLib')
 const Atonomi = artifacts.require('Atonomi')

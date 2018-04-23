@@ -11,6 +11,7 @@
 ### Setup
 
 Downlaod and install the latest version of Solidity here: https://solidity.readthedocs.io/en/v0.4.22/installing-solidity.html (use Homebrew)
+
 Download and install the latest LTS version of Node.js here: https://nodejs.org/en/
 
 Also have `truffle` and `ganache-cli` installed globally
@@ -43,7 +44,7 @@ $ npm run lint
 $ npm run lint:sol
 ```
 
-### Deploy to local Ganache
+### Deploy to local Ganache-CLI
 
 To deploy contracts to a local Ganche RPC provider at port `8546`:
 
@@ -55,14 +56,14 @@ $ npm run deploy
 ### Deploy to Atonomi Ropsten test node
 
 Make sure you have the latest version of `geth` installed: https://github.com/ethereum/go-ethereum/wiki/Installing-Geth
+
 Then change into the deploy directory:
 
 ```
 $ cd deploy
 ```
 
-Then attach to the Atonomi Ropsten Test node (this is internal to Atonomi Network)
-If you need Ropsten Test Ether, go here: http://faucet.ropsten.be:3001/ or https://faucet.metamask.io/
+Then attach to any Ropsten Test node.  If you need Ropsten Test Ether, go here: http://faucet.ropsten.be:3001/ or https://faucet.metamask.io/
 
 ```
 $ export PARITY_NODE=http://test.parity.atonomi.io:8545
@@ -75,7 +76,7 @@ $ ./geth-attach.sh
 This will drop you into a geth console that will have preloaded the Atonomi constants and abi needed for contract deployment.
 
 To deploy the ATMI token contract run the following: 
-NOTE: if ATMI_ADDR is set, it will connect to the existing contract at that address.  (Same with SAFEMATHLIB_ADDR)
+NOTE: if ATMI_ADDR or SAFEMATHLIB_ADDR are set, it will connect to the existing contracts.
 
 ```
 > loadScript('scripts/deploy-atmi-token.js')

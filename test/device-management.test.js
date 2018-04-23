@@ -78,7 +78,7 @@ contract('Device Management', accounts => {
       const log = tx.logs[0]
       expect(log.event).to.be.equal('DeviceRegistered')
       expect(log.args._sender).to.be.equal(ctx.actors.mfg)
-      expect(log.args._beneficiary).to.be.equal(ctx.actors.irnNode)
+      expect(log.args._contributor).to.be.equal(ctx.actors.irnNode)
       expect(log.args._deviceHashKey).to.be.equal(deviceIdHash)
 
       const device = await ctx.contracts.atonomi.devices(deviceIdHash)
@@ -126,7 +126,7 @@ contract('Device Management', accounts => {
       const regEvent = decoder(tx.receipt.logs)
       expect(regEvent[0]._eventName).to.be.equal('DeviceRegistered')
       expect(regEvent[0]._sender).to.be.equal(ctx.actors.mfg)
-      expect(regEvent[0]._beneficiary).to.be.equal(ctx.actors.irnNode)
+      expect(regEvent[0]._contributor).to.be.equal(ctx.actors.irnNode)
       expect(regEvent[0]._deviceHashKey).to.be.equal(deviceIdHash)
 
       const device = await ctx.contracts.atonomi.devices(deviceIdHash)
@@ -186,7 +186,7 @@ contract('Device Management', accounts => {
       const log = tx.logs[0]
       expect(log.event).to.be.equal('DeviceActivated')
       expect(log.args._sender).to.be.equal(ctx.actors.deviceOwner)
-      expect(log.args._beneficiary).to.be.equal(ctx.actors.irnNode)
+      expect(log.args._contributor).to.be.equal(ctx.actors.irnNode)
       expect(web3.toAscii(log.args._deviceId).replace(/\u0000/g, '')).to.be.equal(deviceId)
 
       const device = await ctx.contracts.atonomi.devices(deviceIdHash)
@@ -263,13 +263,13 @@ contract('Device Management', accounts => {
       const log = tx.logs[0]
       expect(log.event).to.be.equal('DeviceRegistered')
       expect(log.args._sender).to.be.equal(ctx.actors.mfg)
-      expect(log.args._beneficiary).to.be.equal(ctx.actors.irnNode)
+      expect(log.args._contributor).to.be.equal(ctx.actors.irnNode)
       expect(log.args._deviceHashKey).to.be.equal(deviceIdHash)
 
       const log1 = tx.logs[1]
       expect(log1.event).to.be.equal('DeviceActivated')
       expect(log1.args._sender).to.be.equal(ctx.actors.mfg)
-      expect(log1.args._beneficiary).to.be.equal(ctx.actors.irnNode)
+      expect(log1.args._contributor).to.be.equal(ctx.actors.irnNode)
       expect(web3.toAscii(log1.args._deviceId).replace(/\u0000/g, '')).to.be.equal(deviceId)
 
       const device = await ctx.contracts.atonomi.devices(deviceIdHash)
@@ -339,7 +339,7 @@ contract('Device Management', accounts => {
       expect(tx.logs[0].args._sender).to.be.equal(ctx.actors.irnNode)
       expect(web3.toAscii(tx.logs[0].args._deviceId).replace(/\u0000/g, '')).to.be.equal(deviceId)
       expect(web3.toAscii(tx.logs[0].args._newScore).replace(/\u0000/g, '')).to.be.equal(score)
-      expect(tx.logs[0].args._beneficiary).to.be.equal(ctx.actors.repAuditor)
+      expect(tx.logs[0].args._contributor).to.be.equal(ctx.actors.repAuditor)
 
       const device = await ctx.contracts.atonomi.devices(deviceIdHash)
       expect(hwPubKey).to.be.equal(web3.toAscii(device[0]).replace(/\u0000/g, ''))
@@ -387,7 +387,207 @@ contract('Device Management', accounts => {
     })
   })
 
-  describe('bulk registration', () => {
+  describe('bulk registrations and activations', () => {
+    let irnStartingBalance
+    let mfgStartingBalance
+
+    const total = 10
+    const deviceIdPrefix = 'apple-ipad'
+    const hwPubKeyPrefix = 'hwpubkey'
+
+    beforeEach(async () => {
+      irnStartingBalance = await ctx.contracts.token.balanceOf(ctx.actors.irnNode)
+      mfgStartingBalance = await ctx.contracts.token.balanceOf(ctx.actors.mfg)
+
+      await ctx.contracts.token.transfer(ctx.actors.mfg, (regFee + actFee) * total, {from: ctx.actors.owner})
+    })
+
+    it('mfg can bulk register devices', async () => {
+      const deviceIdHashes = []
+      const hwPublicKeys = []
+      for (let i = 0; i < total; i++) {
+        deviceIdHashes.push(web3Utils.soliditySha3({t: 'bytes32', v: web3.fromAscii(deviceIdPrefix + i)}))
+        hwPublicKeys.push(hwPubKeyPrefix + i)
+      }
+      await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, regFee * total, {from: ctx.actors.mfg})
+      const success = await ctx.contracts.atonomi.registerDevices.call(deviceIdHashes, hwPublicKeys, {from: ctx.actors.mfg})
+      expect(success).to.be.equal(true)
+
+      const tx = await ctx.contracts.atonomi.registerDevices(deviceIdHashes, hwPublicKeys, {from: ctx.actors.mfg})
+      expect(tx.logs.length).to.be.equal(total)
+
+      for (let i = 0; i < total; i++) {
+        const log = tx.logs[i]
+        expect(log.event).to.be.equal('DeviceRegistered')
+        expect(log.args._sender).to.be.equal(ctx.actors.mfg)
+        expect(log.args._contributor).to.be.equal(ctx.actors.irnNode)
+        expect(log.args._deviceHashKey).to.be.equal(deviceIdHashes[i])
+
+        const device = await ctx.contracts.atonomi.devices(deviceIdHashes[i])
+        expect(web3.toAscii(device[0]).replace(/\u0000/g, '')).to.be.equal(hwPublicKeys[i])
+        expect(web3.toAscii(device[1]).replace(/\u0000/g, '')).to.be.equal(mfgId)
+        expect(device[2]).to.be.equal(true)
+        expect(device[3]).to.be.equal(false)
+        expect('').to.be.equal(web3.toAscii(device[4]).replace(/\u0000/g, ''))
+      }
+
+      expect(tx.receipt.logs.length).to.be.equal(total + 1)
+      const decoder = ethjsABI.logDecoder(ctx.contracts.token.abi)
+      const tokenEvents = decoder(tx.receipt.logs)
+      const tokenLog = tokenEvents[0]
+      expect(tokenLog._eventName).to.be.equal('Transfer')
+      expect(tokenLog.from).to.be.equal(ctx.actors.mfg)
+      expect(tokenLog.to).to.be.equal(ctx.actors.irnNode)
+      expect(tokenLog.value.toString(10)).to.be.equal((regFee * total).toString(10))
+
+      const mfgEndingBalance = await ctx.contracts.token.balanceOf(ctx.actors.mfg)
+      expect((mfgEndingBalance - mfgStartingBalance).toString(10)).to.be.equal((regFee * total).toString(10))
+
+      const irnEndingBalance = await ctx.contracts.token.balanceOf(ctx.actors.irnNode)
+      expect((irnEndingBalance - irnStartingBalance).toString(10)).to.be.equal((regFee * total).toString(10))
+    })
+
+    it('mfg can bulk activate devices', async () => {
+      const deviceIds = []
+      const deviceIdHashes = []
+      const hwPublicKeys = []
+      for (let i = 0; i < total; i++) {
+        deviceIds.push(deviceIdPrefix + i)
+        deviceIdHashes.push(web3Utils.soliditySha3({t: 'bytes32', v: web3.fromAscii(deviceIdPrefix + i)}))
+        hwPublicKeys.push(hwPubKeyPrefix + i)
+      }
+      await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, (regFee + actFee) * total, {from: ctx.actors.mfg})
+      const success = await ctx.contracts.atonomi.registerAndActivateDevices.call(deviceIds, hwPublicKeys, {from: ctx.actors.mfg})
+      expect(success).to.be.equal(true)
+
+      const tx = await ctx.contracts.atonomi.registerAndActivateDevices(deviceIds, hwPublicKeys, {from: ctx.actors.mfg})
+      expect(tx.logs.length).to.be.equal(total * 2)
+      for (let i = 0; i < tx.logs.length; i++) {
+        const log = tx.logs[i]
+        if (i % 2 == 0) {
+          expect(log.event).to.be.equal('DeviceRegistered')
+          expect(log.args._sender).to.be.equal(ctx.actors.mfg)
+          expect(log.args._contributor).to.be.equal(ctx.actors.irnNode)
+          expect(log.args._deviceHashKey).to.be.equal(deviceIdHashes[i / 2])
+        } else {
+          expect(log.event).to.be.equal('DeviceActivated')
+          expect(log.args._sender).to.be.equal(ctx.actors.mfg)
+          expect(log.args._contributor).to.be.equal(ctx.actors.irnNode)
+          expect(web3.toAscii(log.args._deviceId).replace(/\u0000/g, '')).to.be.equal(deviceIds[(i - 1) / 2])
+        }
+      }
+
+      for (let i = 0; i < total; i++) {
+        const device = await ctx.contracts.atonomi.devices(deviceIdHashes[i])
+        expect(web3.toAscii(device[0]).replace(/\u0000/g, '')).to.be.equal(hwPublicKeys[i])
+        expect(web3.toAscii(device[1]).replace(/\u0000/g, '')).to.be.equal(mfgId)
+        expect(device[2]).to.be.equal(true)
+        expect(device[3]).to.be.equal(true)
+        expect('').to.be.equal(web3.toAscii(device[4]).replace(/\u0000/g, ''))
+      }
+
+      expect(tx.receipt.logs.length).to.be.equal((total * 2) + 1)
+      const decoder = ethjsABI.logDecoder(ctx.contracts.token.abi)
+      const tokenEvents = decoder(tx.receipt.logs)
+      const tokenLog = tokenEvents[0]
+      expect(tokenLog._eventName).to.be.equal('Transfer')
+      expect(tokenLog.from).to.be.equal(ctx.actors.mfg)
+      expect(tokenLog.to).to.be.equal(ctx.actors.irnNode)
+      expect(tokenLog.value.toString(10)).to.be.equal(((regFee + actFee) * total).toString(10))
+
+      const mfgEndingBalance = await ctx.contracts.token.balanceOf(ctx.actors.mfg)
+      expect((mfgEndingBalance - mfgStartingBalance).toString(10)).to.be.equal('0')
+
+      const irnEndingBalance = await ctx.contracts.token.balanceOf(ctx.actors.irnNode)
+      expect((irnEndingBalance - irnStartingBalance).toString(10)).to.be.equal(((regFee + actFee) * total).toString(10))
+    })
+
+    it('can bulk operations with some failures', async () => {
+      /* TODO 
+      const deviceIdHashes = []
+      const hwPublicKeys = []
+      for (let i = 0; i < total; i++) {
+        if (i === 0) {
+          // set a zero hash
+          deviceIdHashes.push('')
+          hwPublicKeys.push(hwPubKeyPrefix + i)
+        } else if (i === 1) {
+          // set a zero pub key
+          deviceIdHashes.push(web3Utils.soliditySha3({t: 'bytes32', v: web3.fromAscii(deviceIdPrefix + i)}))
+          hwPublicKeys.push('')
+        } else {
+          deviceIdHashes.push(web3Utils.soliditySha3({t: 'bytes32', v: web3.fromAscii(deviceIdPrefix + i)}))
+          hwPublicKeys.push(hwPubKeyPrefix + i)
+        }
+      }
+      await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, regFee * total, {from: ctx.actors.mfg})
+      const success = await ctx.contracts.atonomi.registerDevices.call(deviceIdHashes, hwPublicKeys, {from: ctx.actors.mfg})
+      expect(success).to.be.equal(true)
+
+      const tx = await ctx.contracts.atonomi.registerDevices(deviceIdHashes, hwPublicKeys, {from: ctx.actors.mfg})
+      expect(tx.logs.length).to.be.equal(total)
+
+      for (let i = 0; i < total; i++) {
+        const log = tx.logs[i]
+
+        if (i === 0 || i === 1) {
+          expect(log.event).to.be.equal('DeviceRegistrationFailed')
+          expect(log.args._sender).to.be.equal(ctx.actors.mfg)
+          expect(log.args._beneficiary).to.be.equal(ctx.actors.irnNode)
+          expect(log.args._deviceHashKey).to.be.equal(i === 0 ? '0x0000000000000000000000000000000000000000000000000000000000000000' : deviceIdHashes[i])
+        } else {
+          expect(log.event).to.be.equal('DeviceRegistered')
+          expect(log.args._sender).to.be.equal(ctx.actors.mfg)
+          expect(log.args._beneficiary).to.be.equal(ctx.actors.irnNode)
+          expect(log.args._deviceHashKey).to.be.equal(deviceIdHashes[i])
+
+          const device = await ctx.contracts.atonomi.devices(deviceIdHashes[i])
+          expect(web3.toAscii(device[0]).replace(/\u0000/g, '')).to.be.equal(hwPublicKeys[i])
+          expect(web3.toAscii(device[1]).replace(/\u0000/g, '')).to.be.equal(mfgId)
+          expect(device[2]).to.be.equal(true)
+          expect(device[3]).to.be.equal(false)
+          expect('').to.be.equal(web3.toAscii(device[4]).replace(/\u0000/g, ''))
+        }
+      }
+
+      expect(tx.receipt.logs.length).to.be.equal(total + 1)
+      const decoder = ethjsABI.logDecoder(ctx.contracts.token.abi)
+      const tokenEvents = decoder(tx.receipt.logs)
+      const tokenLog = tokenEvents[0]
+      expect(tokenLog._eventName).to.be.equal('Transfer')
+      expect(tokenLog.from).to.be.equal(ctx.actors.mfg)
+      expect(tokenLog.to).to.be.equal(ctx.actors.irnNode)
+      expect(tokenLog.value.toString(10)).to.be.equal((regFee * (total - 2)).toString(10))
+
+      const mfgEndingBalance = await ctx.contracts.token.balanceOf(ctx.actors.mfg)
+      expect((mfgEndingBalance - mfgStartingBalance).toString(10)).to.be.equal((regFee * 2).toString(10))
+
+      const irnEndingBalance = await ctx.contracts.token.balanceOf(ctx.actors.irnNode)
+      expect((irnEndingBalance - irnStartingBalance).toString(10)).to.be.equal((regFee * (total - 2)).toString(10))
+      */
+    })
+
+    it('external accounts can not perform bulk operations on devices', async () => {
+      /* TODO 
+      const deviceIdHashes = []
+      const hwPublicKeys = []
+      for (let i = 0; i < total; i++) {
+        deviceIdHashes.push(web3Utils.soliditySha3({t: 'bytes32', v: web3.fromAscii(deviceIdPrefix + i)}))
+        hwPublicKeys.push(hwPubKeyPrefix + i)
+      }
+
+      const bads = [ctx.actors.alice, ctx.actors.owner, ctx.actors.admin, ctx.actors.irnNode]
+      for (let i = 0; i < bads.length; i++) {
+        const from = bads[i]
+        await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, regFee * total, {from: from})
+        const fn = ctx.contracts.atonomi.registerDevices(deviceIdHashes, hwPublicKeys, {from: from})
+        await errors.expectRevert(fn)
+      } */
+    })
+  })
+
+  describe('bulk reputation updates', () => {
+    /* TODO
     let irnStartingBalance
     let mfgStartingBalance
 
@@ -402,7 +602,7 @@ contract('Device Management', accounts => {
       await ctx.contracts.token.transfer(ctx.actors.mfg, regFee * total, {from: ctx.actors.owner})
     })
 
-    it('mfg can bulk register devices', async () => {
+    it('irn node can bulk update reputation scores', async () => {
       const deviceIdHashes = []
       const hwPublicKeys = []
       for (let i = 0; i < total; i++) {
@@ -447,7 +647,7 @@ contract('Device Management', accounts => {
       expect((irnEndingBalance - irnStartingBalance).toString(10)).to.be.equal((regFee * total).toString(10))
     })
 
-    it('can bulk register with some failures', async () => {
+    it('can bulk update reputation scores with some failures', async () => {
       const deviceIdHashes = []
       const hwPublicKeys = []
       for (let i = 0; i < total; i++) {
@@ -510,7 +710,7 @@ contract('Device Management', accounts => {
       expect((irnEndingBalance - irnStartingBalance).toString(10)).to.be.equal((regFee * (total - 2)).toString(10))
     })
 
-    it('external accounts can not bulk register devices', async () => {
+    it('external accounts can not bulk update reputation scores', async () => {
       const deviceIdHashes = []
       const hwPublicKeys = []
       for (let i = 0; i < total; i++) {
@@ -526,5 +726,6 @@ contract('Device Management', accounts => {
         await errors.expectRevert(fn)
       }
     })
+    */
   })
 })
