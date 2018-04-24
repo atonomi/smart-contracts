@@ -75,11 +75,12 @@ $ ./geth-attach.sh
 
 This will drop you into a geth console that will have preloaded the Atonomi constants and abi needed for contract deployment.
 
-To deploy the Atonomi contracts run the following: 
-NOTE: if ATMI_ADDR or SAFEMATHLIB_ADDR are set, it will skip those deployments
-
+To deploy the Atonomi contracts run the following:
 ```
 > loadScript('scripts/deploy-atonomi.js')
+> initSafeMathLib()
+> initATMIToken()
+> initAtonomi()
 ```
 
 ### Unit Tests
