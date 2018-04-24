@@ -5,7 +5,7 @@
 if [ -z ${PARITY_NODE+x} ]; then PARITY_NODE=http://localhost:8545; fi
 echo -e "PARITY_NODE is set to '$PARITY_NODE'"
 
-if [ -z ${ETHER_ADDR+x} ]; then ETHER_ADDR=0xe9a3f9d5e08bce9a8bbe8d00fcc4c1c30019f678; fi
+if [ -z ${ETHER_ADDR+x} ]; then ETHER_ADDR=0x84757b58cd14912d94e665fb0cf66c3693dc2876; fi
 echo -e "ETHER_ADDR is set to '$ETHER_ADDR'"
 
 if [ -z ${SAFEMATHLIB_ADDR+x} ]; then SAFEMATHLIB_ADDR=0x32050f78221d61f8b7641aa11eca0a76d8a0954f; fi
