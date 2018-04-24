@@ -306,9 +306,8 @@ contract Atonomi is Ownable {
     /// @dev tokens will be deducted from the manufacturer to the IRN Node they belong to
     function registerDevice(bytes32 _deviceIdHash, bytes32 _hardwarePublicKey) public onlyManufacturer returns (bool) {
         require(validateAndRegisterDevice(msg.sender, _deviceIdHash, _hardwarePublicKey));
-        balances[address(this)] = balances[address(this)].add(registrationFee);
         emit DeviceRegistered(msg.sender, registrationFee, _deviceIdHash);
-        require(token.transferFrom(msg.sender, address(this), registrationFee));
+        require(depositTokens(msg.sender, registrationFee));
         return true;
     }
 
@@ -320,9 +319,8 @@ contract Atonomi is Ownable {
     /// @dev tokens will be deducted from the device owner to the IRN Node the device belongs to
     function activateDevice(bytes32 _deviceId) public returns (bool) {
         require(validateAndActivateDevice(_deviceId));
-        balances[address(this)] = balances[address(this)].add(activationFee);
         emit DeviceActivated(msg.sender, activationFee, _deviceId);
-        require(token.transferFrom(msg.sender, address(this), activationFee));
+        require(depositTokens(msg.sender, activationFee));
         return true;
     }
 
@@ -344,8 +342,7 @@ contract Atonomi is Ownable {
         emit DeviceActivated(msg.sender, activationFee, _deviceId);
 
         uint256 fee = registrationFee.add(activationFee);
-        balances[address(this)] = balances[address(this)].add(fee);
-        require(token.transferFrom(msg.sender, address(this), fee));
+        require(depositTokens(msg.sender, fee));
         return true;
     }
 
@@ -368,34 +365,19 @@ contract Atonomi is Ownable {
         uint256 contributorReward;
         uint256 irnReward;
         (contributorReward, irnReward) = getReputationRewards();
-        balances[address(this)] = balances[address(this)].sub(contributorReward).sub(irnReward);
-        balances[_contributor] = balances[_contributor].add(contributorReward);
-        balances[msg.sender] = balances[msg.sender].add(irnReward);
-
+        require(distributeRewards(_contributor, contributorReward));
+        require(distributeRewards(msg.sender, irnReward));
         emit ReputationScoreUpdated(msg.sender, _deviceId, _reputationScore, _contributor,
             contributorReward, irnReward);
         return true;
     }
 
-    /// @notice allows participants in the Atonomi network to claim their rewards
-    /// @return true if successful, otherwise false
-    function withdrawTokens() public returns (bool) {
-        uint amount = balances[msg.sender];
-        require(amount > 0);
-
-        balances[msg.sender] = 0;
-        emit TokensWithdrawn(msg.sender, amount);
-
-        require(token.transfer(msg.sender, amount));
-        return true;
-    }
-
-    ///@notice computes the portion of the reputation reward allotted to the contributor
-    ///@return computed value in ATMI
-    function getReputationRewards() public view returns (uint256, uint256) {
-        uint256 contributorReward = reputationReward.mul(reputationContributorShare).div(100);
-        uint256 irnReward = reputationReward.sub(contributorReward);
-        return (contributorReward, irnReward);
+    /// @notice computes the portion of the reputation reward allotted to the contributor
+    /// @return contributorReward is given to reputation score authors, irnReward is given to 
+    /// nodes submitting score transactions
+    function getReputationRewards() public view returns (uint256 contributorReward, uint256 irnReward) {
+        contributorReward = reputationReward.mul(reputationContributorShare).div(100);
+        irnReward = reputationReward.sub(contributorReward);
     }
 
     ///
@@ -433,8 +415,7 @@ contract Atonomi is Ownable {
             runningBalance = runningBalance.add(registrationFee);
         }
 
-        balances[address(this)] = balances[address(this)].add(runningBalance);
-        require(token.transferFrom(msg.sender, address(this), runningBalance));
+        require(depositTokens(msg.sender, runningBalance));
         return true;
     }
 
@@ -479,8 +460,7 @@ contract Atonomi is Ownable {
             runningBalance = runningBalance.add(fee);
         }
 
-        balances[address(this)] = balances[address(this)].add(runningBalance);
-        require(token.transferFrom(msg.sender, address(this), runningBalance));
+        require(depositTokens(msg.sender, runningBalance));
         return true;
     }
 
@@ -516,10 +496,8 @@ contract Atonomi is Ownable {
             uint256 contributorReward;
             uint256 irnReward;
             (contributorReward, irnReward) = getReputationRewards();
-            balances[address(this)] = balances[address(this)].sub(contributorReward).sub(irnReward);
-            balances[_contributor] = balances[_contributor].add(contributorReward);
-            balances[msg.sender] = balances[msg.sender].add(irnReward);
-
+            require(distributeRewards(_contributor, contributorReward));
+            require(distributeRewards(msg.sender, irnReward));
             emit ReputationScoreUpdated(msg.sender, _deviceId, _reputationScore, _contributor,
                 contributorReward, irnReward);
         }
@@ -564,6 +542,32 @@ contract Atonomi is Ownable {
         bytes32 memberId = network[_member].memberId;
         delete network[_member];
         emit NetworkMemberRemoved(msg.sender, _member, memberId);
+        return true;
+    }
+
+    /// @notice allows participants in the Atonomi network to claim their rewards
+    /// @return true if successful, otherwise false
+    function withdrawTokens() public returns (bool) {
+        uint amount = balances[msg.sender];
+        require(amount > 0);
+
+        balances[msg.sender] = 0;
+        emit TokensWithdrawn(msg.sender, amount);
+
+        require(token.transfer(msg.sender, amount));
+        return true;
+    }
+
+    function depositTokens(address _spender, uint256 amount) internal returns (bool) {
+        address tokenPoolAddr = address(this);
+        balances[tokenPoolAddr] = balances[tokenPoolAddr].add(amount);
+        return token.transferFrom(_spender, tokenPoolAddr, amount);
+    }
+
+    function distributeRewards(address _owner, uint256 _amount) internal returns (bool) {
+        address tokenPoolAddr = address(this);
+        balances[tokenPoolAddr] = balances[tokenPoolAddr].sub(_amount);
+        balances[_owner] = balances[_owner].add(_amount);
         return true;
     }
 
