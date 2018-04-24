@@ -369,6 +369,16 @@ contract('Network Management', accounts => {
         expect(fee.toString(10)).to.be.equal(newRegFee.toString(10))
       })
 
+      it('can not set fee to 0', async () => {
+        const fn = ctx.contracts.atonomi.setRegistrationFee(0, {from: ctx.actors.owner})
+        await errors.expectRevert(fn)
+      })
+
+      it('can not set fee to same value', async () => {
+        const fn = ctx.contracts.atonomi.setRegistrationFee(regFee, {from: ctx.actors.owner})
+        await errors.expectRevert(fn)
+      })
+
       it('IRN admin can not set fee', async () => {
         await ctx.contracts.atonomi.addNetworkMember(ctx.actors.admin, true, false, false, '', {from: ctx.actors.owner})
 
@@ -397,6 +407,16 @@ contract('Network Management', accounts => {
         expect(fee.toString(10)).to.be.equal(newActFee.toString(10))
       })
 
+      it('can not set fee to 0', async () => {
+        const fn = ctx.contracts.atonomi.setActivationFee(0, {from: ctx.actors.owner})
+        await errors.expectRevert(fn)
+      })
+
+      it('can not set fee to same value', async () => {
+        const fn = ctx.contracts.atonomi.setActivationFee(actFee, {from: ctx.actors.owner})
+        await errors.expectRevert(fn)
+      })
+
       it('IRN admin can not set fee', async () => {
         await ctx.contracts.atonomi.addNetworkMember(ctx.actors.admin, true, false, false, '', {from: ctx.actors.owner})
 
@@ -423,6 +443,16 @@ contract('Network Management', accounts => {
 
         const fee = await ctx.contracts.atonomi.reputationReward()
         expect(fee.toString(10)).to.be.equal(newRepReward.toString(10))
+      })
+
+      it('can not set fee to 0', async () => {
+        const fn = ctx.contracts.atonomi.setReputationReward(0, {from: ctx.actors.owner})
+        await errors.expectRevert(fn)
+      })
+
+      it('can not set fee to same value', async () => {
+        const fn = ctx.contracts.atonomi.setReputationReward(repReward, {from: ctx.actors.owner})
+        await errors.expectRevert(fn)
       })
 
       it('IRN admin can not set reward', async () => {
@@ -455,7 +485,7 @@ contract('Network Management', accounts => {
 
         const rewards = await ctx.contracts.atonomi.getReputationRewards()
         expect(rewards[0].toString(10)).to.be.equal(newContributionReward.toString(10))
-        expect(rewards[1].toString(10)).to.be.equal(newContributionReward.toString(10))
+        expect(rewards[1].toString(10)).to.be.equal(newIrnReward.toString(10))
       })
 
       it('can not set share to 0%', async () => {
