@@ -65,7 +65,7 @@ $ cd deploy
 Then attach to any Ropsten Test node.  If you need Ropsten Test Ether, go here: http://faucet.ropsten.be:3001/ or https://faucet.metamask.io/
 
 ```
-$ export PARITY_NODE=http://test.parity.atonomi.io:8545
+$ export PARITY_NODE=http://localhost:8545
 $ export ETHER_ADDR=0xe9a3f9d5e08bce9a8bbe8d00fcc4c1c30019f678
 $ export SAFEMATHLIB_ADDR=0x32050f78221d61f8b7641aa11eca0a76d8a0954f
 $ export ATMI_ADDR=0x728913b826b12b38e647880e9cf852161790afdb
@@ -74,11 +74,11 @@ $ ./geth-attach.sh
 
 This will drop you into a geth console that will have preloaded the Atonomi constants and abi needed for contract deployment.
 
-To deploy the ATMI token contract run the following: 
-NOTE: if ATMI_ADDR or SAFEMATHLIB_ADDR are set, it will connect to the existing contracts.
+To deploy the Atonomi contracts run the following: 
+NOTE: if ATMI_ADDR or SAFEMATHLIB_ADDR are set, it will skip those deployments
 
 ```
-> loadScript('scripts/deploy-atmi-token.js')
+> loadScript('scripts/deploy-atonomi.js')
 ```
 
 ### Unit Tests

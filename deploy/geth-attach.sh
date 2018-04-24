@@ -2,7 +2,7 @@
 #set -e
 #set -o pipefail
 
-if [ -z ${PARITY_NODE+x} ]; then PARITY_NODE=http://test.parity.atonomi.io:8545; fi
+if [ -z ${PARITY_NODE+x} ]; then PARITY_NODE=http://localhost:8545; fi
 echo -e "PARITY_NODE is set to '$PARITY_NODE'"
 
 if [ -z ${ETHER_ADDR+x} ]; then ETHER_ADDR=0xe9a3f9d5e08bce9a8bbe8d00fcc4c1c30019f678; fi
@@ -24,5 +24,6 @@ echo -e "var ATMI_ADDR='$ATMI_ADDR'" >> scripts/atonomi-consts.js
 echo -e "" > scripts/atonomi-abis.js
 echo -e "var SafeMathLibJSON = " >> scripts/atonomi-abis.js | cat "../build/contracts/SafeMathLib.json" >> scripts/atonomi-abis.js
 echo -e "\nvar AtonomiTokenJSON = " >> scripts/atonomi-abis.js | cat "../build/contracts/AMLToken.json" >> scripts/atonomi-abis.js
+echo -e "\nvar AtonomiJSON = " >> scripts/atonomi-abis.js | cat "../build/contracts/Atonomi.json" >> scripts/atonomi-abis.js
 
 geth --preload "scripts/atonomi-consts.js,scripts/deploy-helpers.js,scripts/atonomi-abis.js" attach $PARITY_NODE
