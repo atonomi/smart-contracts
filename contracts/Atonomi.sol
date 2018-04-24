@@ -1,4 +1,4 @@
-pragma solidity ^0.4.21;
+pragma solidity ^0.4.23;
 
 import "zeppelin-solidity/contracts/Ownership/Ownable.sol";
 
@@ -7,12 +7,12 @@ import "zeppelin-solidity/contracts/Ownership/Ownable.sol";
 /// @author Fabian Vogelsteller <fabian@ethereum.org>, Vitalik Buterin <vitalik.buterin@ethereum.org>
 /// @dev https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20.md
 interface ERC20Interface {
-    function totalSupply() public constant returns (uint);
-    function balanceOf(address tokenOwner) public constant returns (uint balance);
-    function allowance(address tokenOwner, address spender) public constant returns (uint remaining);
-    function transfer(address to, uint tokens) public returns (bool success);
-    function approve(address spender, uint tokens) public returns (bool success);
-    function transferFrom(address from, address to, uint tokens) public returns (bool success);
+    function totalSupply() external constant returns (uint);
+    function balanceOf(address tokenOwner) external constant returns (uint balance);
+    function allowance(address tokenOwner, address spender) external constant returns (uint remaining);
+    function transfer(address to, uint tokens) external returns (bool success);
+    function approve(address spender, uint tokens) external returns (bool success);
+    function transferFrom(address from, address to, uint tokens) external returns (bool success);
 
     event Transfer(address indexed from, address indexed to, uint tokens);
     event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
@@ -171,7 +171,7 @@ contract Atonomi is Ownable {
     /// @param _registrationFee initial registration fee on the network
     /// @param _activationFee initial activation fee on the network
     /// @param _reputationReward initial reputation reward on the network
-    function Atonomi (address _token, uint256 _registrationFee, uint256 _activationFee, uint256 _reputationReward)
+    constructor(address _token, uint256 _registrationFee, uint256 _activationFee, uint256 _reputationReward)
         public 
     {
         require(_token != address(0));

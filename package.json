@@ -32,7 +32,7 @@
     "solhint": "^1.1.10",
     "solidity-coverage": "^0.4.15",
     "standard": "^10.0.3",
-    "truffle": "^4.1.6",
+    "truffle": "^4.1.7",
     "truffle-contract": "^3.0.5",
     "truffle-ext": "0.1.8",
     "truffle-flattener": "^1.2.5",
