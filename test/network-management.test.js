@@ -341,58 +341,6 @@ contract('Network Management', accounts => {
     })
   })
 
-  describe('IRN Node and MFG mappings', () => {
-    const mfgId = 'APPLE'
-
-    it('owner can map', async () => {
-      await ctx.contracts.atonomi.addNetworkMember(ctx.actors.irnNode, false, false, true, '', {from: ctx.actors.owner})
-
-      const success = await ctx.contracts.atonomi.mapManufacturerToIRNNode.call(ctx.actors.irnNode, mfgId, {from: ctx.actors.owner})
-      expect(success).to.be.equal(true)
-
-      const tx = await ctx.contracts.atonomi.mapManufacturerToIRNNode(ctx.actors.irnNode, mfgId, {from: ctx.actors.owner})
-      expect(tx.logs.length).to.be.equal(1)
-      expect(tx.logs[0].event).to.be.equal('ManufacturerMapped')
-      expect(tx.logs[0].args._sender).to.be.equal(ctx.actors.owner)
-      expect(tx.logs[0].args._irnNode).to.be.equal(ctx.actors.irnNode)
-      expect(web3.toAscii(tx.logs[0].args._manufacturerId).replace(/\u0000/g, '')).to.be.equal(mfgId)
-
-      const lookup = await ctx.contracts.atonomi.iRNLookup(mfgId)
-      expect(lookup).to.be.equal(ctx.actors.irnNode)
-    })
-
-    it('irn admin can map', async () => {
-      await ctx.contracts.atonomi.addNetworkMember(ctx.actors.admin, true, false, false, '', {from: ctx.actors.owner})
-      await ctx.contracts.atonomi.addNetworkMember(ctx.actors.irnNode, false, false, true, '', {from: ctx.actors.owner})
-
-      const success = await ctx.contracts.atonomi.mapManufacturerToIRNNode.call(ctx.actors.irnNode, mfgId, {from: ctx.actors.admin})
-      expect(success).to.be.equal(true)
-
-      const tx = await ctx.contracts.atonomi.mapManufacturerToIRNNode(ctx.actors.irnNode, mfgId, {from: ctx.actors.admin})
-      expect(tx.logs.length).to.be.equal(1)
-      expect(tx.logs[0].event).to.be.equal('ManufacturerMapped')
-      expect(tx.logs[0].args._sender).to.be.equal(ctx.actors.admin)
-      expect(tx.logs[0].args._irnNode).to.be.equal(ctx.actors.irnNode)
-      expect(web3.toAscii(tx.logs[0].args._manufacturerId).replace(/\u0000/g, '')).to.be.equal(mfgId)
-
-      const lookup = await ctx.contracts.atonomi.iRNLookup(mfgId)
-      expect(lookup).to.be.equal(ctx.actors.irnNode)
-    })
-
-    it('external accounts can not map', async () => {
-      await ctx.contracts.atonomi.addNetworkMember(ctx.actors.irnNode, false, false, true, '', {from: ctx.actors.owner})
-
-      const owner = await ctx.contracts.atonomi.owner.call()
-      expect(ctx.actors.bob).not.to.be.equal(owner)
-
-      const m = await ctx.contracts.atonomi.network(ctx.actors.bob)
-      expect(m[0]).not.to.equal(true)
-
-      const fn = ctx.contracts.atonomi.mapManufacturerToIRNNode(ctx.actors.irnNode, mfgId, {from: ctx.actors.bob})
-      await errors.expectRevert(fn)
-    })
-  })
-
   describe('fee management', () => {
     const newRegFee = regFee * 2
     const newActFee = actFee * 2
@@ -413,20 +361,11 @@ contract('Network Management', accounts => {
         expect(fee.toString(10)).to.be.equal(newRegFee.toString(10))
       })
 
-      it('IRN admin can set fee', async () => {
+      it('IRN admin can not set fee', async () => {
         await ctx.contracts.atonomi.addNetworkMember(ctx.actors.admin, true, false, false, '', {from: ctx.actors.owner})
 
-        const success = await ctx.contracts.atonomi.setRegistrationFee.call(newRegFee, {from: ctx.actors.admin})
-        expect(success).to.be.equal(true)
-
-        const tx = await ctx.contracts.atonomi.setRegistrationFee(newRegFee, {from: ctx.actors.admin})
-        expect(tx.logs.length).to.be.equal(1)
-        expect(tx.logs[0].event).to.be.equal('RegistrationFeeUpdated')
-        expect(tx.logs[0].args._sender).to.be.equal(ctx.actors.admin)
-        expect(tx.logs[0].args._amount.toString(10)).to.be.equal(newRegFee.toString(10))
-
-        const fee = await ctx.contracts.atonomi.registrationFee()
-        expect(fee.toString(10)).to.be.equal(newRegFee.toString(10))
+        const fn = ctx.contracts.atonomi.setRegistrationFee(newRegFee, {from: ctx.actors.admin})
+        await errors.expectRevert(fn)
       })
 
       it('external accounts cannot set fee', async () => {
@@ -450,20 +389,11 @@ contract('Network Management', accounts => {
         expect(fee.toString(10)).to.be.equal(newActFee.toString(10))
       })
 
-      it('IRN admin can set fee', async () => {
+      it('IRN admin can not set fee', async () => {
         await ctx.contracts.atonomi.addNetworkMember(ctx.actors.admin, true, false, false, '', {from: ctx.actors.owner})
 
-        const success = await ctx.contracts.atonomi.setActivationFee.call(newActFee, {from: ctx.actors.admin})
-        expect(success).to.be.equal(true)
-
-        const tx = await ctx.contracts.atonomi.setActivationFee(newActFee, {from: ctx.actors.admin})
-        expect(tx.logs.length).to.be.equal(1)
-        expect(tx.logs[0].event).to.be.equal('ActivationFeeUpdated')
-        expect(tx.logs[0].args._sender).to.be.equal(ctx.actors.admin)
-        expect(tx.logs[0].args._amount.toString(10)).to.be.equal(newActFee.toString(10))
-
-        const fee = await ctx.contracts.atonomi.activationFee()
-        expect(fee.toString(10)).to.be.equal(newActFee.toString(10))
+        const fn = ctx.contracts.atonomi.setActivationFee(newActFee, {from: ctx.actors.admin})
+        await errors.expectRevert(fn)
       })
 
       it('external accounts cannot set fee', async () => {
@@ -487,20 +417,11 @@ contract('Network Management', accounts => {
         expect(fee.toString(10)).to.be.equal(newRepReward.toString(10))
       })
 
-      it('IRN admin can set reward', async () => {
+      it('IRN admin can not set reward', async () => {
         await ctx.contracts.atonomi.addNetworkMember(ctx.actors.admin, true, false, false, '', {from: ctx.actors.owner})
 
-        const success = await ctx.contracts.atonomi.setReputationReward.call(newRepReward, {from: ctx.actors.admin})
-        expect(success).to.be.equal(true)
-
-        const tx = await ctx.contracts.atonomi.setReputationReward(newRepReward, {from: ctx.actors.admin})
-        expect(tx.logs.length).to.be.equal(1)
-        expect(tx.logs[0].event).to.be.equal('ReputationRewardUpdated')
-        expect(tx.logs[0].args._sender).to.be.equal(ctx.actors.admin)
-        expect(tx.logs[0].args._amount.toString(10)).to.be.equal(newRepReward.toString(10))
-
-        const fee = await ctx.contracts.atonomi.reputationReward()
-        expect(fee.toString(10)).to.be.equal(newRepReward.toString(10))
+        const fn = ctx.contracts.atonomi.setReputationReward(newRepReward, {from: ctx.actors.admin})
+        await errors.expectRevert(fn)
       })
 
       it('external accounts cannot set reward', async () => {

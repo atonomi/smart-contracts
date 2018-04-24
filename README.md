@@ -41,7 +41,6 @@ To validate linters for JS and SOL files:
 
 ```
 $ npm run lint
-$ npm run lint:sol
 ```
 
 ### Deploy to local Ganache-CLI

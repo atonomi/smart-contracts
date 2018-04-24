@@ -45,8 +45,9 @@
     "test": "(npm run compile) && (ganache-cli -p 8546 -e 1000 -a 15 > /dev/null & truffle test) && (kill -9 $(lsof -ti :8546))",
     "test:single": "(npm run compile) && (ganache-cli -p 8546 -e 1000 -a 15 > /dev/null & truffle test $TESTFILE) && (kill -9 $(lsof -ti :8546))",
     "test:coverage": "(npm run compile) && touch allFiredEvents && (SOLIDITY_COVERAGE=true solidity-coverage)",
-    "lint": "standard --verbose | snazzy",
+    "lint": "npm run lint:js && npm run lint:sol",
     "lint:sol": "solhint contracts/*.sol contracts/**/*.sol",
+    "lint:js": "standard --verbose | snazzy",
     "etherscan:SafeMathLib": "truffle-flattener contracts/tokenmarket/SafeMathLib.sol",
     "etherscan:ATMI": "truffle-flattener contracts/tokenmarket/AMLToken.sol"
   },
