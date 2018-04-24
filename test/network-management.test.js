@@ -17,6 +17,8 @@ contract('Network Management', accounts => {
   const regFee = 1 * multiplier
   const actFee = 1 * multiplier
   const repReward = 1 * multiplier
+  const contributorReward = repReward * 0.8
+  const irnReward = repReward - contributorReward
 
   const testAdd = async (newMember, isIrnAdmin, isMFG, isIrnNode, memberId, from) => {
     const success = await ctx.contracts.atonomi.addNetworkMember.call(
@@ -97,6 +99,12 @@ contract('Network Management', accounts => {
     it('has reputation reward', async () => {
       const fee = await ctx.contracts.atonomi.reputationReward.call()
       expect(fee.toString(10)).to.be.equal(repReward.toString(10))
+    })
+
+    it('has correct reward split with contributor and irn node', async () => {
+      const rewards = await ctx.contracts.atonomi.getReputationRewards()
+      expect(rewards[0].toString(10)).to.be.equal(contributorReward.toString(10))
+      expect(rewards[1].toString(10)).to.be.equal(irnReward.toString(10))
     })
 
     it('cannot deploy with 0x0 token', async () => {
@@ -426,6 +434,54 @@ contract('Network Management', accounts => {
 
       it('external accounts cannot set reward', async () => {
         const fn = ctx.contracts.atonomi.setReputationReward(newRepReward, {from: ctx.actors.alice})
+        await errors.expectRevert(fn)
+      })
+    })
+
+    describe('reward split for reputation', () => {
+      const newShare = 50
+      const newContributionReward = repReward * 0.5
+      const newIrnReward = repReward - newContributionReward
+
+      it('owner can set reward', async () => {
+        const success = await ctx.contracts.atonomi.setReputationContributorShare.call(newShare, {from: ctx.actors.owner})
+        expect(success).to.be.equal(true)
+
+        const tx = await ctx.contracts.atonomi.setReputationContributorShare(newShare, {from: ctx.actors.owner})
+        expect(tx.logs.length).to.be.equal(1)
+        expect(tx.logs[0].event).to.be.equal('ReputationContributorShareUpdated')
+        expect(tx.logs[0].args._sender).to.be.equal(ctx.actors.owner)
+        expect(tx.logs[0].args._percentage.toString(10)).to.be.equal(newShare.toString(10))
+
+        const rewards = await ctx.contracts.atonomi.getReputationRewards()
+        expect(rewards[0].toString(10)).to.be.equal(newContributionReward.toString(10))
+        expect(rewards[1].toString(10)).to.be.equal(newContributionReward.toString(10))
+      })
+
+      it('can not set share to 0%', async () => {
+        const fn = ctx.contracts.atonomi.setReputationContributorShare(0, {from: ctx.actors.owner})
+        await errors.expectRevert(fn)
+      })
+
+      it('can not set share over 100%', async () => {
+        const fn = ctx.contracts.atonomi.setReputationContributorShare(101, {from: ctx.actors.owner})
+        await errors.expectRevert(fn)
+      })
+
+      it('can not set share to same value', async () => {
+        const fn = ctx.contracts.atonomi.setReputationContributorShare(80, {from: ctx.actors.owner})
+        await errors.expectRevert(fn)
+      })
+
+      it('IRN admin can not set split', async () => {
+        await ctx.contracts.atonomi.addNetworkMember(ctx.actors.admin, true, false, false, '', {from: ctx.actors.owner})
+
+        const fn = ctx.contracts.atonomi.setReputationContributorShare(newShare, {from: ctx.actors.admin})
+        await errors.expectRevert(fn)
+      })
+
+      it('external accounts cannot set split', async () => {
+        const fn = ctx.contracts.atonomi.setReputationContributorShare(newShare, {from: ctx.actors.alice})
         await errors.expectRevert(fn)
       })
     })
