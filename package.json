@@ -49,7 +49,8 @@
     "lint:sol": "solhint contracts/*.sol contracts/**/*.sol",
     "lint:js": "standard --verbose | snazzy",
     "etherscan:SafeMathLib": "truffle-flattener contracts/tokenmarket/SafeMathLib.sol",
-    "etherscan:ATMI": "truffle-flattener contracts/tokenmarket/AMLToken.sol"
+    "etherscan:ATMI": "truffle-flattener contracts/tokenmarket/AMLToken.sol",
+    "etherscan:Atonomi": "truffle-flattener contracts/Atonomi.sol"
   },
   "standard": {
     "ignore": [
