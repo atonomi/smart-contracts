@@ -124,6 +124,13 @@ contract('Device Management', accounts => {
       const fn = ctx.contracts.atonomi.registerDevice(deviceIdHash, hwPubKey, {from: from})
       await errors.expectRevert(fn)
     })
+
+    it('can not register with insufficent funds', async () => {
+      await ctx.contracts.atonomi.addNetworkMember(ctx.actors.alice, false, true, false, mfgId, {from: ctx.actors.owner})
+      await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, regFee, { from: ctx.actors.alice })
+      const fn = ctx.contracts.atonomi.registerDevice(deviceIdHash, hwPubKey, {from: ctx.actors.alice})
+      await errors.expectRevert(fn)
+    })
   })
 
   describe('activate device', () => {
@@ -211,6 +218,15 @@ contract('Device Management', accounts => {
       const fn = ctx.contracts.atonomi.activateDevice(deviceId, {from: ctx.actors.deviceOwner})
       await errors.expectRevert(fn)
     })
+
+    it('can not activate with insufficent funds', async () => {
+      await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, regFee, { from: ctx.actors.mfg })
+      await ctx.contracts.atonomi.registerDevice(deviceIdHash, hwPubKey, {from: ctx.actors.mfg})
+
+      await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, actFee, { from: ctx.actors.alice })
+      const fn = ctx.contracts.atonomi.activateDevice(deviceId, {from: ctx.actors.alice})
+      await errors.expectRevert(fn)
+    })
   })
 
   describe('register and activate device', () => {
@@ -285,6 +301,13 @@ contract('Device Management', accounts => {
       await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, 2 * (regFee + actFee), {from: from})
       await ctx.contracts.atonomi.registerAndActivateDevice(deviceId, hwPubKey, {from: from})
       const fn = ctx.contracts.atonomi.registerAndActivateDevice(deviceId, hwPubKey, {from: from})
+      await errors.expectRevert(fn)
+    })
+
+    it('can not register and activate with insufficent funds', async () => {
+      await ctx.contracts.atonomi.addNetworkMember(ctx.actors.alice, false, true, false, mfgId, {from: ctx.actors.owner})
+      await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, regFee + actFee, { from: ctx.actors.alice })
+      const fn = ctx.contracts.atonomi.registerAndActivateDevice(deviceId, hwPubKey, {from: ctx.actors.alice})
       await errors.expectRevert(fn)
     })
   })
