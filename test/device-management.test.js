@@ -60,12 +60,10 @@ contract('Device Management', accounts => {
   describe('register device', () => {
     let poolStartingBalance
     let mfgStartingBalance
-    let claimStarting
 
     beforeEach(async () => {
       poolStartingBalance = await ctx.contracts.token.balanceOf(ctx.contracts.atonomi.address)
       mfgStartingBalance = await ctx.contracts.token.balanceOf(ctx.actors.mfg)
-      claimStarting = await ctx.contracts.atonomi.balances(ctx.contracts.atonomi.address)
     })
 
     it('mfg can register', async () => {
@@ -78,7 +76,7 @@ contract('Device Management', accounts => {
       const log = tx.logs[0]
       expect(log.event).to.be.equal('DeviceRegistered')
       expect(log.args._sender).to.be.equal(ctx.actors.mfg)
-      expect(log.args.fee.toString(10)).to.be.equal(regFee.toString(10))
+      expect(log.args._fee.toString(10)).to.be.equal(regFee.toString(10))
       expect(log.args._deviceHashKey).to.be.equal(deviceIdHash)
       expect(web3.toAscii(log.args._deviceType).replace(/\u0000/g, '')).to.be.equal(deviceType)
 
@@ -104,9 +102,6 @@ contract('Device Management', accounts => {
 
       const poolEndingBalance = await ctx.contracts.token.balanceOf(ctx.contracts.atonomi.address)
       expect((poolEndingBalance - poolStartingBalance).toString(10)).to.be.equal(regFee.toString(10))
-
-      const claimEnding = await ctx.contracts.atonomi.balances(ctx.contracts.atonomi.address)
-      expect((claimEnding - claimStarting).toString(10)).to.be.equal(regFee.toString(10))
     })
 
     it('external accounts can not register', async () => {
@@ -139,13 +134,11 @@ contract('Device Management', accounts => {
     let poolStartingBalance
     let mfgStartingBalance
     let devOwnerStartingBalance
-    let claimStarting
 
     beforeEach(async () => {
       devOwnerStartingBalance = await ctx.contracts.token.balanceOf(ctx.actors.deviceOwner)
       poolStartingBalance = await ctx.contracts.token.balanceOf(ctx.contracts.atonomi.address)
       mfgStartingBalance = await ctx.contracts.token.balanceOf(ctx.actors.mfg)
-      claimStarting = await ctx.contracts.atonomi.balances(ctx.contracts.atonomi.address)
     })
 
     it('device owner can activate', async () => {
@@ -161,7 +154,7 @@ contract('Device Management', accounts => {
       const log = tx.logs[0]
       expect(log.event).to.be.equal('DeviceActivated')
       expect(log.args._sender).to.be.equal(ctx.actors.deviceOwner)
-      expect(log.args.fee.toString(10)).to.be.equal(actFee.toString(10))
+      expect(log.args._fee.toString(10)).to.be.equal(actFee.toString(10))
       expect(web3.toAscii(log.args._deviceId).replace(/\u0000/g, '')).to.be.equal(deviceId)
       expect(web3.toAscii(log.args._deviceType).replace(/\u0000/g, '')).to.be.equal(deviceType)
 
@@ -190,9 +183,6 @@ contract('Device Management', accounts => {
 
       const poolEndingBalance = await ctx.contracts.token.balanceOf(ctx.contracts.atonomi.address)
       expect((poolEndingBalance - poolStartingBalance).toString(10)).to.be.equal((regFee + actFee).toString(10))
-
-      const claimEnding = await ctx.contracts.atonomi.balances(ctx.contracts.atonomi.address)
-      expect((claimEnding - claimStarting).toString(10)).to.be.equal((regFee + actFee).toString(10))
     })
 
     it('persons without the device can not activate', async () => {
@@ -236,12 +226,10 @@ contract('Device Management', accounts => {
   describe('register and activate device', () => {
     let poolStartingBalance
     let mfgStartingBalance
-    let claimStarting
 
     beforeEach(async () => {
       poolStartingBalance = await ctx.contracts.token.balanceOf(ctx.contracts.atonomi.address)
       mfgStartingBalance = await ctx.contracts.token.balanceOf(ctx.actors.mfg)
-      claimStarting = await ctx.contracts.atonomi.balances(ctx.contracts.atonomi.address)
     })
 
     it('mfg can register and activate device', async () => {
@@ -254,14 +242,14 @@ contract('Device Management', accounts => {
       const log = tx.logs[0]
       expect(log.event).to.be.equal('DeviceRegistered')
       expect(log.args._sender).to.be.equal(ctx.actors.mfg)
-      expect(log.args.fee.toString(10)).to.be.equal(regFee.toString(10))
+      expect(log.args._fee.toString(10)).to.be.equal(regFee.toString(10))
       expect(log.args._deviceHashKey).to.be.equal(deviceIdHash)
       expect(web3.toAscii(log.args._deviceType).replace(/\u0000/g, '')).to.be.equal(deviceType)
 
       const log1 = tx.logs[1]
       expect(log1.event).to.be.equal('DeviceActivated')
       expect(log1.args._sender).to.be.equal(ctx.actors.mfg)
-      expect(log.args.fee.toString(10)).to.be.equal(actFee.toString(10))
+      expect(log.args._fee.toString(10)).to.be.equal(actFee.toString(10))
       expect(web3.toAscii(log1.args._deviceId).replace(/\u0000/g, '')).to.be.equal(deviceId)
       expect(web3.toAscii(log.args._deviceType).replace(/\u0000/g, '')).to.be.equal(deviceType)
 
@@ -287,9 +275,6 @@ contract('Device Management', accounts => {
 
       const poolEndingBalance = await ctx.contracts.token.balanceOf(ctx.contracts.atonomi.address)
       expect((poolEndingBalance - poolStartingBalance).toString(10)).to.be.equal((regFee + actFee).toString(10))
-
-      const claimEnding = await ctx.contracts.atonomi.balances(ctx.contracts.atonomi.address)
-      expect((claimEnding - claimStarting).toString(10)).to.be.equal((regFee + actFee).toString(10))
     })
 
     it('external accounts can not register and activate device', async () => {
@@ -322,13 +307,11 @@ contract('Device Management', accounts => {
   describe('reputation scores', () => {
     let irnStartingBalance
     let mfgStartingBalance
-    let claimStarting
     const score = 'somescore'
 
     beforeEach(async () => {
       irnStartingBalance = await ctx.contracts.atonomi.balances(ctx.actors.irnNode)
       mfgStartingBalance = await ctx.contracts.atonomi.balances(ctx.actors.mfg)
-      claimStarting = await ctx.contracts.atonomi.balances(ctx.contracts.atonomi.address)
     })
 
     it('IRN node can set and distribute rewards', async () => {
@@ -348,8 +331,8 @@ contract('Device Management', accounts => {
       expect(web3.toAscii(tx.logs[0].args._newScore).replace(/\u0000/g, '')).to.be.equal(score)
       expect(tx.logs[0].args._irnNode).to.be.equal(ctx.actors.irnNode)
       expect(tx.logs[0].args._irnReward.toString(10)).to.be.equal(irnReward.toString(10))
-      expect(tx.logs[0].args._mfgWallet).to.be.equal(ctx.actors.mfg)
-      expect(tx.logs[0].args._mfgReward.toString(10)).to.be.equal(mfgReward.toString(10))
+      expect(tx.logs[0].args._manufacturerWallet).to.be.equal(ctx.actors.mfg)
+      expect(tx.logs[0].args._manufacturerReward.toString(10)).to.be.equal(mfgReward.toString(10))
 
       const device = await ctx.contracts.atonomi.devices(deviceIdHash)
       expect(mfgId).to.be.equal(web3.toAscii(device[0]).replace(/\u0000/g, ''))
@@ -364,9 +347,6 @@ contract('Device Management', accounts => {
 
       const mfgEndingBalance = await ctx.contracts.atonomi.balances(ctx.actors.mfg)
       expect((mfgEndingBalance - mfgStartingBalance).toString(10)).to.be.equal(mfgReward.toString(10))
-
-      const claimEnding = await ctx.contracts.atonomi.balances(ctx.contracts.atonomi.address)
-      expect((claimEnding - claimStarting).toString(10)).to.be.equal((regFee + actFee - mfgReward - irnReward).toString(10))
 
       const testWithdraws = [
         { account: ctx.actors.mfg, expectedTokens: mfgReward },
@@ -421,7 +401,6 @@ contract('Device Management', accounts => {
   describe('bulk registrations', () => {
     let poolStartingBalance
     let mfgStartingBalance
-    let claimStarting
 
     const total = 10
     const deviceIdPrefix = 'apple-ipad'
@@ -429,7 +408,6 @@ contract('Device Management', accounts => {
     beforeEach(async () => {
       poolStartingBalance = await ctx.contracts.token.balanceOf(ctx.contracts.atonomi.address)
       mfgStartingBalance = await ctx.contracts.token.balanceOf(ctx.actors.mfg)
-      claimStarting = await ctx.contracts.atonomi.balances(ctx.contracts.atonomi.address)
 
       await ctx.contracts.token.transfer(ctx.actors.mfg, (regFee + actFee) * total, {from: ctx.actors.owner})
     })
@@ -452,7 +430,7 @@ contract('Device Management', accounts => {
         const log = tx.logs[i]
         expect(log.event).to.be.equal('DeviceRegistered')
         expect(log.args._sender).to.be.equal(ctx.actors.mfg)
-        expect(log.args.fee.toString(10)).to.be.equal(regFee.toString(10))
+        expect(log.args._fee.toString(10)).to.be.equal(regFee.toString(10))
         expect(log.args._deviceHashKey).to.be.equal(deviceIdHashes[i])
         expect(web3.toAscii(log.args._deviceType).replace(/\u0000/g, '')).to.be.equal(deviceType)
 
@@ -479,9 +457,6 @@ contract('Device Management', accounts => {
 
       const poolEndingBalance = await ctx.contracts.token.balanceOf(ctx.contracts.atonomi.address)
       expect((poolEndingBalance - poolStartingBalance).toString(10)).to.be.equal((regFee * total).toString(10))
-
-      const claimEnding = await ctx.contracts.atonomi.balances(ctx.contracts.atonomi.address)
-      expect((claimEnding - claimStarting).toString(10)).to.be.equal((regFee * total).toString(10))
     })
 
     it('can bulk operations with some failures', async () => {

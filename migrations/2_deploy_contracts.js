@@ -16,7 +16,5 @@ module.exports = function (deployer, network, accounts) {
   deployer.deploy(SafeMathLib)
   deployer.link(SafeMathLib, AtonomiToken)
   deployer.deploy(AtonomiToken, 'Atonomi Token', 'ATMI', 1000000000000000000000000000, tokenDecimals, false, {from: owner})
-    .then(() => {
-      deployer.deploy(Atonomi, AtonomiToken.address, regFee, actFee, repReward)
-    })
+    .then(() => deployer.deploy(Atonomi, AtonomiToken.address, regFee, actFee, repReward, {from: owner}))
 }

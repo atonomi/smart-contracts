@@ -523,31 +523,19 @@ contract('Network Management', accounts => {
 
       const beforePoolBal = await ctx.contracts.token.balanceOf(ctx.contracts.atonomi.address)
       const beforeAliceBal = await ctx.contracts.token.balanceOf(ctx.actors.alice)
-      const escrowBefore = await ctx.contracts.atonomi.balances(ctx.contracts.atonomi.address)
 
-      await ctx.contracts.token.approve(ctx.contracts.atonomi.address, regFee, {from: ctx.actors.alice})
-      const success = await ctx.contracts.atonomi.depositTokens.call(regFee, {from: ctx.actors.alice})
-      expect(success).to.be.equal(true)
-
-      const tx = await ctx.contracts.atonomi.depositTokens(regFee, {from: ctx.actors.alice})
+      const tx = await ctx.contracts.token.transfer(ctx.contracts.atonomi.address, regFee, {from: ctx.actors.alice})
       expect(tx.logs.length).to.be.equal(1)
-      expect(tx.logs[0].event).to.be.equal('TokensDeposited')
-      expect(tx.logs[0].args._sender).to.be.equal(ctx.actors.alice)
-      expect(tx.logs[0].args._amount.toString(10)).to.be.equal(regFee.toString(10))
 
       const afterPoolBal = await ctx.contracts.token.balanceOf(ctx.contracts.atonomi.address)
       const afterAliceBal = await ctx.contracts.token.balanceOf(ctx.actors.alice)
-      const escrowAfter = await ctx.contracts.atonomi.balances(ctx.contracts.atonomi.address)
       expect((afterPoolBal - beforePoolBal).toString(10)).to.be.equal(regFee.toString(10))
       expect((beforeAliceBal - afterAliceBal).toString(10)).to.be.equal(regFee.toString(10))
-      expect((escrowAfter - escrowBefore).toString(10)).to.be.equal(regFee.toString(10))
     })
 
     it('owner can distribute tokens from pool', async () => {
-      await ctx.contracts.token.approve(ctx.contracts.atonomi.address, regFee, {from: ctx.actors.owner})
-      await ctx.contracts.atonomi.depositTokens(regFee, {from: ctx.actors.owner})
+      await ctx.contracts.token.transfer(ctx.contracts.atonomi.address, regFee, {from: ctx.actors.owner})
 
-      const escrowBefore = await ctx.contracts.atonomi.balances(ctx.contracts.atonomi.address)
       const aliceBefore = await ctx.contracts.atonomi.balances(ctx.actors.alice)
 
       const success = await ctx.contracts.atonomi.rewardContributor.call(ctx.actors.alice, regFee, {from: ctx.actors.owner})
@@ -560,9 +548,7 @@ contract('Network Management', accounts => {
       expect(tx.logs[0].args._contributor).to.be.equal(ctx.actors.alice)
       expect(tx.logs[0].args._amount.toString(10)).to.be.equal(regFee.toString(10))
 
-      const escrowAfter = await ctx.contracts.atonomi.balances(ctx.contracts.atonomi.address)
       const aliceAfter = await ctx.contracts.atonomi.balances(ctx.actors.alice)
-      expect((escrowBefore - escrowAfter).toString(10)).to.be.equal(regFee.toString(10))
       expect((aliceAfter - aliceBefore).toString(10)).to.be.equal(regFee.toString(10))
     })
   })
