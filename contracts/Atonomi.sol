@@ -82,9 +82,9 @@ contract Atonomi is Ownable {
     /// @notice IRN Node of the manufacturer pays token to reward contributors
     uint256 public reputationReward;
 
-    /// @title Reputation Contributor Share
-    /// @notice Percentage of the reputation reward allotted to the party contributing the score
-    uint256 public reputationContributorShare;
+    /// @title Reputation Token Share
+    /// @notice percentage that the irn node or auditor receives (remaining goes to mfg)
+    uint256 public reputationTokenShare;
 
     /// @title ATMI Token
     /// @notice Standard ERC20 Token
@@ -119,17 +119,19 @@ contract Atonomi is Ownable {
     ///
     /// @title Atonomi Device
     /// @notice Contains the device state on the Atonomi network
-    /// @dev hardwarePublicKey is used for validation between devices
     /// @dev manufacturerId is the manufacturer the device belongs to
+    /// @dev deviceType is the type of device categorized by the manufacturer
     /// @dev registered is true when device is registered, otherwise false
     /// @dev activated is true when device is activated, otherwise false
     /// @dev reputationScore is official Atonomi Reputation score for the device
+    /// @dev registeredBy account to be rewarded tokens for reputation updates
     struct Device {
-        bytes32 hardwarePublicKey;
         bytes32 manufacturerId;
+        bytes32 deviceType;
         bool registered;
         bool activated;
         bytes32 reputationScore;
+        address registeredBy;
     }
 
     /// @title Atonomi Network Participant
@@ -150,19 +152,19 @@ contract Atonomi is Ownable {
     ///
     /// @notice only manufacturers can call, otherwise throw
     modifier onlyManufacturer() {
-        require(network[msg.sender].isManufacturer);
+        require(network[msg.sender].isManufacturer, "must be a manufacturer");
         _;
     }
 
     /// @notice only IRNAdmins or Owner can call, otherwise throw
     modifier onlyIRNorOwner() {
-        require(msg.sender == owner || network[msg.sender].isIRNAdmin);
+        require(msg.sender == owner || network[msg.sender].isIRNAdmin, "must be owner or an irn admin");
         _;
     }
 
     /// @notice only IRN Nodes can call, otherwise throw
     modifier onlyIRNNode() {
-        require(network[msg.sender].isIRNNode);
+        require(network[msg.sender].isIRNNode, "must be an irn node");
         _;
     }
 
@@ -174,16 +176,16 @@ contract Atonomi is Ownable {
     function Atonomi(address _token, uint256 _registrationFee, uint256 _activationFee, uint256 _reputationReward)
         public 
     {
-        require(_token != address(0));
-        require(_activationFee > 0);
-        require(_registrationFee > 0);
-        require(_reputationReward > 0);
+        require(_token != address(0), "token address cannot be 0x0");
+        require(_activationFee > 0, "activation fee must be greater than 0");
+        require(_registrationFee > 0, "registration fee must be greater than 0");
+        require(_reputationReward > 0, "reputation reward must be greater than 0");
 
         token = ERC20Interface(_token);
         activationFee = _activationFee;
         registrationFee = _registrationFee;
         reputationReward = _reputationReward;
-        reputationContributorShare = 80;
+        reputationTokenShare = 80;
     }
 
     ///
@@ -192,12 +194,16 @@ contract Atonomi is Ownable {
     /// @notice emitted on successful device registration
     /// @param _sender manufacturer paying for registration
     /// @param _deviceHashKey hash of device id used as the key in devices mapping
-    event DeviceRegistered(address indexed _sender, uint256 fee, bytes32 indexed _deviceHashKey);
+    /// @param _deviceType is the type of device categorized by the manufacturer
+    event DeviceRegistered(address indexed _sender, uint256 fee, bytes32 indexed _deviceHashKey,
+        bytes32 indexed _deviceType);
 
     /// @notice emitted on successful device activation
     /// @param _sender manufacturer or device owner paying for activation
     /// @param _deviceId the real device id (only revealed after activation)
-    event DeviceActivated(address indexed _sender, uint256 fee, bytes32 indexed _deviceId);
+    /// @param _deviceType is the type of device categorized by the manufacturer
+    event DeviceActivated(address indexed _sender, uint256 fee, bytes32 indexed _deviceId,
+        bytes32 indexed _deviceType);
 
     /// @notice emitted on successful addition of network member address
     /// @param _sender IRN node sending the addition
@@ -212,14 +218,15 @@ contract Atonomi is Ownable {
     event NetworkMemberRemoved(address indexed _sender, address indexed _member, bytes32 indexed _memberId);
 
     /// @notice emitted on reputation change for a device
-    /// @param _sender IRN node submitting the new reputation
     /// @param _deviceId id of the target device
+    /// @param _deviceType is the type of device categorized by the manufacturer
     /// @param _newScore updated reputation score
-    /// @param _contributor Auditor or Validator who contributed to score
-    /// @param _contributorReward tokens awarded to contributor
+    /// @param _irnNode IRN node submitting the new reputation
     /// @param _irnReward tokens awarded to irn node
-    event ReputationScoreUpdated(address indexed _sender, bytes32 indexed _deviceId,
-        bytes32 _newScore, address indexed _contributor, uint256 _contributorReward, uint256 _irnReward);
+    /// @param _mfgWallet mfg associated with the device is rewared a share of tokens
+    /// @param _mfgReward tokens awarded to contributor
+    event ReputationScoreUpdated(bytes32 indexed _deviceId, bytes32 indexed _deviceType, bytes32 _newScore,
+        address _irnNode, uint256 _irnReward, address indexed _mfgWallet, uint256 _mfgReward);
 
     /// @notice emitted everytime the activation fee changes
     /// @param _sender ethereum address of IRN Admin that made the change
@@ -241,11 +248,21 @@ contract Atonomi is Ownable {
     /// @param _amount tokens withdrawn
     event TokensWithdrawn(address indexed _sender, uint256 _amount);
 
-    /// @notice emitted everytime a participant changes the percentage of the reputation
-    /// reward allotted to the contributor
+    /// @notice emitted everytime a participant deposits to token pool
     /// @param _sender ethereum address of participant
+    /// @param _amount tokens deposited
+    event TokensDeposited(address indexed _sender, uint256 _amount);
+
+    /// @notice emitted everytime owner rewards a network participant
+    /// @param _sender ethereum address of owner
+    /// @param _contributor ethereum address of participant
+    /// @param _amount tokens deposited
+    event ContributorRewarded(address indexed _sender, address indexed _contributor, uint256 _amount);
+
+    /// @notice emitted everytime owner changes the contributation share for reputation authors
+    /// @param _sender ethereum address of irn admin that made the change
     /// @param _percentage new percentage value
-    event ReputationContributorShareUpdated(address indexed _sender, uint256 _percentage);
+    event ReputationTokenShareUpdated(address indexed _sender, uint256 _percentage);
 
     ///
     /// FEE SETTERS
@@ -254,8 +271,8 @@ contract Atonomi is Ownable {
     /// @param _activationFee new fee for activations in ATMI tokens
     /// @return true if successful, otherwise false
     function setActivationFee(uint256 _activationFee) public onlyOwner returns (bool) {
-        require(_activationFee > 0);
-        require(_activationFee != activationFee);
+        require(_activationFee > 0, "new activation fee must be greater than zero");
+        require(_activationFee != activationFee, "new activation fee must be different");
         activationFee = _activationFee;
         emit ActivationFeeUpdated(msg.sender, _activationFee);
         return true;
@@ -265,8 +282,8 @@ contract Atonomi is Ownable {
     /// @param _registrationFee new fee for registrations in ATMI tokens
     /// @return true if successful, otherwise false
     function setRegistrationFee(uint256 _registrationFee) public onlyOwner returns (bool) {
-        require(_registrationFee > 0);
-        require(_registrationFee != registrationFee);
+        require(_registrationFee > 0, "new registration fee must be greater than zero");
+        require(_registrationFee != registrationFee, "new registration fee must be different");
         registrationFee = _registrationFee;
         emit RegistrationFeeUpdated(msg.sender, _registrationFee);
         return true;
@@ -276,22 +293,22 @@ contract Atonomi is Ownable {
     /// @param _reputationReward new reward for reputation score changes in ATMI tokens
     /// @return true if successful, otherwise false
     function setReputationReward(uint256 _reputationReward) public onlyOwner returns (bool) {
-        require(_reputationReward > 0);
-        require(_reputationReward != reputationReward);
+        require(_reputationReward > 0, "new reputation reward must be greater than zero");
+        require(_reputationReward != reputationReward, "new reputation reward must be different");
         reputationReward = _reputationReward;
         emit ReputationRewardUpdated(msg.sender, _reputationReward);
         return true;
     }
 
-    /// @notice sets the global reputation reward share allotted to the contributor
-    /// @param _reputationContributorShare new percentage of the reputation reward allotted to contributor
+    /// @notice sets the global reputation reward share allotted to the authors and mfgs
+    /// @param _reputationTokenShare new percentage of the reputation reward allotted to author
     /// @return true if successful, otherwise false
-    function setReputationContributorShare(uint256 _reputationContributorShare) public onlyOwner returns (bool) {
-        require(_reputationContributorShare > 0);
-        require(_reputationContributorShare <= 100);
-        require(reputationContributorShare != _reputationContributorShare);
-        reputationContributorShare = _reputationContributorShare;
-        emit ReputationContributorShareUpdated(msg.sender, _reputationContributorShare);
+    function setReputationTokenShare(uint256 _reputationTokenShare) public onlyOwner returns (bool) {
+        require(_reputationTokenShare > 0, "new share must be larger than zero");
+        require(_reputationTokenShare <= 100, "new share must be less than or equal to 100");
+        require(reputationTokenShare != _reputationTokenShare, "new share must be different");
+        reputationTokenShare = _reputationTokenShare;
+        emit ReputationTokenShareUpdated(msg.sender, _reputationTokenShare);
         return true;
     }
 
@@ -300,14 +317,16 @@ contract Atonomi is Ownable {
     ///
     /// @notice registers device on the Atonomi network
     /// @param _deviceIdHash secret hash of the device's id (needs to be hashed by caller)
-    /// @param _hardwarePublicKey public key of the physical device used for validation
+    /// @param _deviceType is the type of device categorized by the manufacturer
     /// @return true if successful, otherwise false
     /// @dev msg.sender is expected to be the manufacturer
     /// @dev tokens will be deducted from the manufacturer to the IRN Node they belong to
-    function registerDevice(bytes32 _deviceIdHash, bytes32 _hardwarePublicKey) public onlyManufacturer returns (bool) {
-        require(validateAndRegisterDevice(msg.sender, _deviceIdHash, _hardwarePublicKey));
-        emit DeviceRegistered(msg.sender, registrationFee, _deviceIdHash);
-        require(depositTokens(msg.sender, registrationFee));
+    function registerDevice(bytes32 _deviceIdHash, bytes32 _deviceType)
+        public onlyManufacturer returns (bool)
+    {
+        validateAndRegisterDevice(msg.sender, _deviceIdHash, _deviceType);
+        emit DeviceRegistered(msg.sender, registrationFee, _deviceIdHash, _deviceType);
+        recordPayment(msg.sender, registrationFee);
         return true;
     }
 
@@ -318,31 +337,31 @@ contract Atonomi is Ownable {
     /// @dev anyone with the device id (in hand) is considered the device owner
     /// @dev tokens will be deducted from the device owner to the IRN Node the device belongs to
     function activateDevice(bytes32 _deviceId) public returns (bool) {
-        require(validateAndActivateDevice(_deviceId));
-        emit DeviceActivated(msg.sender, activationFee, _deviceId);
-        require(depositTokens(msg.sender, activationFee));
+        validateAndActivateDevice(_deviceId);
+        emit DeviceActivated(msg.sender, activationFee, _deviceId, devices[keccak256(_deviceId)].deviceType);
+        recordPayment(msg.sender, activationFee);
         return true;
     }
 
     /// @notice Registers and immediately activates device, used by manufacturers to prepay activation
     /// @param _deviceId id of the real device id to be activated (not the has of the device id)
-    /// @param _hardwarePublicKey public key of the physical device used for validation
+    /// @param _deviceType is the type of device categorized by the manufacturer
     /// @return true if successful, otherwise false
     /// @dev since the manufacturer is trusted, no need for the caller to hash the device id
     /// @dev msg.sender is expected to be the manufacturer
     /// @dev tokens will be deducted from the manufacturer to the IRN Node the device belongs to
-    function registerAndActivateDevice(bytes32 _deviceId, bytes32 _hardwarePublicKey) 
+    function registerAndActivateDevice(bytes32 _deviceId, bytes32 _deviceType) 
         public onlyManufacturer returns (bool)
     {
         bytes32 deviceIdHash = keccak256(_deviceId);
-        require(validateAndRegisterDevice(msg.sender, deviceIdHash, _hardwarePublicKey));
-        emit DeviceRegistered(msg.sender, registrationFee, deviceIdHash);
+        validateAndRegisterDevice(msg.sender, deviceIdHash, _deviceType);
+        emit DeviceRegistered(msg.sender, registrationFee, deviceIdHash, _deviceType);
 
-        require(validateAndActivateDevice(_deviceId));
-        emit DeviceActivated(msg.sender, activationFee, _deviceId);
+        validateAndActivateDevice(_deviceId);
+        emit DeviceActivated(msg.sender, activationFee, _deviceId, _deviceType);
 
         uint256 fee = registrationFee.add(activationFee);
-        require(depositTokens(msg.sender, fee));
+        recordPayment(msg.sender, fee);
         return true;
     }
 
@@ -351,33 +370,35 @@ contract Atonomi is Ownable {
     ///
     /// @notice updates reputation for a device
     /// @param _deviceId target device Id
-    /// @param _reputationScore updated reputation score computed by the IRN
-    /// @param _contributor who is rewarded tokens for contributing
+    /// @param _reputationScore updated reputation score computed by the author
     /// @return true if successful, otherwise false
-    /// @dev msg.sender is expected to be an irn node
-    /// @dev tokens will be deducted from the IRN Node to the contributor who wrote the score
-    function updateReputationScore(bytes32 _deviceId, bytes32 _reputationScore, address _contributor)
+    /// @dev msg.sender is expected to be the reputation author (either irn node or the reputation auditor)
+    /// @dev tokens will be deducted from the contract pool
+    /// @dev author and mfg will be rewarded tokens
+    function updateReputationScore(bytes32 _deviceId, bytes32 _reputationScore)
         public onlyIRNNode returns (bool)
     {
-        require(_contributor != address(0));
-        require(validateAndUpdateReputation(_deviceId, _reputationScore));
+        validateAndUpdateReputation(_deviceId, _reputationScore);
 
-        uint256 contributorReward;
+        Device memory d = devices[keccak256(_deviceId)];
+        address _mfgWallet = d.registeredBy;
+        require(_mfgWallet != address(0), "_mfgWallet cannot be 0x0");
+
         uint256 irnReward;
-        (contributorReward, irnReward) = getReputationRewards();
-        require(distributeRewards(_contributor, contributorReward));
-        require(distributeRewards(msg.sender, irnReward));
-        emit ReputationScoreUpdated(msg.sender, _deviceId, _reputationScore, _contributor,
-            contributorReward, irnReward);
+        uint256 mfgReward;
+        (irnReward, mfgReward) = getReputationRewards();
+        distributeRewards(msg.sender, irnReward);
+        distributeRewards(_mfgWallet, mfgReward);
+        emit ReputationScoreUpdated(_deviceId, d.deviceType, _reputationScore,
+            msg.sender, irnReward, _mfgWallet, mfgReward);
         return true;
     }
 
-    /// @notice computes the portion of the reputation reward allotted to the contributor
-    /// @return contributorReward is given to reputation score authors, irnReward is given to 
-    /// nodes submitting score transactions
-    function getReputationRewards() public view returns (uint256 contributorReward, uint256 irnReward) {
-        contributorReward = reputationReward.mul(reputationContributorShare).div(100);
-        irnReward = reputationReward.sub(contributorReward);
+    /// @notice computes the portion of the reputation reward allotted to the mfg and author
+    /// @return irnReward and mfgReward
+    function getReputationRewards() public view returns (uint256 irnReward, uint256 mfgReward) {
+        irnReward = reputationReward.mul(reputationTokenShare).div(100);
+        mfgReward = reputationReward.sub(irnReward);
     }
 
     ///
@@ -385,123 +406,36 @@ contract Atonomi is Ownable {
     ///
     /// @notice registers multiple devices on the Atonomi network
     /// @param _deviceIdHashes array of secret hashed ID's of each device
-    /// @param _hardwarePublicKeys array of public keys of each physical device
+    /// @param _deviceTypes array of types of device categorized by the manufacturer
     /// @return true if successful, otherwise false
     /// @dev msg.sender is expected to be the manufacturer
     /// @dev tokens will be deducted from the manufacturer to the IRN Node they belong to
-    function registerDevices(bytes32[] _deviceIdHashes, bytes32[] _hardwarePublicKeys)
+    function registerDevices(bytes32[] _deviceIdHashes, bytes32[] _deviceTypes)
         public onlyManufacturer returns (bool)
     {
-        require(_deviceIdHashes.length > 0);
-        require(_hardwarePublicKeys.length > 0);
-        require(_deviceIdHashes.length == _hardwarePublicKeys.length);
+        require(_deviceIdHashes.length > 0, "No devices were found");
+        require(_deviceIdHashes.length == _deviceTypes.length, "device type array needs to be same size");
 
         uint256 runningBalance = 0;
         for (uint256 i = 0; i < _deviceIdHashes.length; i++) {
             bytes32 deviceIdHash = _deviceIdHashes[i];
-            bytes32 hardwarePublicKey = _hardwarePublicKeys[i];
-            if (deviceIdHash == 0 || hardwarePublicKey == 0) {
-                revert();
+            bytes32 deviceType = _deviceTypes[i];
+            if (deviceIdHash == 0 || deviceType == 0) {
+                revert("invalid device");
             }
 
             Device memory d = devices[deviceIdHash];
             if (d.registered || d.activated) {
-                revert();
+                revert("device is already registered or activated");
             }
 
-            require(validateAndRegisterDevice(msg.sender, deviceIdHash, hardwarePublicKey));
-            emit DeviceRegistered(msg.sender, registrationFee, deviceIdHash);
+            validateAndRegisterDevice(msg.sender, deviceIdHash, deviceType);
+            emit DeviceRegistered(msg.sender, registrationFee, deviceIdHash, deviceType);
 
             runningBalance = runningBalance.add(registrationFee);
         }
 
-        require(depositTokens(msg.sender, runningBalance));
-        return true;
-    }
-
-    /// @notice registers and activates multiple devices on the Atonomi network
-    /// @param _deviceIds array of real device ids
-    /// @param _hardwarePublicKeys array of public keys of each physical device
-    /// @return true if successful, otherwise false
-    /// @dev msg.sender is expected to be the manufacturer
-    /// @dev tokens will be deducted from the manufacturer to the IRN Node they belong to
-    function registerAndActivateDevices(bytes32[] _deviceIds, bytes32[] _hardwarePublicKeys)
-        public onlyManufacturer returns (bool)
-    {
-        require(_deviceIds.length > 0);
-        require(_hardwarePublicKeys.length > 0);
-        require(_deviceIds.length == _hardwarePublicKeys.length);
-
-        uint256 runningBalance = 0;
-        uint256 fee = registrationFee.add(activationFee);
-        for (uint256 i = 0; i < _deviceIds.length; i++) {
-            bytes32 deviceId = _deviceIds[i];
-            if (deviceId == 0) {
-                revert();
-            }
-
-            bytes32 deviceIdHash = keccak256(deviceId);
-            bytes32 hardwarePublicKey = _hardwarePublicKeys[i];
-            if (deviceIdHash == 0 || hardwarePublicKey == 0) {
-                revert();
-            }
-
-            Device memory d = devices[deviceIdHash];
-            if (d.registered || d.activated) {
-                revert();
-            }
-
-            require(validateAndRegisterDevice(msg.sender, keccak256(deviceId), hardwarePublicKey));
-            emit DeviceRegistered(msg.sender, registrationFee, deviceIdHash);
-
-            require(validateAndActivateDevice(deviceId));
-            emit DeviceActivated(msg.sender, activationFee, deviceId);
-
-            runningBalance = runningBalance.add(fee);
-        }
-
-        require(depositTokens(msg.sender, runningBalance));
-        return true;
-    }
-
-    /// @notice updates reputation for multiple device
-    /// @param _deviceIds array of target device Ids
-    /// @param _reputationScores array of updated reputation scores computed by the IRN
-    /// @param _contributor who is rewarded tokens for contributing
-    /// @return true if successful, otherwise false
-    /// @dev msg.sender is expected to be an irn node
-    /// @dev tokens will be deducted from the IRN Node to the contributor who wrote the score
-    function updateReputationScores(bytes32[] _deviceIds, bytes32[] _reputationScores, address _contributor)
-        public onlyIRNNode returns (bool)
-    {
-        require(_deviceIds.length > 0);
-        require(_reputationScores.length > 0);
-        require(_deviceIds.length == _reputationScores.length);
-        require(_contributor != address(0));
-
-        for (uint256 i = 0; i < _deviceIds.length; i++) {
-            bytes32 _deviceId = _deviceIds[i];
-            if (_deviceId == 0) {
-                revert();
-            }
-
-            bytes32 _reputationScore = _reputationScores[i];
-            Device memory d = devices[keccak256(_deviceId)];
-            if (!d.registered || !d.activated || d.reputationScore == _reputationScore) {
-                revert();
-            }
-
-            require(validateAndUpdateReputation(_deviceId, _reputationScore));
-
-            uint256 contributorReward;
-            uint256 irnReward;
-            (contributorReward, irnReward) = getReputationRewards();
-            require(distributeRewards(_contributor, contributorReward));
-            require(distributeRewards(msg.sender, irnReward));
-            emit ReputationScoreUpdated(msg.sender, _deviceId, _reputationScore, _contributor,
-                contributorReward, irnReward);
-        }
-
+        recordPayment(msg.sender, runningBalance);
         return true;
     }
 
@@ -519,16 +453,17 @@ contract Atonomi is Ownable {
     function addNetworkMember(address _member, bool _isIRNAdmin, bool _isManufacturer,
         bool _isIRNNode, bytes32 _memberId) public onlyIRNorOwner returns(bool)
     {
-        require(!network[_member].isIRNAdmin);
-        require(!network[_member].isManufacturer);
-        require(!network[_member].isIRNNode);
-        require(network[_member].memberId == 0);
+        require(!network[_member].isIRNAdmin, "already an irn admin");
+        require(!network[_member].isManufacturer, "already a manufacturer");
+        require(!network[_member].isIRNNode, "already an irn node");
+        require(network[_member].memberId == 0, "already assigned a member id");
 
         network[_member] = NetworkMember(
             _isIRNAdmin,
             _isManufacturer,
             _isIRNNode,
             _memberId);
+
         emit NetworkMemberAdded(msg.sender, _member, _memberId);
 
         return true;
@@ -549,71 +484,91 @@ contract Atonomi is Ownable {
     /// @return true if successful, otherwise false
     function withdrawTokens() public returns (bool) {
         uint amount = balances[msg.sender];
-        require(amount > 0);
+        require(amount > 0, "amount is zero");
 
         balances[msg.sender] = 0;
         emit TokensWithdrawn(msg.sender, amount);
 
-        require(token.transfer(msg.sender, amount));
+        require(token.transfer(msg.sender, amount), "token transfer failed");
         return true;
     }
 
-    function depositTokens(address _spender, uint256 amount) internal returns (bool) {
-        address tokenPoolAddr = address(this);
-        balances[tokenPoolAddr] = balances[tokenPoolAddr].add(amount);
-        return token.transferFrom(_spender, tokenPoolAddr, amount);
+    /// @notice allows anyone to replenish the token pool
+    /// @param _amount amount of tokens to deposit
+    /// @return true if successful, otherwise false
+    function depositTokens(uint256 _amount) public returns (bool) {
+        require(_amount > 0, "amount is zero");
+        emit TokensDeposited(msg.sender, _amount);
+        recordPayment(msg.sender, _amount);
+        return true;
     }
 
-    function distributeRewards(address _owner, uint256 _amount) internal returns (bool) {
+    /// @notice owner is able to redistribute tokens to reward participants
+    /// @param _contributor ethereum account that will be rewarded tokens
+    /// @param _amount amount of tokens to award
+    /// @return true if successful, otherwise false
+    function rewardContributor(address _contributor, uint256 _amount) 
+        public onlyOwner returns (bool)
+    {
+        require(_amount > 0, "amount is zero");
+        require(_contributor != address(0), "contributor cannot be 0x0");
+        emit ContributorRewarded(msg.sender, _contributor, _amount);
+        distributeRewards(_contributor, _amount);
+        return true;
+    }
+
+    function recordPayment(address _spender, uint256 amount) internal returns (bool) {
+        address tokenPoolAddr = address(this);
+        balances[tokenPoolAddr] = balances[tokenPoolAddr].add(amount);
+        require(token.transferFrom(_spender, tokenPoolAddr, amount), "token transfer failed");
+    }
+
+    function distributeRewards(address _owner, uint256 _amount) internal {
         address tokenPoolAddr = address(this);
         balances[tokenPoolAddr] = balances[tokenPoolAddr].sub(_amount);
         balances[_owner] = balances[_owner].add(_amount);
-        return true;
     }
 
-    function validateAndRegisterDevice(address manufacturer, bytes32 _deviceIdHash, bytes32 _hardwarePublicKey)
-        internal returns (bool)
+    function validateAndRegisterDevice(address manufacturer, bytes32 _deviceIdHash, bytes32 _deviceType) internal
     {
-        require(_deviceIdHash != 0);
-        require(_hardwarePublicKey != 0);
+        require(_deviceIdHash != 0, "hash of device id is empty");
+        require(_deviceType != 0, "device type is empty");
 
         Device storage d = devices[_deviceIdHash];
-        require(!d.registered);
-        require(!d.activated);
+        require(!d.registered, "already registered");
+        require(!d.activated, "already activated");
 
         bytes32 manufacturerId = network[manufacturer].memberId;
-        require(manufacturerId != 0);
+        require(manufacturerId != 0, "no manufacturer id was found");
 
-        d.hardwarePublicKey = _hardwarePublicKey;
         d.manufacturerId = manufacturerId;
+        d.deviceType = _deviceType;
         d.registered = true;
         d.activated = false;
         d.reputationScore = "";
-        return true;
+        d.registeredBy = manufacturer;
     }
 
-    function validateAndActivateDevice(bytes32 _deviceId) internal returns(bool) {
+    function validateAndActivateDevice(bytes32 _deviceId) internal {
         bytes32 deviceIdHash = keccak256(_deviceId);
         Device storage d = devices[deviceIdHash];
-        require(d.registered);
-        require(!d.activated);
-        require(d.manufacturerId != 0);
+        require(d.registered, "not registered");
+        require(!d.activated, "already activated");
+        require(d.manufacturerId != 0, "no manufacturer id was found");
 
         d.activated = true;
-        return true;
     }
 
     function validateAndUpdateReputation(bytes32 _deviceId, bytes32 _reputationScore)
-        internal returns (bool)
+        internal
     {
-        require(_deviceId != 0);
+        require(_deviceId != 0, "device id is empty");
 
         Device storage d = devices[keccak256(_deviceId)];
-        require(d.registered);
-        require(d.activated);
-        require(d.reputationScore != _reputationScore);
+        require(d.registered, "not registered");
+        require(d.activated, "not activated");
+        require(d.reputationScore != _reputationScore, "new score needs to be different");
 
         d.reputationScore = _reputationScore;
-        return true;
     }
 }
