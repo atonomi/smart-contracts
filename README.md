@@ -6,7 +6,7 @@
 | ------------- | ------------- |
 | SafeMathLib (TokenMarket)  | [0x32050f78221d61f8b7641aa11eca0a76d8a0954f](https://ropsten.etherscan.io/address/0x32050f78221d61f8b7641aa11eca0a76d8a0954f#code)  |
 | ATMI Token (TokenMarket)  | [0x728913b826b12b38e647880e9cf852161790afdb](https://ropsten.etherscan.io/address/0x728913b826b12b38e647880e9cf852161790afdb#code)  |
-| Atonomi ([11cbd81](https://github.com/atonomi/smart-contracts/tree/11cbd8146147a744d79a98e1f8a12b9a1d6c04bf)) | [0x778756b689e729c3ab73335f7c21559b43a4f2e9](https://ropsten.etherscan.io/address/0x778756b689e729c3ab73335f7c21559b43a4f2e9#code)  |
+| Atonomi ([833948c](https://github.com/atonomi/smart-contracts/tree/833948c0b70b3609880f322392eb57950d09da05)) | [0xaee5c9721b81a385fd0a243316dd3e88f3245c8f](https://ropsten.etherscan.io/address/0xaee5c9721b81a385fd0a243316dd3e88f3245c8f#code)  |
 
 
 ### Setup
