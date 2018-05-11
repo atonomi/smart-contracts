@@ -1,12 +1,10 @@
 // helper function to wait for mining times
-function waitForTransactionReceipt (tag, hash) {
+function waitForTransactionReceipt (hash) {
   var receipt = web3.eth.getTransactionReceipt(hash)
   if (receipt === null) {
-    console.log('retry after 10 seconds...')
-      setTimeout(function () {
-        waitForTransactionReceipt(tag, hash)
-      }, 10000)
+    console.log('not found, retry later')
   } else {
-    console.log(tag, 'published at', receipt.contractAddress)
+    console.log(receipt)
   }
+  return receipt
 }

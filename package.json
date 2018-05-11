@@ -10,21 +10,24 @@
   ],
   "dependencies": {
     "moment": "^2.22.1",
+    "sha3": "^1.2.2",
     "truffle-blockchain-utils": "^0.0.3",
+    "truffle-core": "^4.1.8",
     "truffle-hdwallet-provider": "^0.0.3",
     "zeppelin-solidity": "^1.8.0"
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",
-    "babel-plugin-transform-es2015-modules-commonjs": "^6.24.1",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.26.2",
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-polyfill": "^6.26.0",
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-stage-0": "^6.24.1",
     "babel-register": "^6.26.0",
     "chai": "^4.1.2",
-    "coveralls": "^3.0.0",
-    "cross-env": "^5.1.4",
+    "chai-bignumber": "^2.0.2",
+    "coveralls": "^3.0.1",
+    "cross-env": "^5.1.5",
     "ethjs-abi": "^0.2.1",
     "ganache-cli": "^6.1.0",
     "lk-test-helpers": "^0.1.4",
@@ -32,7 +35,7 @@
     "solhint": "^1.1.10",
     "solidity-coverage": "^0.4.15",
     "standard": "^10.0.3",
-    "truffle": "^4.1.7",
+    "truffle": "^4.1.8",
     "truffle-contract": "^3.0.5",
     "truffle-ext": "0.1.8",
     "truffle-flattener": "^1.2.5",
@@ -42,7 +45,7 @@
     "compile": "truffle compile --all",
     "ganache-cli": "ganache-cli -p 8546 -e 1000 -a 15 -l 990000000000000",
     "deploy": "truffle migrate --reset",
-    "deploy:web": "truffle migrate --reset --network web && cp -rf ./build/. ../admin-portal/",
+    "deploy:web": "truffle migrate --reset --network web && cp -rf ./build/. ../admin-portal/build/",
     "test": "(npm run compile) && (ganache-cli -p 8546 -e 1000 -a 15 > /dev/null & truffle test) && (kill -9 $(lsof -ti :8546))",
     "test:single": "(npm run compile) && (ganache-cli -p 8546 -e 1000 -a 15 > /dev/null & truffle test $TESTFILE) && (kill -9 $(lsof -ti :8546))",
     "test:coverage": "(npm run compile) && touch allFiredEvents && (SOLIDITY_COVERAGE=true solidity-coverage)",
@@ -64,7 +67,10 @@
       "it",
       "beforeEach",
       "contract",
-      "_"
+      "_",
+      "before",
+      "expect",
+      "assert"
     ]
   }
 }

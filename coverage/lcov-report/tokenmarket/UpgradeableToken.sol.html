@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for tokenmarket/UpgradeableToken.sol</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../index.html">all files</a> / <a href="index.html">tokenmarket/</a> UpgradeableToken.sol
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">2.7% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>1/37</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>0/26</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">16.67% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>1/6</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">4.17% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>1/24</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line low'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">29×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * This smart contract code is Copyright 2017 TokenMarket Ltd. For more information see https://tokenmarket.net
+ *
+ * Licensed under the Apache License, version 2.0: https://github.com/TokenMarketNet/ico/blob/master/LICENSE.txt
+ */
+&nbsp;
+pragma solidity ^0.4.8;
+&nbsp;
+import "zeppelin-solidity/contracts/token/ERC20/ERC20.sol";
+import "./StandardTokenExt.sol";
+import "./UpgradeAgent.sol";
+&nbsp;
+/**
+ * A token upgrade mechanism where users can opt-in amount of tokens to the next smart contract revision.
+ *
+ * First envisioned by Golem and Lunyr projects.
+ */
+contract UpgradeableToken is StandardTokenExt {
+&nbsp;
+  /** Contract / person who can set the upgrade path. This can be the same as team multisig wallet, as what it is with its default value. */
+  address public upgradeMaster;
+&nbsp;
+  /** The next contract where the tokens will be migrated. */
+  UpgradeAgent public upgradeAgent;
+&nbsp;
+  /** How many tokens we have upgraded by now. */
+  uint256 public totalUpgraded;
+&nbsp;
+  /**
+   * Upgrade states.
+   *
+   * - NotAllowed: The child contract has not reached a condition where the upgrade can bgun
+   * - WaitingForAgent: Token allows upgrade, but we don't have a new agent yet
+   * - ReadyToUpgrade: The agent is set, but not a single token has been upgraded yet
+   * - Upgrading: Upgrade agent is set and the balance holders can upgrade their tokens
+   *
+   */
+  enum UpgradeState {Unknown, NotAllowed, WaitingForAgent, ReadyToUpgrade, Upgrading}
+&nbsp;
+  /**
+   * Somebody has upgraded some of his tokens.
+   */
+  event Upgrade(address indexed _from, address indexed _to, uint256 _value);
+&nbsp;
+  /**
+   * New upgrade agent available.
+   */
+  event UpgradeAgentSet(address agent);
+&nbsp;
+  /**
+   * Do not allow construction without upgrade master set.
+   */
+  function UpgradeableToken(address _upgradeMaster) {
+    upgradeMaster = _upgradeMaster;
+  }
+&nbsp;
+  /**
+   * Allow the token holder to upgrade some of their tokens to a new contract.
+   */
+<span class="fstat-no" title="function not covered" >  function upgrade(uint256 value) public </span>{
+&nbsp;
+<span class="cstat-no" title="statement not covered" >      UpgradeState state = getUpgradeState()</span>;
+<span class="cstat-no" title="statement not covered" >      if(!(state == UpgradeState.ReadyToUpgrade || state == UpgradeState.Upgrading)) {</span>
+        // Called in a bad state
+<span class="cstat-no" title="statement not covered" >        throw;</span>
+      }
+&nbsp;
+      // Validate input value.
+<span class="cstat-no" title="statement not covered" >      if (value == 0) <span class="cstat-no" title="statement not covered" >throw;</span></span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >      balances[msg.sender] = balances[msg.sender].sub(value)</span>;
+&nbsp;
+      // Take tokens out from circulation
+<span class="cstat-no" title="statement not covered" >      totalSupply_ = totalSupply_.sub(value)</span>;
+<span class="cstat-no" title="statement not covered" >      totalUpgraded = totalUpgraded.add(value)</span>;
+&nbsp;
+      // Upgrade agent reissues the tokens
+      upgradeAgent.upgradeFrom(msg.sender, value);
+<span class="cstat-no" title="statement not covered" >      Upgrade(msg.sender, upgradeAgent, value)</span>;
+  }
+&nbsp;
+  /**
+   * Set an upgrade agent that handles
+   */
+<span class="fstat-no" title="function not covered" >  function setUpgradeAgent(address agent) external </span>{
+&nbsp;
+<span class="cstat-no" title="statement not covered" >      if(!canUpgrade()) {</span>
+        // The token is not yet in a state that we could think upgrading
+<span class="cstat-no" title="statement not covered" >        throw;</span>
+      }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >      if (agent == 0x0) <span class="cstat-no" title="statement not covered" >throw;</span></span>
+      // Only a master can designate the next agent
+<span class="cstat-no" title="statement not covered" >      if (msg.sender != upgradeMaster) <span class="cstat-no" title="statement not covered" >throw;</span></span>
+      // Upgrade has already begun for an agent
+<span class="cstat-no" title="statement not covered" >      if (getUpgradeState() == UpgradeState.Upgrading) <span class="cstat-no" title="statement not covered" >throw;</span></span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >      upgradeAgent = UpgradeAgent(agent)</span>;
+&nbsp;
+      // Bad interface
+<span class="cstat-no" title="statement not covered" >      if(!upgradeAgent.isUpgradeAgent()) <span class="cstat-no" title="statement not covered" >throw;</span></span>
+      // Make sure that token supplies match in source and target
+<span class="cstat-no" title="statement not covered" >      if (upgradeAgent.originalSupply() != totalSupply_) <span class="cstat-no" title="statement not covered" >throw;</span></span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >      UpgradeAgentSet(upgradeAgent)</span>;
+  }
+&nbsp;
+  /**
+   * Get the state of the token upgrade.
+   */
+<span class="fstat-no" title="function not covered" >  function getUpgradeState() public constant returns(UpgradeState) </span>{
+<span class="cstat-no" title="statement not covered" >    if(!canUpgrade()) <span class="cstat-no" title="statement not covered" >return UpgradeState.NotAllowed;</span></span>
+    else <span class="cstat-no" title="statement not covered" >if(address(upgradeAgent) == 0x00) <span class="cstat-no" title="statement not covered" >return UpgradeState.WaitingForAgent;</span></span>
+    else <span class="cstat-no" title="statement not covered" >if(totalUpgraded == 0) <span class="cstat-no" title="statement not covered" >return UpgradeState.ReadyToUpgrade;</span></span>
+    else <span class="cstat-no" title="statement not covered" >return UpgradeState.Upgrading;</span>
+  }
+&nbsp;
+  /**
+   * Change the upgrade master.
+   *
+   * This allows us to set a new owner for the upgrade mechanism.
+   */
+<span class="fstat-no" title="function not covered" >  function setUpgradeMaster(address master) public </span>{
+<span class="cstat-no" title="statement not covered" >      if (master == 0x0) <span class="cstat-no" title="statement not covered" >throw;</span></span>
+<span class="cstat-no" title="statement not covered" >      if (msg.sender != upgradeMaster) <span class="cstat-no" title="statement not covered" >throw;</span></span>
+<span class="cstat-no" title="statement not covered" >      upgradeMaster = master</span>;
+  }
+&nbsp;
+  /**
+   * Child contract can enable to provide the condition when the upgrade can begun.
+   */
+<span class="fstat-no" title="function not covered" >  function canUpgrade() public constant returns(bool) </span>{
+<span class="cstat-no" title="statement not covered" >     return true;</span>
+  }
+&nbsp;
+}</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Wed Apr 18 2018 16:04:58 GMT-0700 (PDT)
+</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>

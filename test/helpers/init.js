@@ -33,6 +33,11 @@ export async function getAtonomiContract (owner, tokenAddr) {
   const regFee = 1 * multiplier
   const actFee = 1 * multiplier
   const repReward = 1 * multiplier
-  const c = await Atonomi.new(tokenAddr, regFee, actFee, repReward, {from: owner})
+  const reputationShare = 20
+  const blockThreshold = 5760 // assuming 15s blocks, 1 write per day
+  const c = await Atonomi.new(
+    tokenAddr,
+    regFee, actFee, repReward,
+    reputationShare, blockThreshold, {from: owner})
   return c
 }

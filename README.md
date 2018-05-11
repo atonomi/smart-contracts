@@ -1,13 +1,12 @@
 # Atonomi Ethereum Smart Contracts
 
-### Ropsten Contracts
+### Private Dev Chain
 
 | Contract  | Address |
 | ------------- | ------------- |
-| SafeMathLib (TokenMarket)  | [0x32050f78221d61f8b7641aa11eca0a76d8a0954f](https://ropsten.etherscan.io/address/0x32050f78221d61f8b7641aa11eca0a76d8a0954f#code)  |
-| ATMI Token (TokenMarket)  | [0x728913b826b12b38e647880e9cf852161790afdb](https://ropsten.etherscan.io/address/0x728913b826b12b38e647880e9cf852161790afdb#code)  |
-| Atonomi ([833948c](https://github.com/atonomi/smart-contracts/tree/833948c0b70b3609880f322392eb57950d09da05)) | [0xaee5c9721b81a385fd0a243316dd3e88f3245c8f](https://ropsten.etherscan.io/address/0xaee5c9721b81a385fd0a243316dd3e88f3245c8f#code)  |
-
+| SafeMathLib (TokenMarket)  | 0x1e07783a9ef2648a4e99b3e9a9cc0440a978dbeb |
+| ATMI Token (TokenMarket)  | 0xc84d2d4d20cba70c00ada9da9d9940983ae4e9b9 |
+| Atonomi | 0xb46d9f080f704595ff44fad7a676eb9202faa951 |
 
 ### Setup
 
@@ -44,7 +43,7 @@ To validate linters for JS and SOL files:
 $ npm run lint
 ```
 
-### Deploy to local Ganache-CLI
+### Deploy to local ganache-cli
 
 To deploy contracts to a local Ganche RPC provider at port `8546`:
 
@@ -53,7 +52,14 @@ $ npm run ganache-cli
 $ npm run deploy
 ```
 
-### Deploy to Atonomi Ropsten test node
+### Start a private dev chain node
+
+```
+$ export DATA_DIR=/atonomi/demochain
+$ ./parity-dev.sh
+```
+
+### Deploy to private dev chain
 
 Make sure you have the latest version of `geth` installed: https://github.com/ethereum/go-ethereum/wiki/Installing-Geth
 
@@ -61,26 +67,19 @@ Then change into the deploy directory:
 
 ```
 $ cd deploy
-```
-
-Then attach to any Ropsten Test node.  If you need Ropsten Test Ether, go here: http://faucet.ropsten.be:3001/ or https://faucet.metamask.io/
-
-```
-$ export PARITY_NODE=http://localhost:8545
-$ export ETHER_ADDR=0x84757b58cd14912d94e665fb0cf66c3693dc2876
-$ export SAFEMATHLIB_ADDR=0x32050f78221d61f8b7641aa11eca0a76d8a0954f
-$ export ATMI_ADDR=0x728913b826b12b38e647880e9cf852161790afdb
+$ export PARITY_NODE=http://ropsten.atonomi.io:8545
+$ export ETHER_ADDR=0xfb0987013cc730d33e537bb0ce61298ab8eb2553
 $ ./geth-attach.sh
 ```
 
-This will drop you into a geth console that will have preloaded the Atonomi constants and abi needed for contract deployment.
+This will drop you into a geth console that will have preloaded the Atonomi constants and abi needed for contract deployment.  Replace ETHER_ADDR with your own account.
 
 To deploy the Atonomi contracts run the following:
 ```
-> loadScript('scripts/deploy-atonomi.js')
 > initSafeMathLib()
-> initATMIToken()
-> initAtonomi()
+> initATMIToken("address of safemathlib")
+> initAtonomi("address of erc token")
+> waitForTransactionReceipt('txn hash')  // use this to ping if the transaction has been confirmed
 ```
 
 ### Unit Tests

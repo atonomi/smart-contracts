@@ -121,7 +121,7 @@ contract('ATMI ERC Compliance', accounts => {
     it('can transfer 1 token', async () => {
       const testNumber = 24
       const callbackData = ctx.contracts.receiverMock.contract.onTokenTransfer.getData(testNumber)
-      const abiMethod = abiHelper.findMethod(ctx.contracts.token.abi, 'transfer', 'address,uint256,bytes')
+      const abiMethod = abiHelper.findMethod(ctx.contracts.token.abi, 'transferAndCall', 'address,uint256,bytes')
       const transferData = ethjsABI.encodeMethod(abiMethod, [ctx.contracts.receiverMock.contract.address, transferAmount, callbackData])
       const tx = await ctx.contracts.token.sendTransaction({from: ctx.actors.owner, data: transferData})
 
@@ -151,7 +151,7 @@ contract('ATMI ERC Compliance', accounts => {
 
       const testNumber = 24
       const callbackData = ctx.contracts.receiverMock.contract.onTokenTransfer.getData(testNumber)
-      const abiMethod = abiHelper.findMethod(ctx.contracts.token.abi, 'transfer', 'address,uint256,bytes')
+      const abiMethod = abiHelper.findMethod(ctx.contracts.token.abi, 'transferAndCall', 'address,uint256,bytes')
       const transferData = ethjsABI.encodeMethod(abiMethod, [ctx.contracts.receiverMock.contract.address, transferZero, callbackData])
       const tx = await ctx.contracts.token.sendTransaction({from: ctx.actors.owner, data: transferData})
 
@@ -182,7 +182,7 @@ contract('ATMI ERC Compliance', accounts => {
 
       const testNumber = 24
       const callbackData = ctx.contracts.receiverMock.contract.onTokenTransfer.getData(testNumber)
-      const abiMethod = abiHelper.findMethod(ctx.contracts.token.abi, 'transfer', 'address,uint256,bytes')
+      const abiMethod = abiHelper.findMethod(ctx.contracts.token.abi, 'transferAndCall', 'address,uint256,bytes')
       const transferData = ethjsABI.encodeMethod(abiMethod, [ctx.contracts.receiverMock.contract.address, transferAmount, callbackData])
 
       const fn = ctx.contracts.token.sendTransaction({from: ctx.actors.alice, data: transferData})
@@ -215,8 +215,7 @@ contract('ATMI ERC Compliance', accounts => {
       await ctx.contracts.token.approve(ctx.actors.alice, initialAllowance, { from: ctx.actors.owner })
 
       const increasedAllowance = transferAmount * 2
-      // TruffleContract is currently bugged, having issues with function overloads, need to call it this way
-      await ctx.contracts.token.contract.increaseApproval['address,uint256'].sendTransaction(ctx.actors.alice, transferAmount, { from: ctx.actors.owner })
+      await ctx.contracts.token.contract.increaseApproval(ctx.actors.alice, transferAmount, { from: ctx.actors.owner })
 
       const allowance = await ctx.contracts.token.allowance.call(ctx.actors.owner, ctx.actors.alice)
       expect(allowance.toNumber()).to.be.equal(increasedAllowance)
@@ -240,7 +239,7 @@ contract('ATMI ERC Compliance', accounts => {
     it('can approve a transfer', async () => {
       const testNumber = 8
       const callbackData = ctx.contracts.receiverMock.contract.onTokenApprove.getData(testNumber)
-      const abiMethod = abiHelper.findMethod(ctx.contracts.token.abi, 'approve', 'address,uint256,bytes')
+      const abiMethod = abiHelper.findMethod(ctx.contracts.token.abi, 'approveAndCall', 'address,uint256,bytes')
       const approveData = ethjsABI.encodeMethod(abiMethod, [ctx.contracts.receiverMock.contract.address, transferAmount, callbackData])
       const tx = await ctx.contracts.token.sendTransaction({ from: ctx.actors.owner, data: approveData })
 
@@ -266,14 +265,14 @@ contract('ATMI ERC Compliance', accounts => {
       const intialAllowance = transferAmount
       let testNumber = 8
       let callbackData = ctx.contracts.receiverMock.contract.onTokenApprove.getData(testNumber)
-      let abiMethod = abiHelper.findMethod(ctx.contracts.token.abi, 'approve', 'address,uint256,bytes')
+      let abiMethod = abiHelper.findMethod(ctx.contracts.token.abi, 'approveAndCall', 'address,uint256,bytes')
       let approveData = ethjsABI.encodeMethod(abiMethod, [ctx.contracts.receiverMock.contract.address, intialAllowance, callbackData])
       await ctx.contracts.token.sendTransaction({ from: ctx.actors.owner, data: approveData })
 
       const increasedAllowance = transferAmount * 2
       testNumber = 8 * 2
       callbackData = ctx.contracts.receiverMock.contract.onTokenApprove.getData(testNumber)
-      abiMethod = abiHelper.findMethod(ctx.contracts.token.abi, 'increaseApproval', 'address,uint256,bytes')
+      abiMethod = abiHelper.findMethod(ctx.contracts.token.abi, 'increaseApprovalAndCall', 'address,uint256,bytes')
       approveData = ethjsABI.encodeMethod(abiMethod, [ctx.contracts.receiverMock.contract.address, transferAmount, callbackData])
       await ctx.contracts.token.sendTransaction({ from: ctx.actors.owner, data: approveData })
 
@@ -285,14 +284,14 @@ contract('ATMI ERC Compliance', accounts => {
       const intialAllowance = transferAmount
       let testNumber = 8
       let callbackData = ctx.contracts.receiverMock.contract.onTokenApprove.getData(testNumber)
-      let abiMethod = abiHelper.findMethod(ctx.contracts.token.abi, 'approve', 'address,uint256,bytes')
+      let abiMethod = abiHelper.findMethod(ctx.contracts.token.abi, 'approveAndCall', 'address,uint256,bytes')
       let approveData = ethjsABI.encodeMethod(abiMethod, [ctx.contracts.receiverMock.contract.address, intialAllowance, callbackData])
       await ctx.contracts.token.sendTransaction({ from: ctx.actors.owner, data: approveData })
 
       const decreasedAllowance = transferAmount / 2
       testNumber = 8 / 2
       callbackData = ctx.contracts.receiverMock.contract.onTokenApprove.getData(testNumber)
-      abiMethod = abiHelper.findMethod(ctx.contracts.token.abi, 'decreaseApproval', 'address,uint256,bytes')
+      abiMethod = abiHelper.findMethod(ctx.contracts.token.abi, 'decreaseApprovalAndCall', 'address,uint256,bytes')
       approveData = ethjsABI.encodeMethod(abiMethod, [ctx.contracts.receiverMock.contract.address, transferAmount / 2, callbackData])
       await ctx.contracts.token.sendTransaction({ from: ctx.actors.owner, data: approveData })
 
@@ -391,7 +390,7 @@ contract('ATMI ERC Compliance', accounts => {
 
       const testNumber = 241
       const callbackData = ctx.contracts.receiverMock.contract.onTokenTransfer.getData(testNumber)
-      const abiMethod = abiHelper.findMethod(ctx.contracts.token.abi, 'transferFrom', 'address,address,uint256,bytes')
+      const abiMethod = abiHelper.findMethod(ctx.contracts.token.abi, 'transferFromAndCall', 'address,address,uint256,bytes')
       const transferData = ethjsABI.encodeMethod(abiMethod, [ctx.actors.owner, ctx.contracts.receiverMock.contract.address, transferAmount, callbackData])
       const tx = await ctx.contracts.token.sendTransaction({from: ctx.actors.alice, data: transferData})
 
@@ -422,7 +421,7 @@ contract('ATMI ERC Compliance', accounts => {
 
       const testNumber = 241
       const callbackData = ctx.contracts.receiverMock.contract.onTokenTransfer.getData(testNumber)
-      const abiMethod = abiHelper.findMethod(ctx.contracts.token.abi, 'transferFrom', 'address,address,uint256,bytes')
+      const abiMethod = abiHelper.findMethod(ctx.contracts.token.abi, 'transferFromAndCall', 'address,address,uint256,bytes')
       const transferData = ethjsABI.encodeMethod(abiMethod, [ctx.actors.owner, ctx.contracts.receiverMock.contract.address, transferZero, callbackData])
       const tx = await ctx.contracts.token.sendTransaction({from: ctx.actors.alice, data: transferData})
 
@@ -453,7 +452,7 @@ contract('ATMI ERC Compliance', accounts => {
 
       const testNumber = 241
       const callbackData = ctx.contracts.receiverMock.contract.onTokenTransfer.getData(testNumber)
-      const abiMethod = abiHelper.findMethod(ctx.contracts.token.abi, 'transferFrom', 'address,address,uint256,bytes')
+      const abiMethod = abiHelper.findMethod(ctx.contracts.token.abi, 'transferFromAndCall', 'address,address,uint256,bytes')
       const transferData = ethjsABI.encodeMethod(abiMethod, [ctx.actors.owner, ctx.contracts.receiverMock.contract.address, transferAmount, callbackData])
 
       const fn = ctx.contracts.token.sendTransaction({from: ctx.actors.alice, data: transferData})
@@ -469,7 +468,7 @@ contract('ATMI ERC Compliance', accounts => {
 
       const testNumber = 241
       const callbackData = ctx.contracts.receiverMock.contract.onTokenTransfer.getData(testNumber)
-      const abiMethod = abiHelper.findMethod(ctx.contracts.token.abi, 'transferFrom', 'address,address,uint256,bytes')
+      const abiMethod = abiHelper.findMethod(ctx.contracts.token.abi, 'transferFromAndCall', 'address,address,uint256,bytes')
       const transferData = ethjsABI.encodeMethod(abiMethod, [ctx.actors.owner, ctx.contracts.receiverMock.contract.address, badAmount, callbackData])
 
       const fn = ctx.contracts.token.sendTransaction({from: ctx.actors.alice, data: transferData})
@@ -483,7 +482,7 @@ contract('ATMI ERC Compliance', accounts => {
 
       const testNumber = 241
       const callbackData = ctx.contracts.receiverMock.contract.onTokenTransfer.getData(testNumber)
-      const abiMethod = abiHelper.findMethod(ctx.contracts.token.abi, 'transferFrom', 'address,address,uint256,bytes')
+      const abiMethod = abiHelper.findMethod(ctx.contracts.token.abi, 'transferFromAndCall', 'address,address,uint256,bytes')
       const transferData = ethjsABI.encodeMethod(abiMethod, [ctx.actors.alice, ctx.contracts.receiverMock.contract.address, transferAmount, callbackData])
 
       const fn = ctx.contracts.token.sendTransaction({from: ctx.actors.bob, data: transferData})

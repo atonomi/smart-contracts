@@ -2,7 +2,6 @@ node_modules
 build
 *.log
 lib
-coverage
 coverage.json
 allFiredEvents
 scTopics
@@ -11,3 +10,4 @@ deploy/log/*.log
 deploy/scripts/atonomi-abis.js
 deploy/scripts/atonomi-consts.js
 .DS_Store
+.vscode

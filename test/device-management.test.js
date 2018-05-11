@@ -25,6 +25,7 @@ contract('Device Management', accounts => {
   const deviceIdHash = web3Utils.soliditySha3({t: 'bytes32', v: web3.fromAscii(deviceId)})
   const mfgId = 'APPLE'
   const deviceType = 'phone'
+  const devicePublicKey = 'somepublickey'
 
   beforeEach(async () => {
     ctx.contracts.mockSolHash = await MockSolHash.new({from: ctx.actors.owner})
@@ -60,17 +61,19 @@ contract('Device Management', accounts => {
   describe('register device', () => {
     let poolStartingBalance
     let mfgStartingBalance
+    let bountyStartingBalance
 
     beforeEach(async () => {
       poolStartingBalance = await ctx.contracts.token.balanceOf(ctx.contracts.atonomi.address)
       mfgStartingBalance = await ctx.contracts.token.balanceOf(ctx.actors.mfg)
+      bountyStartingBalance = await ctx.contracts.atonomi.pools(ctx.actors.mfg)
     })
 
     it('mfg can register', async () => {
       await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, regFee, { from: ctx.actors.mfg })
-      const success = await ctx.contracts.atonomi.registerDevice.call(deviceIdHash, deviceType, {from: ctx.actors.mfg})
+      const success = await ctx.contracts.atonomi.registerDevice.call(deviceIdHash, deviceType, devicePublicKey, {from: ctx.actors.mfg})
       expect(success).to.be.equal(true)
-      const tx = await ctx.contracts.atonomi.registerDevice(deviceIdHash, deviceType, {from: ctx.actors.mfg})
+      const tx = await ctx.contracts.atonomi.registerDevice(deviceIdHash, deviceType, devicePublicKey, {from: ctx.actors.mfg})
 
       expect(tx.logs.length).to.be.equal(1)
       const log = tx.logs[0]
@@ -78,6 +81,7 @@ contract('Device Management', accounts => {
       expect(log.args._sender).to.be.equal(ctx.actors.mfg)
       expect(log.args._fee.toString(10)).to.be.equal(regFee.toString(10))
       expect(log.args._deviceHashKey).to.be.equal(deviceIdHash)
+      expect(web3.toAscii(log.args._manufacturerId).replace(/\u0000/g, '')).to.be.equal(mfgId)
       expect(web3.toAscii(log.args._deviceType).replace(/\u0000/g, '')).to.be.equal(deviceType)
 
       const device = await ctx.contracts.atonomi.devices(deviceIdHash)
@@ -85,8 +89,11 @@ contract('Device Management', accounts => {
       expect(deviceType).to.be.equal(web3.toAscii(device[1]).replace(/\u0000/g, ''))
       expect(device[2]).to.be.equal(true)
       expect(device[3]).to.be.equal(false)
-      expect('').to.be.equal(web3.toAscii(device[4]).replace(/\u0000/g, ''))
-      expect(device[5]).to.be.equal(ctx.actors.mfg)
+      expect(web3.toAscii(device[4]).replace(/\u0000/g, '')).to.be.equal('')
+      expect(web3.toAscii(device[5]).replace(/\u0000/g, '')).to.be.equal(devicePublicKey)
+
+      const mfgWallet = await ctx.contracts.atonomi.manufacturerRewards(mfgId)
+      expect(mfgWallet).to.be.equal(ctx.actors.mfg)
 
       expect(tx.receipt.logs.length).to.be.equal(2)
       const decoder = ethjsABI.logDecoder(ctx.contracts.token.abi)
@@ -102,6 +109,9 @@ contract('Device Management', accounts => {
 
       const poolEndingBalance = await ctx.contracts.token.balanceOf(ctx.contracts.atonomi.address)
       expect((poolEndingBalance - poolStartingBalance).toString(10)).to.be.equal(regFee.toString(10))
+
+      const bountyEndingBalance = await ctx.contracts.atonomi.pools(ctx.actors.mfg)
+      expect((bountyEndingBalance[0] - bountyStartingBalance[0]).toString(10)).to.be.equal(regFee.toString(10))
     })
 
     it('external accounts can not register', async () => {
@@ -109,7 +119,7 @@ contract('Device Management', accounts => {
       for (let i = 0; i < bads.length; i++) {
         const from = bads[i]
         await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, regFee, {from: from})
-        const fn = ctx.contracts.atonomi.registerDevice(deviceIdHash, deviceType, {from: from})
+        const fn = ctx.contracts.atonomi.registerDevice(deviceIdHash, deviceType, devicePublicKey, {from: from})
         await errors.expectRevert(fn)
       }
     })
@@ -117,15 +127,15 @@ contract('Device Management', accounts => {
     it('can not register device that is already registered', async () => {
       const from = ctx.actors.mfg
       await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, 2 * regFee, {from: from})
-      await ctx.contracts.atonomi.registerDevice(deviceIdHash, deviceType, {from: from})
-      const fn = ctx.contracts.atonomi.registerDevice(deviceIdHash, deviceType, {from: from})
+      await ctx.contracts.atonomi.registerDevice(deviceIdHash, deviceType, devicePublicKey, {from: from})
+      const fn = ctx.contracts.atonomi.registerDevice(deviceIdHash, deviceType, devicePublicKey, {from: from})
       await errors.expectRevert(fn)
     })
 
     it('can not register with insufficent funds', async () => {
-      await ctx.contracts.atonomi.addNetworkMember(ctx.actors.alice, false, true, false, mfgId, {from: ctx.actors.owner})
-      await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, regFee, { from: ctx.actors.alice })
-      const fn = ctx.contracts.atonomi.registerDevice(deviceIdHash, deviceType, {from: ctx.actors.alice})
+      await ctx.contracts.token.transfer(ctx.actors.alice, regFee + actFee, {from: ctx.actors.mfg})
+      await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, regFee, { from: ctx.actors.mfg })
+      const fn = ctx.contracts.atonomi.registerDevice(deviceIdHash, deviceType, devicePublicKey, {from: ctx.actors.mfg})
       await errors.expectRevert(fn)
     })
   })
@@ -134,16 +144,18 @@ contract('Device Management', accounts => {
     let poolStartingBalance
     let mfgStartingBalance
     let devOwnerStartingBalance
+    let bountyStartingBalance
 
     beforeEach(async () => {
       devOwnerStartingBalance = await ctx.contracts.token.balanceOf(ctx.actors.deviceOwner)
       poolStartingBalance = await ctx.contracts.token.balanceOf(ctx.contracts.atonomi.address)
       mfgStartingBalance = await ctx.contracts.token.balanceOf(ctx.actors.mfg)
+      bountyStartingBalance = await ctx.contracts.atonomi.pools(ctx.actors.mfg)
     })
 
     it('device owner can activate', async () => {
       await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, regFee, { from: ctx.actors.mfg })
-      await ctx.contracts.atonomi.registerDevice(deviceIdHash, deviceType, {from: ctx.actors.mfg})
+      await ctx.contracts.atonomi.registerDevice(deviceIdHash, deviceType, devicePublicKey, {from: ctx.actors.mfg})
 
       await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, actFee, { from: ctx.actors.deviceOwner })
       const success = await ctx.contracts.atonomi.activateDevice.call(deviceId, {from: ctx.actors.deviceOwner})
@@ -156,6 +168,7 @@ contract('Device Management', accounts => {
       expect(log.args._sender).to.be.equal(ctx.actors.deviceOwner)
       expect(log.args._fee.toString(10)).to.be.equal(actFee.toString(10))
       expect(web3.toAscii(log.args._deviceId).replace(/\u0000/g, '')).to.be.equal(deviceId)
+      expect(web3.toAscii(log.args._manufacturerId).replace(/\u0000/g, '')).to.be.equal(mfgId)
       expect(web3.toAscii(log.args._deviceType).replace(/\u0000/g, '')).to.be.equal(deviceType)
 
       const device = await ctx.contracts.atonomi.devices(deviceIdHash)
@@ -164,7 +177,10 @@ contract('Device Management', accounts => {
       expect(device[2]).to.be.equal(true)
       expect(device[3]).to.be.equal(true)
       expect('').to.be.equal(web3.toAscii(device[4]).replace(/\u0000/g, ''))
-      expect(device[5]).to.be.equal(ctx.actors.mfg)
+      expect(web3.toAscii(device[5]).replace(/\u0000/g, '')).to.be.equal(devicePublicKey)
+
+      const mfgWallet = await ctx.contracts.atonomi.manufacturerRewards(mfgId)
+      expect(mfgWallet).to.be.equal(ctx.actors.mfg)
 
       expect(tx.receipt.logs.length).to.be.equal(2)
       const decoder = ethjsABI.logDecoder(ctx.contracts.token.abi)
@@ -183,11 +199,14 @@ contract('Device Management', accounts => {
 
       const poolEndingBalance = await ctx.contracts.token.balanceOf(ctx.contracts.atonomi.address)
       expect((poolEndingBalance - poolStartingBalance).toString(10)).to.be.equal((regFee + actFee).toString(10))
+
+      const bountyEndingBalance = await ctx.contracts.atonomi.pools(ctx.actors.mfg)
+      expect((bountyEndingBalance[0] - bountyStartingBalance[0]).toString(10)).to.be.equal((regFee + actFee).toString(10))
     })
 
     it('persons without the device can not activate', async () => {
       await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, regFee, { from: ctx.actors.mfg })
-      await ctx.contracts.atonomi.registerDevice(deviceIdHash, deviceType, {from: ctx.actors.mfg})
+      await ctx.contracts.atonomi.registerDevice(deviceIdHash, deviceType, devicePublicKey, {from: ctx.actors.mfg})
 
       const wrongDeviceId = 'samsung-microwave1'
       await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, actFee, { from: ctx.actors.deviceOwner })
@@ -203,7 +222,7 @@ contract('Device Management', accounts => {
 
     it('can not activate device that is already activated', async () => {
       await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, regFee, { from: ctx.actors.mfg })
-      await ctx.contracts.atonomi.registerDevice(deviceIdHash, deviceType, {from: ctx.actors.mfg})
+      await ctx.contracts.atonomi.registerDevice(deviceIdHash, deviceType, devicePublicKey, {from: ctx.actors.mfg})
 
       await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, actFee, { from: ctx.actors.deviceOwner })
       await ctx.contracts.atonomi.activateDevice(deviceId, {from: ctx.actors.deviceOwner})
@@ -215,7 +234,7 @@ contract('Device Management', accounts => {
 
     it('can not activate with insufficent funds', async () => {
       await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, regFee, { from: ctx.actors.mfg })
-      await ctx.contracts.atonomi.registerDevice(deviceIdHash, deviceType, {from: ctx.actors.mfg})
+      await ctx.contracts.atonomi.registerDevice(deviceIdHash, deviceType, devicePublicKey, {from: ctx.actors.mfg})
 
       await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, actFee, { from: ctx.actors.alice })
       const fn = ctx.contracts.atonomi.activateDevice(deviceId, {from: ctx.actors.alice})
@@ -226,17 +245,19 @@ contract('Device Management', accounts => {
   describe('register and activate device', () => {
     let poolStartingBalance
     let mfgStartingBalance
+    let bountyStartingBalance
 
     beforeEach(async () => {
       poolStartingBalance = await ctx.contracts.token.balanceOf(ctx.contracts.atonomi.address)
       mfgStartingBalance = await ctx.contracts.token.balanceOf(ctx.actors.mfg)
+      bountyStartingBalance = await ctx.contracts.atonomi.pools(ctx.actors.mfg)
     })
 
     it('mfg can register and activate device', async () => {
       await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, (regFee + actFee), { from: ctx.actors.mfg })
-      const success = await ctx.contracts.atonomi.registerAndActivateDevice.call(deviceId, deviceType, {from: ctx.actors.mfg})
+      const success = await ctx.contracts.atonomi.registerAndActivateDevice.call(deviceId, deviceType, devicePublicKey, {from: ctx.actors.mfg})
       expect(success).to.be.equal(true)
-      const tx = await ctx.contracts.atonomi.registerAndActivateDevice(deviceId, deviceType, {from: ctx.actors.mfg})
+      const tx = await ctx.contracts.atonomi.registerAndActivateDevice(deviceId, deviceType, devicePublicKey, {from: ctx.actors.mfg})
 
       expect(tx.logs.length).to.be.equal(2)
       const log = tx.logs[0]
@@ -244,6 +265,7 @@ contract('Device Management', accounts => {
       expect(log.args._sender).to.be.equal(ctx.actors.mfg)
       expect(log.args._fee.toString(10)).to.be.equal(regFee.toString(10))
       expect(log.args._deviceHashKey).to.be.equal(deviceIdHash)
+      expect(web3.toAscii(log.args._manufacturerId).replace(/\u0000/g, '')).to.be.equal(mfgId)
       expect(web3.toAscii(log.args._deviceType).replace(/\u0000/g, '')).to.be.equal(deviceType)
 
       const log1 = tx.logs[1]
@@ -251,6 +273,7 @@ contract('Device Management', accounts => {
       expect(log1.args._sender).to.be.equal(ctx.actors.mfg)
       expect(log.args._fee.toString(10)).to.be.equal(actFee.toString(10))
       expect(web3.toAscii(log1.args._deviceId).replace(/\u0000/g, '')).to.be.equal(deviceId)
+      expect(web3.toAscii(log.args._manufacturerId).replace(/\u0000/g, '')).to.be.equal(mfgId)
       expect(web3.toAscii(log.args._deviceType).replace(/\u0000/g, '')).to.be.equal(deviceType)
 
       const device = await ctx.contracts.atonomi.devices(deviceIdHash)
@@ -259,7 +282,10 @@ contract('Device Management', accounts => {
       expect(device[2]).to.be.equal(true)
       expect(device[3]).to.be.equal(true)
       expect('').to.be.equal(web3.toAscii(device[4]).replace(/\u0000/g, ''))
-      expect(device[5]).to.be.equal(ctx.actors.mfg)
+      expect(web3.toAscii(device[5]).replace(/\u0000/g, '')).to.be.equal(devicePublicKey)
+
+      const mfgWallet = await ctx.contracts.atonomi.manufacturerRewards(mfgId)
+      expect(mfgWallet).to.be.equal(ctx.actors.mfg)
 
       expect(tx.receipt.logs.length).to.be.equal(3)
       const decoder = ethjsABI.logDecoder(ctx.contracts.token.abi)
@@ -275,6 +301,9 @@ contract('Device Management', accounts => {
 
       const poolEndingBalance = await ctx.contracts.token.balanceOf(ctx.contracts.atonomi.address)
       expect((poolEndingBalance - poolStartingBalance).toString(10)).to.be.equal((regFee + actFee).toString(10))
+
+      const bountyEndingBalance = await ctx.contracts.atonomi.pools(ctx.actors.mfg)
+      expect((bountyEndingBalance[0] - bountyStartingBalance[0]).toString(10)).to.be.equal((regFee + actFee).toString(10))
     })
 
     it('external accounts can not register and activate device', async () => {
@@ -282,7 +311,7 @@ contract('Device Management', accounts => {
       for (let i = 0; i < bads.length; i++) {
         const from = bads[i]
         await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, (regFee + actFee), {from: from})
-        const fn = ctx.contracts.atonomi.registerAndActivateDevice(deviceId, deviceType, {from: from})
+        const fn = ctx.contracts.atonomi.registerAndActivateDevice(deviceId, deviceType, devicePublicKey, {from: from})
         await errors.expectRevert(fn)
       }
     })
@@ -291,15 +320,15 @@ contract('Device Management', accounts => {
       const from = ctx.actors.mfg
       await ctx.contracts.token.transfer(ctx.actors.mfg, 2 * (regFee + actFee), {from: ctx.actors.owner})
       await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, 2 * (regFee + actFee), {from: from})
-      await ctx.contracts.atonomi.registerAndActivateDevice(deviceId, deviceType, {from: from})
-      const fn = ctx.contracts.atonomi.registerAndActivateDevice(deviceId, deviceType, {from: from})
+      await ctx.contracts.atonomi.registerAndActivateDevice(deviceId, deviceType, devicePublicKey, {from: from})
+      const fn = ctx.contracts.atonomi.registerAndActivateDevice(deviceId, deviceType, devicePublicKey, {from: from})
       await errors.expectRevert(fn)
     })
 
     it('can not register and activate with insufficent funds', async () => {
-      await ctx.contracts.atonomi.addNetworkMember(ctx.actors.alice, false, true, false, mfgId, {from: ctx.actors.owner})
-      await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, regFee + actFee, { from: ctx.actors.alice })
-      const fn = ctx.contracts.atonomi.registerAndActivateDevice(deviceId, deviceType, {from: ctx.actors.alice})
+      await ctx.contracts.token.transfer(ctx.actors.alice, regFee + actFee, {from: ctx.actors.mfg})
+      await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, regFee + actFee, { from: ctx.actors.mfg })
+      const fn = ctx.contracts.atonomi.registerAndActivateDevice(deviceId, deviceType, devicePublicKey, {from: ctx.actors.mfg})
       await errors.expectRevert(fn)
     })
   })
@@ -307,22 +336,24 @@ contract('Device Management', accounts => {
   describe('reputation scores', () => {
     let irnStartingBalance
     let mfgStartingBalance
+    let bountyStartingBalance
     const score = 'somescore'
 
     beforeEach(async () => {
-      irnStartingBalance = await ctx.contracts.atonomi.balances(ctx.actors.irnNode)
-      mfgStartingBalance = await ctx.contracts.atonomi.balances(ctx.actors.mfg)
+      irnStartingBalance = await ctx.contracts.atonomi.rewards(ctx.actors.irnNode)
+      mfgStartingBalance = await ctx.contracts.atonomi.rewards(ctx.actors.mfg)
+      bountyStartingBalance = await ctx.contracts.atonomi.pools(ctx.actors.mfg)
     })
 
     it('IRN node can set and distribute rewards', async () => {
       await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, regFee + actFee, {from: ctx.actors.mfg})
-      await ctx.contracts.atonomi.registerAndActivateDevice(deviceId, deviceType, {from: ctx.actors.mfg})
+      await ctx.contracts.atonomi.registerAndActivateDevice(deviceId, deviceType, devicePublicKey, {from: ctx.actors.mfg})
 
       const success = await ctx.contracts.atonomi.updateReputationScore.call(deviceId, score, {from: ctx.actors.irnNode})
       expect(success).to.be.equal(true)
       const tx = await ctx.contracts.atonomi.updateReputationScore(deviceId, score, {from: ctx.actors.irnNode})
 
-      const irnReward = repReward * 0.80
+      const irnReward = repReward * 0.20
       const mfgReward = repReward - irnReward
       expect(tx.logs.length).to.be.equal(1)
       expect(tx.logs[0].event).to.be.equal('ReputationScoreUpdated')
@@ -340,13 +371,22 @@ contract('Device Management', accounts => {
       expect(device[2]).to.be.equal(true)
       expect(device[3]).to.be.equal(true)
       expect(score).to.be.equal(web3.toAscii(device[4]).replace(/\u0000/g, ''))
-      expect(device[5]).to.be.equal(ctx.actors.mfg)
+      expect(web3.toAscii(device[5]).replace(/\u0000/g, '')).to.be.equal(devicePublicKey)
 
-      const irnEndingBalance = await ctx.contracts.atonomi.balances(ctx.actors.irnNode)
+      const blockNumber = await ctx.contracts.atonomi.authorWrites(ctx.actors.irnNode, deviceId)
+      expect(blockNumber.toString(10)).to.be.equal(web3.eth.blockNumber.toString(10))
+
+      const mfgWallet = await ctx.contracts.atonomi.manufacturerRewards(mfgId)
+      expect(mfgWallet).to.be.equal(ctx.actors.mfg)
+
+      const irnEndingBalance = await ctx.contracts.atonomi.rewards(ctx.actors.irnNode)
       expect((irnEndingBalance - irnStartingBalance).toString(10)).to.be.equal(irnReward.toString(10))
 
-      const mfgEndingBalance = await ctx.contracts.atonomi.balances(ctx.actors.mfg)
+      const mfgEndingBalance = await ctx.contracts.atonomi.rewards(ctx.actors.mfg)
       expect((mfgEndingBalance - mfgStartingBalance).toString(10)).to.be.equal(mfgReward.toString(10))
+
+      const bountyEndingBalance = await ctx.contracts.atonomi.pools(ctx.actors.mfg)
+      expect((bountyEndingBalance[0] - bountyStartingBalance[0]).toString(10)).to.be.equal((irnReward + mfgReward).toString(10))
 
       const testWithdraws = [
         { account: ctx.actors.mfg, expectedTokens: mfgReward },
@@ -377,7 +417,7 @@ contract('Device Management', accounts => {
 
     it('can not set score for device that is not activated', async () => {
       await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, regFee, {from: ctx.actors.mfg})
-      await ctx.contracts.atonomi.registerDevice(deviceId, deviceType, {from: ctx.actors.mfg})
+      await ctx.contracts.atonomi.registerDevice(deviceId, deviceType, devicePublicKey, {from: ctx.actors.mfg})
 
       await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, repReward, {from: ctx.actors.irnNode})
       const fn = ctx.contracts.atonomi.updateReputationScore(deviceId, score, {from: ctx.actors.irnNode})
@@ -386,7 +426,7 @@ contract('Device Management', accounts => {
 
     it('external accounts can not set', async () => {
       await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, regFee + actFee, {from: ctx.actors.mfg})
-      await ctx.contracts.atonomi.registerAndActivateDevice(deviceId, deviceType, {from: ctx.actors.mfg})
+      await ctx.contracts.atonomi.registerAndActivateDevice(deviceId, deviceType, devicePublicKey, {from: ctx.actors.mfg})
 
       const bads = [ctx.actors.owner, ctx.actors.admin, ctx.actors.deviceOwner, ctx.actors.mfg, ctx.actors.alice]
       for (let i = 0; i < bads.length; i++) {
@@ -401,6 +441,7 @@ contract('Device Management', accounts => {
   describe('bulk registrations', () => {
     let poolStartingBalance
     let mfgStartingBalance
+    let bountyStartingBalance
 
     const total = 10
     const deviceIdPrefix = 'apple-ipad'
@@ -408,6 +449,7 @@ contract('Device Management', accounts => {
     beforeEach(async () => {
       poolStartingBalance = await ctx.contracts.token.balanceOf(ctx.contracts.atonomi.address)
       mfgStartingBalance = await ctx.contracts.token.balanceOf(ctx.actors.mfg)
+      bountyStartingBalance = await ctx.contracts.atonomi.pools(ctx.actors.mfg)
 
       await ctx.contracts.token.transfer(ctx.actors.mfg, (regFee + actFee) * total, {from: ctx.actors.owner})
     })
@@ -415,15 +457,17 @@ contract('Device Management', accounts => {
     it('mfg can bulk register devices', async () => {
       const deviceIdHashes = []
       const deviceTypes = []
+      const devicePublicKeys = []
       for (let i = 0; i < total; i++) {
         deviceIdHashes.push(web3Utils.soliditySha3({t: 'bytes32', v: web3.fromAscii(deviceIdPrefix + i)}))
         deviceTypes.push(deviceType)
+        devicePublicKeys.push(devicePublicKey)
       }
       await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, regFee * total, {from: ctx.actors.mfg})
-      const success = await ctx.contracts.atonomi.registerDevices.call(deviceIdHashes, deviceTypes, {from: ctx.actors.mfg})
+      const success = await ctx.contracts.atonomi.registerDevices.call(deviceIdHashes, deviceTypes, devicePublicKeys, {from: ctx.actors.mfg})
       expect(success).to.be.equal(true)
 
-      const tx = await ctx.contracts.atonomi.registerDevices(deviceIdHashes, deviceTypes, {from: ctx.actors.mfg})
+      const tx = await ctx.contracts.atonomi.registerDevices(deviceIdHashes, deviceTypes, devicePublicKeys, {from: ctx.actors.mfg})
       expect(tx.logs.length).to.be.equal(total)
 
       for (let i = 0; i < total; i++) {
@@ -432,6 +476,7 @@ contract('Device Management', accounts => {
         expect(log.args._sender).to.be.equal(ctx.actors.mfg)
         expect(log.args._fee.toString(10)).to.be.equal(regFee.toString(10))
         expect(log.args._deviceHashKey).to.be.equal(deviceIdHashes[i])
+        expect(web3.toAscii(log.args._manufacturerId).replace(/\u0000/g, '')).to.be.equal(mfgId)
         expect(web3.toAscii(log.args._deviceType).replace(/\u0000/g, '')).to.be.equal(deviceType)
 
         const device = await ctx.contracts.atonomi.devices(deviceIdHashes[i])
@@ -440,7 +485,10 @@ contract('Device Management', accounts => {
         expect(device[2]).to.be.equal(true)
         expect(device[3]).to.be.equal(false)
         expect('').to.be.equal(web3.toAscii(device[4]).replace(/\u0000/g, ''))
-        expect(device[5]).to.be.equal(ctx.actors.mfg)
+        expect(web3.toAscii(device[5]).replace(/\u0000/g, '')).to.be.equal(devicePublicKey)
+
+        const mfgWallet = await ctx.contracts.atonomi.manufacturerRewards(mfgId)
+        expect(mfgWallet).to.be.equal(ctx.actors.mfg)
       }
 
       expect(tx.receipt.logs.length).to.be.equal(total + 1)
@@ -457,11 +505,15 @@ contract('Device Management', accounts => {
 
       const poolEndingBalance = await ctx.contracts.token.balanceOf(ctx.contracts.atonomi.address)
       expect((poolEndingBalance - poolStartingBalance).toString(10)).to.be.equal((regFee * total).toString(10))
+
+      const bountyEndingBalance = await ctx.contracts.atonomi.pools(ctx.actors.mfg)
+      expect((bountyEndingBalance[0] - bountyStartingBalance[0]).toString(10)).to.be.equal((regFee * total).toString(10))
     })
 
     it('can bulk operations with some failures', async () => {
       const deviceIdHashes = []
       const deviceTypes = []
+      const devicePublicKeys = []
       for (let i = 0; i < total; i++) {
         if (i === 0) {
           // set a zero hash
@@ -473,9 +525,10 @@ contract('Device Management', accounts => {
           deviceIdHashes.push(web3Utils.soliditySha3({t: 'bytes32', v: web3.fromAscii(deviceIdPrefix + i)}))
         }
         deviceTypes.push(deviceType)
+        devicePublicKeys.push(devicePublicKey)
       }
       await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, regFee * total, {from: ctx.actors.mfg})
-      const fn = ctx.contracts.atonomi.registerDevices(deviceIdHashes, deviceTypes, {from: ctx.actors.mfg})
+      const fn = ctx.contracts.atonomi.registerDevices(deviceIdHashes, deviceTypes, devicePublicKeys, {from: ctx.actors.mfg})
       await errors.expectRevert(fn)
     })
   })
