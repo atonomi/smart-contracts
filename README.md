@@ -6,9 +6,9 @@
 
 | Contract  | Address |
 | ------------- | ------------- |
-| SafeMathLib (TokenMarket)  | 0x5ef8b987e8c733d957a70441d3a086bccd1f78a9 |
-| ATMI Token (TokenMarket)  | 0x38e29b9c172da31696e784efb7c69c9cbf172308 |
-| Atonomi | 0x4f2c90249d452e7bf2d0b714d803f74eaa150ca4 |
+| SafeMathLib (TokenMarket)  | [0x5ef8b987e8c733d957a70441d3a086bccd1f78a9](https://kovan.etherscan.io/address/0x5ef8b987e8c733d957a70441d3a086bccd1f78a9#code) |
+| ATMI Token (TokenMarket)  | [0x38e29b9c172da31696e784efb7c69c9cbf172308](https://kovan.etherscan.io/address/0x38e29b9c172da31696e784efb7c69c9cbf172308#code) |
+| Atonomi ([78a61fb](https://github.com/atonomi/smart-contracts/tree/78a61fb5b1e60f11fd3e9592376551e4ff38c341)) | [0x4f2c90249d452e7bf2d0b714d803f74eaa150ca4](https://kovan.etherscan.io/address/0x4f2c90249d452e7bf2d0b714d803f74eaa150ca4#code) |
 
 
 ### Setup
