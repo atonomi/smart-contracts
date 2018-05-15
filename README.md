@@ -13,7 +13,7 @@
 
 ### Setup
 
-Downlaod and install the latest version of Solidity here: https://solidity.readthedocs.io/en/v0.4.22/installing-solidity.html (use Homebrew)
+Download and install the latest version of Solidity here: https://solidity.readthedocs.io/en/v0.4.22/installing-solidity.html (use Homebrew)
 
 Download and install the latest LTS version of Node.js here: https://nodejs.org/en/
 
