@@ -2,7 +2,7 @@
 
 ### Private Dev Chain
 
-<img src="hosho.png" alt="Hosho audit in process" style="height: 150px"/>
+<img src="hosho.png" alt="Hosho audit in process" height="125px"/>
 
 | Contract  | Address |
 | ------------- | ------------- |
