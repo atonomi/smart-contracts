@@ -1,8 +1,8 @@
 # Atonomi Ethereum Smart Contracts
 
-### Kovan Chain
-
 <img src="hosho.png" alt="Hosho audit in process" height="125px"/>
+
+### Kovan Chain
 
 | Contract  | Address |
 | ------------- | ------------- |
