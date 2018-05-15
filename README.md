@@ -1,14 +1,15 @@
 # Atonomi Ethereum Smart Contracts
 
-### Private Dev Chain
+### Kovan Chain
 
 <img src="hosho.png" alt="Hosho audit in process" height="125px"/>
 
 | Contract  | Address |
 | ------------- | ------------- |
-| SafeMathLib (TokenMarket)  | 0x1e07783a9ef2648a4e99b3e9a9cc0440a978dbeb |
-| ATMI Token (TokenMarket)  | 0xc84d2d4d20cba70c00ada9da9d9940983ae4e9b9 |
-| Atonomi | 0xb46d9f080f704595ff44fad7a676eb9202faa951 |
+| SafeMathLib (TokenMarket)  | 0x5ef8b987e8c733d957a70441d3a086bccd1f78a9 |
+| ATMI Token (TokenMarket)  | 0x38e29b9c172da31696e784efb7c69c9cbf172308 |
+| Atonomi | 0x4f2c90249d452e7bf2d0b714d803f74eaa150ca4 |
+
 
 ### Setup
 
