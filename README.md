@@ -70,7 +70,7 @@ Then change into the deploy directory:
 
 ```
 $ cd deploy
-$ export PARITY_NODE=http://ropsten.atonomi.io:8545
+$ export PARITY_NODE=http://localhost:8545
 $ export ETHER_ADDR=0xfb0987013cc730d33e537bb0ce61298ab8eb2553
 $ ./geth-attach.sh
 ```
