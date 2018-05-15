@@ -2,6 +2,8 @@
 
 ### Private Dev Chain
 
+<img src="hosho.png" alt="Hosho audit in process" style="height: 150px"/>
+
 | Contract  | Address |
 | ------------- | ------------- |
 | SafeMathLib (TokenMarket)  | 0x1e07783a9ef2648a4e99b3e9a9cc0440a978dbeb |
