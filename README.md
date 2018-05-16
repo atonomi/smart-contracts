@@ -100,3 +100,5 @@ To execute the full unit test truffle suite and generate test coverage report:
 ```
 $ npm run test:coverage
 ```
+
+View the current test coverage report [here](https://htmlpreview.github.io/?https://raw.githubusercontent.com/atonomi/smart-contracts/master/coverage/contracts/Atonomi.sol.html)
