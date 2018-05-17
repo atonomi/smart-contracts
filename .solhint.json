@@ -1,7 +1,6 @@
 { 
   "extends": "default", 
   "rules": {
-    "indent": ["warn", 4], 
     "quotes": ["error", "double"], 
     "max-line-length": ["error", 120], 
     "var-name-mixedcase": "warn", 

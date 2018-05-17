@@ -1,4 +1,4 @@
-pragma solidity ^0.4.23;
+pragma solidity ^0.4.23; // solhint-disable-line
 
 import "zeppelin-solidity/contracts/lifecycle/Pausable.sol";
 import "zeppelin-solidity/contracts/lifecycle/TokenDestructible.sol";
@@ -16,7 +16,7 @@ interface ERC20Interface {
     function approve(address spender, uint tokens) public returns (bool success);
     function transferFrom(address from, address to, uint tokens) public returns (bool success);
 
-    event Transfer(address indexed from, address indexed to, uint tokens);
+    event Transfer(address indexed from, address indexed to, uint tokens);   // solhint-disable-line
     event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
 }
 
@@ -209,29 +209,28 @@ contract Atonomi is Pausable, TokenDestructible {
     /// @param _defaultReputationReward initial reputation reward on the network
     /// @param _reputationIRNNodeShare share that the reputation author recieves (remaining goes to manufacturer)
     /// @param _blockThreshold the number of blocks that need to pass to receive the full reward
-    function Atonomi(
+    constructor (
         address _token,
         uint256 _registrationFee,
         uint256 _activationFee,
         uint256 _defaultReputationReward,
         uint256 _reputationIRNNodeShare,
         uint256 _blockThreshold)
-        public 
-    {
-        require(_token != address(0), "token address cannot be 0x0");
-        require(_activationFee > 0, "activation fee must be greater than 0");
-        require(_registrationFee > 0, "registration fee must be greater than 0");
-        require(_defaultReputationReward > 0, "default reputation reward must be greater than 0");
-        require(_reputationIRNNodeShare > 0, "new share must be larger than zero");
-        require(_reputationIRNNodeShare <= 100, "new share must be less than or equal to 100");
+        public {
+            require(_token != address(0), "token address cannot be 0x0");
+            require(_activationFee > 0, "activation fee must be greater than 0");
+            require(_registrationFee > 0, "registration fee must be greater than 0");
+            require(_defaultReputationReward > 0, "default reputation reward must be greater than 0");
+            require(_reputationIRNNodeShare > 0, "new share must be larger than zero");
+            require(_reputationIRNNodeShare <= 100, "new share must be less than or equal to 100");
 
-        token = ERC20Interface(_token);
-        activationFee = _activationFee;
-        registrationFee = _registrationFee;
-        defaultReputationReward = _defaultReputationReward;
-        reputationIRNNodeShare = _reputationIRNNodeShare;
-        blockThreshold = _blockThreshold;
-    }
+            token = ERC20Interface(_token);
+            activationFee = _activationFee;
+            registrationFee = _registrationFee;
+            defaultReputationReward = _defaultReputationReward;
+            reputationIRNNodeShare = _reputationIRNNodeShare;
+            blockThreshold = _blockThreshold;
+        }
 
     ///
     /// EVENTS 

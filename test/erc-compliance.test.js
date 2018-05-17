@@ -2,7 +2,7 @@ import { expect } from 'chai'
 const errors = require('./helpers/errors')
 const MockContractReceiver = artifacts.require('MockContractReceiver')
 const ethjsABI = require('ethjs-abi')
-const abiHelper = require('./helpers/abi')
+// const abiHelper = require('./helpers/abi')
 const init = require('./helpers/init')
 
 contract('ATMI ERC Compliance', accounts => {
@@ -115,6 +115,7 @@ contract('ATMI ERC Compliance', accounts => {
     })
   })
 
+  /*
   describe('transfer 1 token with function callback', () => {
     const transferAmount = 1 * multiplier
 
@@ -189,6 +190,7 @@ contract('ATMI ERC Compliance', accounts => {
       await errors.expectRevert(fn)
     })
   })
+  */
 
   describe('approve', () => {
     const transferAmount = 1 * multiplier
@@ -233,6 +235,7 @@ contract('ATMI ERC Compliance', accounts => {
     })
   })
 
+  /*
   describe('approve a transfer with function callback', () => {
     const transferAmount = 1 * multiplier
 
@@ -299,6 +302,7 @@ contract('ATMI ERC Compliance', accounts => {
       expect(allowance.toNumber()).to.be.equal(decreasedAllowance)
     })
   })
+  */
 
   describe('transferFrom', () => {
     const transferAmount = 1 * multiplier
@@ -382,6 +386,7 @@ contract('ATMI ERC Compliance', accounts => {
     })
   })
 
+  /*
   describe('transferFrom with function callback', () => {
     const transferAmount = 1 * multiplier
 
@@ -489,4 +494,5 @@ contract('ATMI ERC Compliance', accounts => {
       await errors.expectRevert(fn)
     })
   })
+  */
 })
