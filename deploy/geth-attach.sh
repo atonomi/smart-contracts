@@ -11,7 +11,7 @@ echo -e "ETHER_ADDR is set to '$ETHER_ADDR'"
 if [ -z ${SAFEMATHLIB_ADDR+x} ]; then SAFEMATHLIB_ADDR=0x5ef8b987e8c733d957a70441d3a086bccd1f78a9; fi
 echo -e "SAFEMATHLIB_ADDR is set to '$SAFEMATHLIB_ADDR'"
 
-if [ -z ${ATMI_ADDR+x} ]; then ATMI_ADDR=0x38e29b9c172da31696e784efb7c69c9cbf172308; fi
+if [ -z ${ATMI_ADDR+x} ]; then ATMI_ADDR=0xe66254d9560c2d030ca5c3439c5d6b58061dd6f7; fi
 echo -e "ATMI_ADDR is set to '$ATMI_ADDR'"
 
 npm run compile

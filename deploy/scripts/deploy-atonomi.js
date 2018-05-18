@@ -16,6 +16,7 @@ function initSafeMathLib() {
   console.log('gas estimate', gas)
   var hash = web3.eth.sendTransaction({from: ETHER_ADDR, data: safeMathByteCode, gas: gas})
   console.log('txn hash:', hash)
+  return hash
 }
 
 function initATMIToken(safeMathAddress) {
@@ -32,6 +33,7 @@ function initATMIToken(safeMathAddress) {
   console.log('gas estimate', gas)
   var hash = web3.eth.sendTransaction({from: ETHER_ADDR, data: constructorByteCode, gas: gas})
   console.log('txn hash', hash)
+  return hash
 }
 
 function initAtonomi(ercAddress) {
@@ -48,4 +50,20 @@ function initAtonomi(ercAddress) {
   console.log('gas estimate', gas)
   var hash = web3.eth.sendTransaction({from: ETHER_ADDR, data: constructorByteCode, gas: gas})
   console.log('txn hash', hash)
+  return hash
+}
+
+function getATMIContract(addr) {
+  return web3.eth.contract(AtonomiTokenJSON.abi).at(addr)
+}
+
+function getAtonomiContract(addr) {
+  return web3.eth.contract(AtonomiJSON.abi).at(addr)
+}
+
+function initTestEnv(addr) {
+  var mikeAccount = '0x079Df73b5Ce40323020E7064a6De14c1702A8bfD'
+
+  var c = getAtonomiContract(addr)
+  return c.addNetworkMember(mikeAccount, true, true, true, 'LEVELK', {from: ETHER_ADDR})
 }

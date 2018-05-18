@@ -7,8 +7,8 @@
 | Contract  | Address |
 | ------------- | ------------- |
 | SafeMathLib (TokenMarket)  | [0x5ef8b987e8c733d957a70441d3a086bccd1f78a9](https://kovan.etherscan.io/address/0x5ef8b987e8c733d957a70441d3a086bccd1f78a9#code) |
-| ATMI Token (TokenMarket)  | [0x38e29b9c172da31696e784efb7c69c9cbf172308](https://kovan.etherscan.io/address/0x38e29b9c172da31696e784efb7c69c9cbf172308#code) |
-| Atonomi ([78a61fb](https://github.com/atonomi/smart-contracts/tree/78a61fb5b1e60f11fd3e9592376551e4ff38c341)) | [0x4f2c90249d452e7bf2d0b714d803f74eaa150ca4](https://kovan.etherscan.io/address/0x4f2c90249d452e7bf2d0b714d803f74eaa150ca4#code) |
+| ATMI Token (TokenMarket)  | [0xe66254d9560c2d030ca5c3439c5d6b58061dd6f7](https://kovan.etherscan.io/address/0xe66254d9560c2d030ca5c3439c5d6b58061dd6f7#code) |
+| Atonomi ([d3c53e6](https://github.com/atonomi/smart-contracts/tree/d3c53e6c9912c0f81ef914280abe8cb391d7b0eb)) | [0xff8c59b2235c08d31269a4d95dba4925ec60c214](https://kovan.etherscan.io/address/0xff8c59b2235c08d31269a4d95dba4925ec60c214#code) |
 
 
 ### Setup
@@ -55,14 +55,14 @@ $ npm run ganache-cli
 $ npm run deploy
 ```
 
-### Start a private dev chain node
+### Start a parity node
 
 ```
-$ export DATA_DIR=/atonomi/demochain
-$ ./parity-dev.sh
+$ cd deploy/kovan
+$ ./parity-kovan.sh
 ```
 
-### Deploy to private dev chain
+### Deploy contracts
 
 Make sure you have the latest version of `geth` installed: https://github.com/ethereum/go-ethereum/wiki/Installing-Geth
 
