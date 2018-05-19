@@ -61,9 +61,14 @@ function getAtonomiContract(addr) {
   return web3.eth.contract(AtonomiJSON.abi).at(addr)
 }
 
-function initTestEnv(addr) {
-  var mikeAccount = '0x079Df73b5Ce40323020E7064a6De14c1702A8bfD'
+function initTestEnv(atmiAddr, atonomiAddr) {
+  var t = getATMIContract(atmiAddr)
+  var c = getAtonomiContract(atonomiAddr)
 
-  var c = getAtonomiContract(addr)
-  return c.addNetworkMember(mikeAccount, true, true, true, 'LEVELK', {from: ETHER_ADDR})
+  var mikeAccount = '0x079Df73b5Ce40323020E7064a6De14c1702A8bfD'
+  var h = c.addNetworkMember(mikeAccount, true, true, true, 'LEVELK', {from: ETHER_ADDR})
+  console.log('Mike added to network', h)
+
+  h = t.transfer(mikeAccount, 100 * multiplier, {from: ETHER_ADDR})
+  console.log('Transfer 100 ATMI to mike', h)
 }
