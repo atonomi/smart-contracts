@@ -86,10 +86,10 @@ function getAtonomiState(atonomiAddr) {
   console.log('Registration Fee', (registrationFee / multiplier).toFixed(18))
 
   var activationFee = c.activationFee()
-  console.log('Activation Fee', (registrationFee / multiplier).toFixed(18))
+  console.log('Activation Fee', (activationFee / multiplier).toFixed(18))
 
   var defaultReputationReward = c.defaultReputationReward()
-  console.log('Default Reputation Reward', (registrationFee / multiplier).toFixed(18))
+  console.log('Default Reputation Reward', (defaultReputationReward / multiplier).toFixed(18))
 
   var blockThreshold = c.blockThreshold()
   console.log('Reputation Block Threshold', blockThreshold)
