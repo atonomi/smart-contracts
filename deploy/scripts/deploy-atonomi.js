@@ -2,9 +2,9 @@ var tokenName = 'Atonomi Token'
 var tokenSymbol = 'ATMI'
 var tokenDecimals = 18
 var multiplier = Math.pow(10, tokenDecimals)
-var regFee = 1 * multiplier
-var actFee = 1 * multiplier
-var repReward = 1 * multiplier
+var regFee = 0.25 * multiplier
+var actFee = 0.25 * multiplier
+var repReward = 0.125 * multiplier
 var reputationShare = 20
 var blockThreshold = 5760 // assuming 15s blocks, 1 write per day
 var initalSupply = 1000000000 * multiplier
@@ -64,8 +64,12 @@ function getAtonomiContract(addr) {
 function initTestEnv(atonomiAddr) {
   var c = getAtonomiContract(atonomiAddr)
 
+  var ownerAccount = ETHER_ADDR
+  var h = c.addNetworkMember(ownerAccount, true, true, true, 'TEST', {from: ETHER_ADDR})
+  console.log('Owner added to network', h)
+
   var mikeAccount = '0x079Df73b5Ce40323020E7064a6De14c1702A8bfD'
-  var h = c.addNetworkMember(mikeAccount, true, true, true, 'LEVELK', {from: ETHER_ADDR})
+  h = c.addNetworkMember(mikeAccount, true, true, true, 'LEVK', {from: ETHER_ADDR})
   console.log('Mike added to network', h)
 }
 
@@ -73,4 +77,24 @@ function grantTokens(atmiAddr, ethAccount) {
   var t = getATMIContract(atmiAddr)
   var h = t.transfer(ethAccount, 100 * multiplier, {from: ETHER_ADDR})
   console.log('Transfer 100 ATMI to', ethAccount, h)
+}
+
+function getAtonomiState(atonomiAddr) {
+  var c = getAtonomiContract(atonomiAddr)
+
+  var registrationFee = c.registrationFee()
+  console.log('Registration Fee', (registrationFee / multiplier).toFixed(18))
+
+  var activationFee = c.activationFee()
+  console.log('Activation Fee', (registrationFee / multiplier).toFixed(18))
+
+  var defaultReputationReward = c.defaultReputationReward()
+  console.log('Default Reputation Reward', (registrationFee / multiplier).toFixed(18))
+
+  var blockThreshold = c.blockThreshold()
+  console.log('Reputation Block Threshold', blockThreshold)
+
+  var reputationAuthorShare = c.reputationIRNNodeShare()
+  console.log('Reputation Author Share', reputationAuthorShare + '%')
+  console.log('Manufacturer Share', (100 - reputationAuthorShare) + '%')
 }
