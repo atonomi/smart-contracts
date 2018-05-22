@@ -37,7 +37,15 @@ export async function expectError (asyncFn) {
 }
 
 export async function expectInvalidOpcode (asyncFn) {
-  const error = await asyncReturnErr(asyncFn)
-  const invalidOpcodeReceived = error.message.search('invalid opcode') >= 0
-  assert(invalidOpcodeReceived, `Expected "invalid opcode", got ${error} instead`)
+  const err = await asyncReturnErr(asyncFn)
+  expect(
+    typeof err !== 'undefined',
+    'expected invalid opcode, but it succeeded'
+  ).to.equal(true)
+  if (typeof err !== 'undefined') {
+    expect(
+      err.message.search('invalid opcode') > -1,
+      `expected error message "${err.message}" to contain "invalid opcode"`
+    ).to.equal(true)
+  }
 }
