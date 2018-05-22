@@ -1,4 +1,6 @@
 import { expect } from 'chai'
+import { mineBlock } from './helpers/mine'
+
 const init = require('./helpers/init')
 const errors = require('./helpers/errors')
 const web3Utils = require('web3-utils')
@@ -20,6 +22,7 @@ contract('Device Management', accounts => {
   const regFee = 1 * multiplier
   const actFee = 1 * multiplier
   const repReward = 1 * multiplier
+  const blockThreshold = 5760
 
   const deviceId = 'apple-iphone1'
   const deviceIdHash = web3Utils.soliditySha3({t: 'bytes32', v: web3.fromAscii(deviceId)})
@@ -413,6 +416,55 @@ contract('Device Management', accounts => {
         const tokenAtonomiAfter = await ctx.contracts.token.balanceOf(ctx.contracts.atonomi.address)
         expect((tokenAtonomiBefore - tokenAtonomiAfter).toString(10)).to.be.equal(expectTokens.toString(10))
       }
+    })
+
+    it('immediate score update should yeild small reward', async () => {
+      await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, regFee + actFee, {from: ctx.actors.mfg})
+      await ctx.contracts.atonomi.registerAndActivateDevice(deviceId, deviceType, devicePublicKey, {from: ctx.actors.mfg})
+      await ctx.contracts.atonomi.updateReputationScore(deviceId, score, {from: ctx.actors.irnNode})
+      await ctx.contracts.atonomi.withdrawTokens({ from: ctx.actors.irnNode })
+
+      await mineBlock()
+
+      const newScore = 'some new score'
+      await ctx.contracts.atonomi.updateReputationScore(deviceId, newScore, {from: ctx.actors.irnNode})
+
+      const myNewReward = await ctx.contracts.atonomi.rewards(ctx.actors.irnNode)
+      expect(myNewReward.toString(10)).to.be.equal('104166666666666')
+    })
+
+    it('later score update should yeild medium reward', async () => {
+      await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, regFee + actFee, {from: ctx.actors.mfg})
+      await ctx.contracts.atonomi.registerAndActivateDevice(deviceId, deviceType, devicePublicKey, {from: ctx.actors.mfg})
+      await ctx.contracts.atonomi.updateReputationScore(deviceId, score, {from: ctx.actors.irnNode})
+      await ctx.contracts.atonomi.withdrawTokens({ from: ctx.actors.irnNode })
+
+      for (let i = 0; i < blockThreshold / 2; i++) {
+        await mineBlock()
+      }
+
+      const newScore = 'some new score'
+      await ctx.contracts.atonomi.updateReputationScore(deviceId, newScore, {from: ctx.actors.irnNode})
+
+      const myNewReward = await ctx.contracts.atonomi.rewards(ctx.actors.irnNode)
+      expect(myNewReward.toString(10)).to.be.equal('100069444444444444')
+    })
+
+    it('normal wait time score update should yeild full reward', async () => {
+      await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, regFee + actFee, {from: ctx.actors.mfg})
+      await ctx.contracts.atonomi.registerAndActivateDevice(deviceId, deviceType, devicePublicKey, {from: ctx.actors.mfg})
+      await ctx.contracts.atonomi.updateReputationScore(deviceId, score, {from: ctx.actors.irnNode})
+      await ctx.contracts.atonomi.withdrawTokens({ from: ctx.actors.irnNode })
+
+      for (let i = 0; i < blockThreshold + 1; i++) {
+        await mineBlock()
+      }
+
+      const newScore = 'some new score'
+      await ctx.contracts.atonomi.updateReputationScore(deviceId, newScore, {from: ctx.actors.irnNode})
+
+      const myNewReward = await ctx.contracts.atonomi.rewards(ctx.actors.irnNode)
+      expect(myNewReward.toString(10)).to.be.equal((repReward * .2).toString(10))
     })
 
     it('can not set score for device that is not activated', async () => {
