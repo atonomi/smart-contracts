@@ -215,22 +215,21 @@ contract Atonomi is Pausable, TokenDestructible {
         uint256 _activationFee,
         uint256 _defaultReputationReward,
         uint256 _reputationIRNNodeShare,
-        uint256 _blockThreshold)
-        public {
-            require(_token != address(0), "token address cannot be 0x0");
-            require(_activationFee > 0, "activation fee must be greater than 0");
-            require(_registrationFee > 0, "registration fee must be greater than 0");
-            require(_defaultReputationReward > 0, "default reputation reward must be greater than 0");
-            require(_reputationIRNNodeShare > 0, "new share must be larger than zero");
-            require(_reputationIRNNodeShare <= 100, "new share must be less than or equal to 100");
+        uint256 _blockThreshold) public {
+        require(_token != address(0), "token address cannot be 0x0");
+        require(_activationFee > 0, "activation fee must be greater than 0");
+        require(_registrationFee > 0, "registration fee must be greater than 0");
+        require(_defaultReputationReward > 0, "default reputation reward must be greater than 0");
+        require(_reputationIRNNodeShare > 0, "new share must be larger than zero");
+        require(_reputationIRNNodeShare <= 100, "new share must be less than or equal to 100");
 
-            token = ERC20Interface(_token);
-            activationFee = _activationFee;
-            registrationFee = _registrationFee;
-            defaultReputationReward = _defaultReputationReward;
-            reputationIRNNodeShare = _reputationIRNNodeShare;
-            blockThreshold = _blockThreshold;
-        }
+        token = ERC20Interface(_token);
+        activationFee = _activationFee;
+        registrationFee = _registrationFee;
+        defaultReputationReward = _defaultReputationReward;
+        reputationIRNNodeShare = _reputationIRNNodeShare;
+        blockThreshold = _blockThreshold;
+    }
 
     ///
     /// EVENTS 
@@ -246,7 +245,8 @@ contract Atonomi is Pausable, TokenDestructible {
         uint256 _fee,
         bytes32 indexed _deviceHashKey,
         bytes32 indexed _manufacturerId,
-        bytes32 _deviceType);
+        bytes32 _deviceType
+    );
 
     /// @notice emitted on successful device activation
     /// @param _sender manufacturer or device owner paying for activation
@@ -259,7 +259,8 @@ contract Atonomi is Pausable, TokenDestructible {
         uint256 _fee,
         bytes32 indexed _deviceId,
         bytes32 indexed _manufacturerId,
-        bytes32 _deviceType);
+        bytes32 _deviceType
+    );
 
     /// @notice emitted on reputation change for a device
     /// @param _deviceId device id of the target device
@@ -276,7 +277,8 @@ contract Atonomi is Pausable, TokenDestructible {
         address indexed _irnNode,
         uint256 _irnReward,
         address indexed _manufacturerWallet,
-        uint256 _manufacturerReward);
+        uint256 _manufacturerReward
+    );
 
     /// @notice emitted on successful addition of network member address
     /// @param _sender ethereum account of participant that made the change
@@ -285,7 +287,8 @@ contract Atonomi is Pausable, TokenDestructible {
     event NetworkMemberAdded(
         address indexed _sender,
         address indexed _member,
-        bytes32 indexed _memberId);
+        bytes32 indexed _memberId
+    );
 
     /// @notice emitted on successful removal of network member address
     /// @param _sender ethereum account of participant that made the change
@@ -294,35 +297,40 @@ contract Atonomi is Pausable, TokenDestructible {
     event NetworkMemberRemoved(
         address indexed _sender,
         address indexed _member,
-        bytes32 indexed _memberId);
+        bytes32 indexed _memberId
+    );
 
     /// @notice emitted everytime the registration fee changes
     /// @param _sender ethereum account of participant that made the change
     /// @param _amount new fee value in ATMI tokens
     event RegistrationFeeUpdated(
         address indexed _sender,
-        uint256 _amount);
+        uint256 _amount
+    );
 
     /// @notice emitted everytime the activation fee changes
     /// @param _sender ethereum account of participant that made the change
     /// @param _amount new fee value in ATMI tokens
     event ActivationFeeUpdated(
         address indexed _sender,
-        uint256 _amount);
+        uint256 _amount
+    );
 
     /// @notice emitted everytime the default reputation reward changes
     /// @param _sender ethereum account of participant that made the change
     /// @param _amount new fee value in ATMI tokens
     event DefaultReputationRewardUpdated(
         address indexed _sender,
-        uint256 _amount);
+        uint256 _amount
+    );
 
     /// @notice emitted everytime owner changes the contributation share for reputation authors
     /// @param _sender ethereum account of participant that made the change
     /// @param _percentage new percentage value
     event ReputationIRNNodeShareUpdated(
         address indexed _sender,
-        uint256 _percentage);
+        uint256 _percentage
+    );
 
     /// @notice emitted everytime a manufacturer changes their wallet for rewards
     /// @param _old ethereum account
@@ -331,21 +339,24 @@ contract Atonomi is Pausable, TokenDestructible {
     event ManufacturerRewardWalletChanged(
         address indexed _old,
         address indexed _new,
-        bytes32 indexed _manufacturerId);
+        bytes32 indexed _manufacturerId
+    );
 
     /// @notice emitted everytime a token pool reward amount changes
     /// @param _sender ethereum account of the token pool owner
     /// @param _newReward new reward value in ATMI tokens
     event TokenPoolRewardUpdated(
         address indexed _sender,
-        uint256 _newReward);
+        uint256 _newReward
+    );
 
     /// @notice emitted everytime the block threshold is changed
     /// @param _sender ethereum account who made the change
     /// @param _newBlockThreshold new value for all token pools
     event RewardBlockThresholdChanged(
         address indexed _sender,
-        uint256 _newBlockThreshold);
+        uint256 _newBlockThreshold
+    );
 
     /// @notice emitted everytime someone donates tokens to a manufacturer
     /// @param _sender ethereum account of the donater
@@ -356,14 +367,16 @@ contract Atonomi is Pausable, TokenDestructible {
         address indexed _sender,
         bytes32 indexed _manufacturerId,
         address indexed _manufacturer,
-        uint256 _amount);
+        uint256 _amount
+    );
     
     /// @notice emitted everytime a participant withdraws from token pool
     /// @param _sender ethereum account of participant that made the change
     /// @param _amount tokens withdrawn
     event TokensWithdrawn(
         address indexed _sender,
-        uint256 _amount);
+        uint256 _amount
+    );
 
     ///
     /// FEE SETTERS
@@ -588,9 +601,14 @@ contract Atonomi is Pausable, TokenDestructible {
         public onlyManufacturer whenNotPaused returns (bool)
     {
         require(_deviceIdHashes.length > 0, "at least one device is required");
-        require(_deviceIdHashes.length == _deviceTypes.length, "device type array needs to be same size as devices");
-        require(_deviceIdHashes.length == _devicePublicKeys.length,
-            "device public key array needs to be same size as devices");
+        require(
+            _deviceIdHashes.length == _deviceTypes.length,
+            "device type array needs to be same size as devices"
+        );
+        require(
+            _deviceIdHashes.length == _devicePublicKeys.length,
+            "device public key array needs to be same size as devices"
+        );
 
         uint256 runningBalance = 0;
         for (uint256 i = 0; i < _deviceIdHashes.length; i++) {
