@@ -1,6 +1,7 @@
 import { expect } from 'chai'
 import { mineBlock } from './helpers/mine'
 
+const BigNumber = require('bignumber.js')
 const init = require('./helpers/init')
 const errors = require('./helpers/errors')
 const web3Utils = require('web3-utils')
@@ -28,7 +29,7 @@ contract('Device Management', accounts => {
   const deviceIdHash = web3Utils.soliditySha3({t: 'bytes32', v: web3.fromAscii(deviceId)})
   const mfgId = 'APPLE'
   const deviceType = 'phone'
-  const devicePublicKey = 'somepublickey'
+  const devicePublicKey = new BigNumber('0x9c274091da1ce47bd321f272d66b6e5514fb82346d7992e2d1a3eefdeffed791')
 
   beforeEach(async () => {
     ctx.contracts.mockSolHash = await MockSolHash.new({from: ctx.actors.owner})
@@ -92,8 +93,8 @@ contract('Device Management', accounts => {
       expect(deviceType).to.be.equal(web3.toAscii(device[1]).replace(/\u0000/g, ''))
       expect(device[2]).to.be.equal(true)
       expect(device[3]).to.be.equal(false)
-      expect(web3.toAscii(device[4]).replace(/\u0000/g, '')).to.be.equal('')
-      expect(web3.toAscii(device[5]).replace(/\u0000/g, '')).to.be.equal(devicePublicKey)
+      expect(device[4]).to.be.equal('0x0000000000000000000000000000000000000000000000000000000000000000')
+      expect(device[5]).to.be.equal('0x' + devicePublicKey.toString(16))
 
       const mfgWallet = await ctx.contracts.atonomi.manufacturerRewards(mfgId)
       expect(mfgWallet).to.be.equal(ctx.actors.mfg)
@@ -179,8 +180,8 @@ contract('Device Management', accounts => {
       expect(deviceType).to.be.equal(web3.toAscii(device[1]).replace(/\u0000/g, ''))
       expect(device[2]).to.be.equal(true)
       expect(device[3]).to.be.equal(true)
-      expect('').to.be.equal(web3.toAscii(device[4]).replace(/\u0000/g, ''))
-      expect(web3.toAscii(device[5]).replace(/\u0000/g, '')).to.be.equal(devicePublicKey)
+      expect(device[4]).to.be.equal('0x0000000000000000000000000000000000000000000000000000000000000000')
+      expect(device[5]).to.be.equal('0x' + devicePublicKey.toString(16))
 
       const mfgWallet = await ctx.contracts.atonomi.manufacturerRewards(mfgId)
       expect(mfgWallet).to.be.equal(ctx.actors.mfg)
@@ -284,8 +285,8 @@ contract('Device Management', accounts => {
       expect(deviceType).to.be.equal(web3.toAscii(device[1]).replace(/\u0000/g, ''))
       expect(device[2]).to.be.equal(true)
       expect(device[3]).to.be.equal(true)
-      expect('').to.be.equal(web3.toAscii(device[4]).replace(/\u0000/g, ''))
-      expect(web3.toAscii(device[5]).replace(/\u0000/g, '')).to.be.equal(devicePublicKey)
+      expect(device[4]).to.be.equal('0x0000000000000000000000000000000000000000000000000000000000000000')
+      expect(device[5]).to.be.equal('0x' + devicePublicKey.toString(16))
 
       const mfgWallet = await ctx.contracts.atonomi.manufacturerRewards(mfgId)
       expect(mfgWallet).to.be.equal(ctx.actors.mfg)
@@ -373,8 +374,8 @@ contract('Device Management', accounts => {
       expect(deviceType).to.be.equal(web3.toAscii(device[1]).replace(/\u0000/g, ''))
       expect(device[2]).to.be.equal(true)
       expect(device[3]).to.be.equal(true)
-      expect(score).to.be.equal(web3.toAscii(device[4]).replace(/\u0000/g, ''))
-      expect(web3.toAscii(device[5]).replace(/\u0000/g, '')).to.be.equal(devicePublicKey)
+      expect(web3.toAscii(device[4]).replace(/\u0000/g, '')).to.be.equal(score)
+      expect(device[5]).to.be.equal('0x' + devicePublicKey.toString(16))
 
       const blockNumber = await ctx.contracts.atonomi.authorWrites(ctx.actors.irnNode, deviceId)
       expect(blockNumber.toString(10)).to.be.equal(web3.eth.blockNumber.toString(10))
@@ -536,8 +537,8 @@ contract('Device Management', accounts => {
         expect(deviceType).to.be.equal(web3.toAscii(device[1]).replace(/\u0000/g, ''))
         expect(device[2]).to.be.equal(true)
         expect(device[3]).to.be.equal(false)
-        expect('').to.be.equal(web3.toAscii(device[4]).replace(/\u0000/g, ''))
-        expect(web3.toAscii(device[5]).replace(/\u0000/g, '')).to.be.equal(devicePublicKey)
+        expect(device[4]).to.be.equal('0x0000000000000000000000000000000000000000000000000000000000000000')
+        expect(device[5]).to.be.equal('0x' + devicePublicKey.toString(16))
 
         const mfgWallet = await ctx.contracts.atonomi.manufacturerRewards(mfgId)
         expect(mfgWallet).to.be.equal(ctx.actors.mfg)

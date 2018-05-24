@@ -1,5 +1,5 @@
 TN:
-SF:/Users/fil.capiral/dev/github.com/filcap/atonomi-smart-contracts/contracts/Atonomi.sol
+SF:/Users/fil.capiral/dev/github.com/atonomi/smart-contracts/contracts/Atonomi.sol
 FN:29,mul
 FN:39,div
 FN:47,sub
@@ -426,7 +426,7 @@ BRF:148
 BRH:107
 end_of_record
 TN:
-SF:/Users/fil.capiral/dev/github.com/filcap/atonomi-smart-contracts/contracts/mocks/MockSafeMath.sol
+SF:/Users/fil.capiral/dev/github.com/atonomi/smart-contracts/contracts/mocks/MockSafeMath.sol
 FN:9,mul
 FN:13,div
 FN:17,sub
@@ -447,7 +447,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/Users/fil.capiral/dev/github.com/filcap/atonomi-smart-contracts/contracts/mocks/MockSolHash.sol
+SF:/Users/fil.capiral/dev/github.com/atonomi/smart-contracts/contracts/mocks/MockSolHash.sol
 FN:5,solHash
 FNF:1
 FNH:1
