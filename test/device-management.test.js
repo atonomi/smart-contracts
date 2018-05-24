@@ -464,7 +464,7 @@ contract('Device Management', accounts => {
       await ctx.contracts.atonomi.updateReputationScore(deviceId, newScore, {from: ctx.actors.irnNode})
 
       const myNewReward = await ctx.contracts.atonomi.rewards(ctx.actors.irnNode)
-      expect(myNewReward.toString(10)).to.be.equal((repReward * .2).toString(10))
+      expect(myNewReward.toString(10)).to.be.equal((repReward * 0.2).toString(10))
     })
 
     it('can not set score for device that is not activated', async () => {

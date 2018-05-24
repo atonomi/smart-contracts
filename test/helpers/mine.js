@@ -1,4 +1,4 @@
-export function mineBlock() {
+export function mineBlock () {
   return new Promise((resolve, reject) => {
     web3.currentProvider.sendAsync({
       jsonrpc: '2.0',
