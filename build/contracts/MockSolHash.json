@@ -1,0 +1,407 @@
+{
+  "contractName": "MockSolHash",
+  "abi": [
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "clearText",
+          "type": "bytes32"
+        }
+      ],
+      "name": "solHash",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "pure",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x608060405234801561001057600080fd5b5060e18061001f6000396000f300608060405260043610603f576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff1680636a7c2036146044575b600080fd5b348015604f57600080fd5b5060706004803603810190808035600019169060200190929190505050608e565b60405180826000191660001916815260200191505060405180910390f35b600081604051808260001916600019168152602001915050604051809103902090509190505600a165627a7a72305820957d18bce7d018ffb0e283a8130183ea81992688e7637600988992ed635c46ff0029",
+  "deployedBytecode": "0x608060405260043610603f576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff1680636a7c2036146044575b600080fd5b348015604f57600080fd5b5060706004803603810190808035600019169060200190929190505050608e565b60405180826000191660001916815260200191505060405180910390f35b600081604051808260001916600019168152602001915050604051809103902090509190505600a165627a7a72305820957d18bce7d018ffb0e283a8130183ea81992688e7637600988992ed635c46ff0029",
+  "sourceMap": "27:139:4:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;27:139:4;;;;;;;",
+  "deployedSourceMap": "27:139:4:-;;;;;;;;;;;;;;;;;;;;;;;;54:110;;8:9:-1;5:2;;;30:1;27;20:12;5:2;54:110:4;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;111:7;147:9;137:20;;;;;;;;;;;;;;;;;;;;;;;;130:27;;54:110;;;:::o",
+  "source": "pragma solidity ^0.4.23;\n\n\ncontract MockSolHash {\n    function solHash(bytes32 clearText) public pure returns (bytes32) {\n        return keccak256(clearText);\n    }\n}",
+  "sourcePath": "/Users/fil.capiral/dev/github.com/atonomi/smart-contracts/contracts/mocks/MockSolHash.sol",
+  "ast": {
+    "absolutePath": "/Users/fil.capiral/dev/github.com/atonomi/smart-contracts/contracts/mocks/MockSolHash.sol",
+    "exportedSymbols": {
+      "MockSolHash": [
+        2167
+      ]
+    },
+    "id": 2168,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 2154,
+        "literals": [
+          "solidity",
+          "^",
+          "0.4",
+          ".23"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:24:4"
+      },
+      {
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 2167,
+        "linearizedBaseContracts": [
+          2167
+        ],
+        "name": "MockSolHash",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": {
+              "id": 2165,
+              "nodeType": "Block",
+              "src": "120:44:4",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "id": 2162,
+                        "name": "clearText",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 2156,
+                        "src": "147:9:4",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bytes32",
+                          "typeString": "bytes32"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_bytes32",
+                          "typeString": "bytes32"
+                        }
+                      ],
+                      "id": 2161,
+                      "name": "keccak256",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 3845,
+                      "src": "137:9:4",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_sha3_pure$__$returns$_t_bytes32_$",
+                        "typeString": "function () pure returns (bytes32)"
+                      }
+                    },
+                    "id": 2163,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "137:20:4",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "functionReturnParameters": 2160,
+                  "id": 2164,
+                  "nodeType": "Return",
+                  "src": "130:27:4"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 2166,
+            "implemented": true,
+            "isConstructor": false,
+            "isDeclaredConst": true,
+            "modifiers": [],
+            "name": "solHash",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2157,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2156,
+                  "name": "clearText",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2166,
+                  "src": "71:17:4",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 2155,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "71:7:4",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "70:19:4"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 2160,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2159,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2166,
+                  "src": "111:7:4",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 2158,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "111:7:4",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "110:9:4"
+            },
+            "scope": 2167,
+            "src": "54:110:4",
+            "stateMutability": "pure",
+            "superFunction": null,
+            "visibility": "public"
+          }
+        ],
+        "scope": 2168,
+        "src": "27:139:4"
+      }
+    ],
+    "src": "0:166:4"
+  },
+  "legacyAST": {
+    "absolutePath": "/Users/fil.capiral/dev/github.com/atonomi/smart-contracts/contracts/mocks/MockSolHash.sol",
+    "exportedSymbols": {
+      "MockSolHash": [
+        2167
+      ]
+    },
+    "id": 2168,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 2154,
+        "literals": [
+          "solidity",
+          "^",
+          "0.4",
+          ".23"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:24:4"
+      },
+      {
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 2167,
+        "linearizedBaseContracts": [
+          2167
+        ],
+        "name": "MockSolHash",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": {
+              "id": 2165,
+              "nodeType": "Block",
+              "src": "120:44:4",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "id": 2162,
+                        "name": "clearText",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 2156,
+                        "src": "147:9:4",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bytes32",
+                          "typeString": "bytes32"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_bytes32",
+                          "typeString": "bytes32"
+                        }
+                      ],
+                      "id": 2161,
+                      "name": "keccak256",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 3845,
+                      "src": "137:9:4",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_sha3_pure$__$returns$_t_bytes32_$",
+                        "typeString": "function () pure returns (bytes32)"
+                      }
+                    },
+                    "id": 2163,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "137:20:4",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "functionReturnParameters": 2160,
+                  "id": 2164,
+                  "nodeType": "Return",
+                  "src": "130:27:4"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 2166,
+            "implemented": true,
+            "isConstructor": false,
+            "isDeclaredConst": true,
+            "modifiers": [],
+            "name": "solHash",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2157,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2156,
+                  "name": "clearText",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2166,
+                  "src": "71:17:4",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 2155,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "71:7:4",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "70:19:4"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 2160,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2159,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2166,
+                  "src": "111:7:4",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 2158,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "111:7:4",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "110:9:4"
+            },
+            "scope": 2167,
+            "src": "54:110:4",
+            "stateMutability": "pure",
+            "superFunction": null,
+            "visibility": "public"
+          }
+        ],
+        "scope": 2168,
+        "src": "27:139:4"
+      }
+    ],
+    "src": "0:166:4"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.4.23+commit.124ca40d.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "2.0.0",
+  "updatedAt": "2018-05-24T13:32:23.232Z"
+}
