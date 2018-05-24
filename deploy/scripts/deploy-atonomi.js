@@ -9,6 +9,14 @@ var reputationShare = 20
 var blockThreshold = 5760 // assuming 15s blocks, 1 write per day
 var initalSupply = 1000000000 * multiplier
 
+var chains = {
+  // TODO: add mainnet
+  kovan: {
+    token: '0xe66254d9560c2d030ca5c3439c5d6b58061dd6f7',
+    atonomi: '0xff8c59b2235c08d31269a4d95dba4925ec60c214',
+  }
+}
+
 function initSafeMathLib() {
   console.log('Configuring SafeMathLib...')
   var safeMathByteCode = web3.eth.contract(SafeMathLibJSON.abi).new.getData({data: SafeMathLibJSON.bytecode})
@@ -53,16 +61,18 @@ function initAtonomi(ercAddress) {
   return hash
 }
 
-function getATMIContract(addr) {
+function getATMIContract(chain) {
+  var addr = chains[chain].token
   return web3.eth.contract(AtonomiTokenJSON.abi).at(addr)
 }
 
-function getAtonomiContract(addr) {
+function getAtonomiContract(chain) {
+  var addr = chains[chain].atonomi
   return web3.eth.contract(AtonomiJSON.abi).at(addr)
 }
 
-function initTestEnv(atonomiAddr) {
-  var c = getAtonomiContract(atonomiAddr)
+function initTestEnv(chain) {
+  var c = getAtonomiContract(chain)
 
   var ownerAccount = ETHER_ADDR
   var h = c.addNetworkMember(ownerAccount, true, true, true, 'TEST', {from: ETHER_ADDR})
@@ -73,14 +83,14 @@ function initTestEnv(atonomiAddr) {
   console.log('Mike added to network', h)
 }
 
-function grantTokens(atmiAddr, ethAccount) {
-  var t = getATMIContract(atmiAddr)
+function grantTokens(chain, ethAccount) {
+  var t = getATMIContract(chain)
   var h = t.transfer(ethAccount, 100 * multiplier, {from: ETHER_ADDR})
   console.log('Transfer 100 ATMI to', ethAccount, h)
 }
 
-function getAtonomiState(atonomiAddr) {
-  var c = getAtonomiContract(atonomiAddr)
+function getAtonomiState(chain) {
+  var c = getAtonomiContract(chain)
 
   var registrationFee = c.registrationFee()
   console.log('Registration Fee', (registrationFee / multiplier).toFixed(18))
