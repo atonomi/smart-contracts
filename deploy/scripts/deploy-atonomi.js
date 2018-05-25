@@ -81,6 +81,10 @@ function initTestEnv(chain) {
   var mikeAccount = '0x079Df73b5Ce40323020E7064a6De14c1702A8bfD'
   h = c.addNetworkMember(mikeAccount, true, true, true, 'LEVK', {from: ETHER_ADDR})
   console.log('Mike added to network', h)
+
+  var scottAccount = '0xa657926c2180c5ef8469dd3c09e585fb2471f2f9'
+  h = c.addNetworkMember(scottAccount, true, true, true, 'SCOT', {from: ETHER_ADDR})
+  console.log('Scott added to network', h)
 }
 
 function grantTokens(chain, ethAccount) {
