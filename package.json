@@ -9,10 +9,11 @@
     "src"
   ],
   "dependencies": {
+    "csv-writer": "^1.0.0",
     "moment": "^2.22.1",
     "sha3": "^1.2.2",
     "truffle-blockchain-utils": "^0.0.3",
-    "truffle-core": "^4.1.8",
+    "truffle-core": "^4.1.11",
     "truffle-hdwallet-provider": "^0.0.3",
     "zeppelin-solidity": "1.9.0"
   },
@@ -27,7 +28,7 @@
     "chai": "^4.1.2",
     "chai-bignumber": "^2.0.2",
     "coveralls": "^3.0.1",
-    "cross-env": "^5.1.5",
+    "cross-env": "^5.1.6",
     "ethjs-abi": "^0.2.1",
     "ganache-cli": "^6.1.0",
     "lk-test-helpers": "^0.1.4",
@@ -35,7 +36,7 @@
     "solhint": "git+https://github.com/protofire/solhint.git",
     "solidity-coverage": "^0.5.0",
     "standard": "^10.0.3",
-    "truffle": "^4.1.8",
+    "truffle": "^4.1.11",
     "truffle-contract": "^3.0.5",
     "truffle-ext": "0.1.8",
     "truffle-flattener": "^1.2.5",

@@ -11,3 +11,4 @@ deploy/scripts/atonomi-abis.js
 deploy/scripts/atonomi-consts.js
 .DS_Store
 .vscode
+output/gasOutput.csv
