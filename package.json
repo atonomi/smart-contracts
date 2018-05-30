@@ -46,7 +46,7 @@
     "ganache-cli": "ganache-cli -p 8546 -e 1000 -a 15 -l 990000000000000",
     "deploy": "truffle migrate --reset",
     "deploy:web": "truffle migrate --reset --network web && cp -rf ./build/. ../admin-portal/build/",
-    "copy-contracts": "cp -rf ./build/. ./released-abi/",
+    "copy-contracts": "rm -rf ./released-abi/contracts && cp -rf ./build/. ./released-abi/",
     "test": "(npm run compile) && (ganache-cli -p 8546 -e 1000 -a 15 > /dev/null & truffle test) && (kill -9 $(lsof -ti :8546))",
     "test:single": "(npm run compile) && (ganache-cli -p 8546 -e 1000 -a 15 > /dev/null & truffle test $TESTFILE) && (kill -9 $(lsof -ti :8546))",
     "test:coverage": "(npm run compile) && touch allFiredEvents && (SOLIDITY_COVERAGE=true solidity-coverage)",
