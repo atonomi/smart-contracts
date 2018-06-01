@@ -54,6 +54,7 @@
     "lint": "npm run lint:js && npm run lint:sol",
     "lint:sol": "solhint contracts/*.sol contracts/**/*.sol",
     "lint:js": "standard --verbose | snazzy",
+    "etherscan:NetworkSettings": "truffle-flattener contracts/NetworkSettings.sol",
     "etherscan:Atonomi": "truffle-flattener contracts/Atonomi.sol"
   },
   "standard": {

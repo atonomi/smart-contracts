@@ -30,14 +30,23 @@ export async function getAtonomiTokenContract (owner, releaseAgent) {
 
 export async function getAtonomiContract (owner, tokenAddr) {
   const Atonomi = artifacts.require('Atonomi')
+  const NetworkSettings = artifacts.require('NetworkSettings')
+
   const regFee = 1 * multiplier
   const actFee = 1 * multiplier
   const repReward = 1 * multiplier
   const reputationShare = 20
   const blockThreshold = 5760 // assuming 15s blocks, 1 write per day
+  const r = await NetworkSettings.new(
+    regFee, actFee,
+    repReward,
+    reputationShare,
+    blockThreshold, {from: owner})
+
   const c = await Atonomi.new(
     tokenAddr,
-    regFee, actFee, repReward,
-    reputationShare, blockThreshold, {from: owner})
+    r.address,
+    {from: owner})
+
   return c
 }

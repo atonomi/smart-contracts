@@ -14,16 +14,21 @@ echo -e "SAFEMATHLIB_ADDR is set to '$SAFEMATHLIB_ADDR'"
 if [ -z ${ATMI_ADDR+x} ]; then ATMI_ADDR=0xe66254d9560c2d030ca5c3439c5d6b58061dd6f7; fi
 echo -e "ATMI_ADDR is set to '$ATMI_ADDR'"
 
+if [ -z ${SETTINGS_ADDR+x} ]; then SETTINGS_ADDR=0x729a741ce0c776130c50d35906f0dbd248184982; fi
+echo -e "SETTINGS_ADDR is set to '$SETTINGS_ADDR'"
+
 npm run compile
 
 echo -e "" > scripts/atonomi-consts.js
 echo -e "var ETHER_ADDR='$ETHER_ADDR'" >> scripts/atonomi-consts.js
 echo -e "var SAFEMATHLIB_ADDR='$SAFEMATHLIB_ADDR'" >> scripts/atonomi-consts.js
+echo -e "var SETTINGS_ADDR='$SETTINGS_ADDR'" >> scripts/atonomi-consts.js
 echo -e "var ATMI_ADDR='$ATMI_ADDR'" >> scripts/atonomi-consts.js
 
 echo -e "" > scripts/atonomi-abis.js
 echo -e "var SafeMathLibJSON = " >> scripts/atonomi-abis.js | cat "../build/contracts/SafeMathLib.json" >> scripts/atonomi-abis.js
 echo -e "\nvar AtonomiTokenJSON = " >> scripts/atonomi-abis.js | cat "../build/contracts/AMLToken.json" >> scripts/atonomi-abis.js
+echo -e "\nvar NetworkSettingsJSON = " >> scripts/atonomi-abis.js | cat "../build/contracts/NetworkSettings.json" >> scripts/atonomi-abis.js
 echo -e "\nvar AtonomiJSON = " >> scripts/atonomi-abis.js | cat "../build/contracts/Atonomi.json" >> scripts/atonomi-abis.js
 
 geth --preload "scripts/atonomi-consts.js,scripts/deploy-helpers.js,scripts/atonomi-abis.js,scripts/deploy-atonomi.js" attach $PARITY_NODE

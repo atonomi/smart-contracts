@@ -13,21 +13,25 @@ var chains = {
   // TODO: add mainnet
   kovan: {
     token: '0xe66254d9560c2d030ca5c3439c5d6b58061dd6f7',
-    atonomi: '0xff8c59b2235c08d31269a4d95dba4925ec60c214',
+    atonomi: '0xbde8f51601e552d620c208049c5970f7b52cd044',
+    settings: '0x729a741ce0c776130c50d35906f0dbd248184982'
   }
 }
 
-function initSafeMathLib() {
+function initSafeMathLib(estimateOnly) {
   console.log('Configuring SafeMathLib...')
   var safeMathByteCode = web3.eth.contract(SafeMathLibJSON.abi).new.getData({data: SafeMathLibJSON.bytecode})
   var gas = web3.eth.estimateGas({from: ETHER_ADDR, data: safeMathByteCode})
   console.log('gas estimate', gas)
+
+  if(estimateOnly) return undefined
+
   var hash = web3.eth.sendTransaction({from: ETHER_ADDR, data: safeMathByteCode, gas: gas})
   console.log('txn hash:', hash)
   return hash
 }
 
-function initATMIToken(safeMathAddress) {
+function initATMIToken(safeMathAddress, estimateOnly) {
   console.log('Configuring ATMI...')
   var linkedATMIByteCode = AtonomiTokenJSON.bytecode.replace(/__SafeMathLib___________________________+/g, safeMathAddress.substring(2))
   var constructorByteCode = web3.eth.contract(AtonomiTokenJSON.abi).new.getData(
@@ -39,23 +43,47 @@ function initATMIToken(safeMathAddress) {
     {data: linkedATMIByteCode})
   var gas = web3.eth.estimateGas({from: ETHER_ADDR, data: constructorByteCode})
   console.log('gas estimate', gas)
+
+  if(estimateOnly) return undefined
+
   var hash = web3.eth.sendTransaction({from: ETHER_ADDR, data: constructorByteCode, gas: gas})
   console.log('txn hash', hash)
   return hash
 }
 
-function initAtonomi(ercAddress) {
-  console.log('Configuring Atonomi...')
-  var constructorByteCode = web3.eth.contract(AtonomiJSON.abi).new.getData(
-    ercAddress,
+function initNetworkSettings(estimateOnly) {
+  console.log('Configuring Networking Settings...')
+  var constructorByteCode = web3.eth.contract(NetworkSettingsJSON.abi).new.getData(
     regFee,
     actFee,
     repReward,
     reputationShare,
     blockThreshold,
-    {data: AtonomiJSON.bytecode})
+    {data: NetworkSettingsJSON.bytecode})
   var gas = web3.eth.estimateGas({from: ETHER_ADDR, data: constructorByteCode})
   console.log('gas estimate', gas)
+
+  if(estimateOnly) return undefined
+
+  var hash = web3.eth.sendTransaction({from: ETHER_ADDR, data: constructorByteCode, gas: gas})
+  console.log('txn hash', hash)
+  return hash
+}
+
+function initAtonomi(ercAddress, settingsAddress, estimateOnly) {
+  console.log('Configuring Atonomi...')
+  var constructorByteCode = web3.eth.contract(AtonomiJSON.abi).new.getData(
+    ercAddress,
+    settingsAddress,
+    {data: AtonomiJSON.bytecode})
+
+  // TODO: kovan issue with estimate gas for larger contracts
+  // var gas = web3.eth.estimateGas({from: ETHER_ADDR, data: constructorByteCode})
+  var gas = 6500000
+  console.log('gas estimate', gas)
+
+  if(estimateOnly) return undefined
+
   var hash = web3.eth.sendTransaction({from: ETHER_ADDR, data: constructorByteCode, gas: gas})
   console.log('txn hash', hash)
   return hash
@@ -71,20 +99,31 @@ function getAtonomiContract(chain) {
   return web3.eth.contract(AtonomiJSON.abi).at(addr)
 }
 
+function getSettingsContract(chain) {
+  var addr = chains[chain].settings
+  return web3.eth.contract(NetworkSettingsJSON.abi).at(addr)
+}
+
 function initTestEnv(chain) {
   var c = getAtonomiContract(chain)
 
   var ownerAccount = ETHER_ADDR
   var h = c.addNetworkMember(ownerAccount, true, true, true, 'TEST', {from: ETHER_ADDR})
   console.log('Owner added to network', h)
+  h = c.setDefaultReputationForManufacturer('TEST', '50-0-0', {from: ETHER_ADDR})
+  console.log('Owner default rep is set', h)
 
   var mikeAccount = '0x079Df73b5Ce40323020E7064a6De14c1702A8bfD'
   h = c.addNetworkMember(mikeAccount, true, true, true, 'LEVK', {from: ETHER_ADDR})
   console.log('Mike added to network', h)
+  h = c.setDefaultReputationForManufacturer('LEVK', '50-0-0', {from: ETHER_ADDR})
+  console.log('Mike default rep is set', h)
 
   var scottAccount = '0xa657926c2180c5ef8469dd3c09e585fb2471f2f9'
   h = c.addNetworkMember(scottAccount, true, true, true, 'SCOT', {from: ETHER_ADDR})
   console.log('Scott added to network', h)
+  h = c.setDefaultReputationForManufacturer('SCOT', '50-0-0', {from: ETHER_ADDR})
+  console.log('Scott default rep is set', h)
 }
 
 function grantTokens(chain, ethAccount) {
@@ -94,7 +133,7 @@ function grantTokens(chain, ethAccount) {
 }
 
 function getAtonomiState(chain) {
-  var c = getAtonomiContract(chain)
+  var c = getSettingsContract(chain)
 
   var registrationFee = c.registrationFee()
   console.log('Registration Fee', (registrationFee / multiplier).toFixed(18))

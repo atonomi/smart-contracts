@@ -6,9 +6,10 @@
 
 | Contract  | Address |
 | ------------- | ------------- |
-| SafeMathLib (TokenMarket)  | [0x5ef8b987e8c733d957a70441d3a086bccd1f78a9](https://kovan.etherscan.io/address/0x5ef8b987e8c733d957a70441d3a086bccd1f78a9#code) |
-| ATMI Token (TokenMarket)  | [0xe66254d9560c2d030ca5c3439c5d6b58061dd6f7](https://kovan.etherscan.io/address/0xe66254d9560c2d030ca5c3439c5d6b58061dd6f7#code) |
-| Atonomi ([d3c53e6](https://github.com/atonomi/smart-contracts/tree/d3c53e6c9912c0f81ef914280abe8cb391d7b0eb)) | [0xff8c59b2235c08d31269a4d95dba4925ec60c214](https://kovan.etherscan.io/address/0xff8c59b2235c08d31269a4d95dba4925ec60c214#code) |
+| SafeMathLib (TokenMarket)  | [0x5ef8b987e8c733d957a70441d3a086bccd1f78a9](https://kovan.etherscan.io/address/0x5ef8b987e8c733d957a70441d3a086bccd1f78a9) |
+| ATMI Token (TokenMarket)  | [0xe66254d9560c2d030ca5c3439c5d6b58061dd6f7](https://kovan.etherscan.io/address/0xe66254d9560c2d030ca5c3439c5d6b58061dd6f7) |
+| Network Settings | [0x729a741ce0c776130c50d35906f0dbd248184982](https://kovan.etherscan.io/address/0x729a741ce0c776130c50d35906f0dbd248184982) |
+| Atonomi | [0xbde8f51601e552d620c208049c5970f7b52cd044](https://kovan.etherscan.io/address/0xbde8f51601e552d620c208049c5970f7b52cd044) |
 
 
 ### Setup
@@ -79,10 +80,11 @@ This will drop you into a geth console that will have preloaded the Atonomi cons
 
 To deploy the Atonomi contracts run the following:
 ```
-> initSafeMathLib()
-> initATMIToken("address of safemathlib")
-> initAtonomi("address of erc token")
-> waitForTransactionReceipt('txn hash')  // use this to ping if the transaction has been confirmed
+> hash = initSafeMathLib()
+> hash = initATMIToken("address of safemathlib", false)
+> hash = initNetworkSettings(false)
+> hash = initAtonomi("address of erc token", "address of network settings contract", false)
+> receipt = getTransactionReceipt('txn hash')  // use this to ping if the transaction has been confirmed
 ```
 
 ### Unit Tests

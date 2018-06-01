@@ -58,6 +58,16 @@ library SafeMath {
 }
 
 
+/// @dev Interface for the Network Settings contract
+interface SettingsInterface {
+    function registrationFee() external view returns (uint256);
+    function activationFee() external view returns (uint256);
+    function defaultReputationReward() external view returns (uint256);
+    function reputationIRNNodeShare() external view returns (uint256);
+    function blockThreshold() external view returns (uint256);
+}
+
+
 /// @title Atonomi Smart Contract
 /// @author Atonomi
 /// @notice Governs the activation, registration, and reputation of devices on the Atonomi network
@@ -67,34 +77,14 @@ library SafeMath {
 contract Atonomi is Pausable, TokenDestructible {
     using SafeMath for uint256;
 
-    ///
-    /// STATE VARIABLES
-    ///
-    /// @title Registration Fee
-    /// @notice Manufacturer pays token to register a device
-    /// @notice Manufacturer will recieve a share in any reputation updates for a device
-    uint256 public registrationFee;
-
-    /// @title Activiation Fee
-    /// @notice Manufacturer or Device Owner pays token to activate device
-    uint256 public activationFee;
-
-    /// @title Default Reputation Reward
-    /// @notice The default reputation reward set for new manufacturers
-    uint256 public defaultReputationReward;
-
-    /// @title Reputation Share for IRN Nodes
-    /// @notice percentage that the irn node or auditor receives (remaining goes to manufacturer)
-    uint256 public reputationIRNNodeShare;
-
-    /// @title Block threshold
-    /// @notice the number of blocks that need to pass between reputation updates to gain the full reward
-    uint256 public blockThreshold;
-
     /// @title ATMI Token
     /// @notice Standard ERC20 Token
     /// @dev AMLToken source: https://github.com/TokenMarketNet/ico/blob/master/contracts/AMLToken.sol
     ERC20Interface public token;
+
+    /// @title Network Settings
+    /// @notice Atonomi Owner controlled settings are governed in this contract
+    SettingsInterface public settings;
 
     ///
     /// STORAGE MAPPINGS 
@@ -138,6 +128,11 @@ contract Atonomi is Pausable, TokenDestructible {
     /// @dev Second key is the device id
     /// @dev Value is the block number of the last time the author has submitted a score for the device
     mapping (address => mapping (bytes32 => uint256)) public authorWrites;
+
+    /// @title Default Repuration score for manufacturers
+    /// @dev Key is the manufacturer id
+    /// @dev value is the score to use for newly registered devices
+    mapping (bytes32 => bytes32) public defaultManufacturerReputations;
 
     ///
     /// TYPES 
@@ -204,31 +199,14 @@ contract Atonomi is Pausable, TokenDestructible {
 
     /// @notice Constructor sets the ERC Token contract and initial values for network fees
     /// @param _token is the Atonomi Token contract address (must be ERC20)
-    /// @param _registrationFee initial registration fee on the network
-    /// @param _activationFee initial activation fee on the network
-    /// @param _defaultReputationReward initial reputation reward on the network
-    /// @param _reputationIRNNodeShare share that the reputation author recieves (remaining goes to manufacturer)
-    /// @param _blockThreshold the number of blocks that need to pass to receive the full reward
+    /// @param _settings is the Atonomi Network Settings contract address
     constructor (
         address _token,
-        uint256 _registrationFee,
-        uint256 _activationFee,
-        uint256 _defaultReputationReward,
-        uint256 _reputationIRNNodeShare,
-        uint256 _blockThreshold) public {
+        address _settings) public {
         require(_token != address(0), "token address cannot be 0x0");
-        require(_activationFee > 0, "activation fee must be greater than 0");
-        require(_registrationFee > 0, "registration fee must be greater than 0");
-        require(_defaultReputationReward > 0, "default reputation reward must be greater than 0");
-        require(_reputationIRNNodeShare > 0, "new share must be larger than zero");
-        require(_reputationIRNNodeShare <= 100, "new share must be less than or equal to 100");
-
+        require(_settings != address(0), "settings address cannot be 0x0");
         token = ERC20Interface(_token);
-        activationFee = _activationFee;
-        registrationFee = _registrationFee;
-        defaultReputationReward = _defaultReputationReward;
-        reputationIRNNodeShare = _reputationIRNNodeShare;
-        blockThreshold = _blockThreshold;
+        settings = SettingsInterface(_settings);
     }
 
     ///
@@ -300,38 +278,6 @@ contract Atonomi is Pausable, TokenDestructible {
         bytes32 indexed _memberId
     );
 
-    /// @notice emitted everytime the registration fee changes
-    /// @param _sender ethereum account of participant that made the change
-    /// @param _amount new fee value in ATMI tokens
-    event RegistrationFeeUpdated(
-        address indexed _sender,
-        uint256 _amount
-    );
-
-    /// @notice emitted everytime the activation fee changes
-    /// @param _sender ethereum account of participant that made the change
-    /// @param _amount new fee value in ATMI tokens
-    event ActivationFeeUpdated(
-        address indexed _sender,
-        uint256 _amount
-    );
-
-    /// @notice emitted everytime the default reputation reward changes
-    /// @param _sender ethereum account of participant that made the change
-    /// @param _amount new fee value in ATMI tokens
-    event DefaultReputationRewardUpdated(
-        address indexed _sender,
-        uint256 _amount
-    );
-
-    /// @notice emitted everytime owner changes the contributation share for reputation authors
-    /// @param _sender ethereum account of participant that made the change
-    /// @param _percentage new percentage value
-    event ReputationIRNNodeShareUpdated(
-        address indexed _sender,
-        uint256 _percentage
-    );
-
     /// @notice emitted everytime a manufacturer changes their wallet for rewards
     /// @param _old ethereum account
     /// @param _new ethereum account
@@ -348,14 +294,6 @@ contract Atonomi is Pausable, TokenDestructible {
     event TokenPoolRewardUpdated(
         address indexed _sender,
         uint256 _newReward
-    );
-
-    /// @notice emitted everytime the block threshold is changed
-    /// @param _sender ethereum account who made the change
-    /// @param _newBlockThreshold new value for all token pools
-    event RewardBlockThresholdChanged(
-        address indexed _sender,
-        uint256 _newBlockThreshold
     );
 
     /// @notice emitted everytime someone donates tokens to a manufacturer
@@ -378,63 +316,15 @@ contract Atonomi is Pausable, TokenDestructible {
         uint256 _amount
     );
 
-    ///
-    /// FEE SETTERS
-    ///
-    /// @notice sets the global registration fee
-    /// @param _registrationFee new fee for registrations in ATMI tokens
-    /// @return true if successful, otherwise false
-    function setRegistrationFee(uint256 _registrationFee) public onlyOwner returns (bool) {
-        require(_registrationFee > 0, "new registration fee must be greater than zero");
-        require(_registrationFee != registrationFee, "new registration fee must be different");
-        registrationFee = _registrationFee;
-        emit RegistrationFeeUpdated(msg.sender, _registrationFee);
-        return true;
-    }
-
-    /// @notice sets the global activation fee
-    /// @param _activationFee new fee for activations in ATMI tokens
-    /// @return true if successful, otherwise false
-    function setActivationFee(uint256 _activationFee) public onlyOwner returns (bool) {
-        require(_activationFee > 0, "new activation fee must be greater than zero");
-        require(_activationFee != activationFee, "new activation fee must be different");
-        activationFee = _activationFee;
-        emit ActivationFeeUpdated(msg.sender, _activationFee);
-        return true;
-    }
-
-    /// @notice sets the default reputation reward for new manufacturers
-    /// @param _defaultReputationReward new reward for reputation score changes in ATMI tokens
-    /// @return true if successful, otherwise false
-    function setDefaultReputationReward(uint256 _defaultReputationReward) public onlyOwner returns (bool) {
-        require(_defaultReputationReward > 0, "new reputation reward must be greater than zero");
-        require(_defaultReputationReward != defaultReputationReward, "new reputation reward must be different");
-        defaultReputationReward = _defaultReputationReward;
-        emit DefaultReputationRewardUpdated(msg.sender, _defaultReputationReward);
-        return true;
-    }
-
-    /// @notice sets the global reputation reward share allotted to the authors and manufacturers
-    /// @param _reputationIRNNodeShare new percentage of the reputation reward allotted to author
-    /// @return true if successful, otherwise false
-    function setReputationIRNNodeShare(uint256 _reputationIRNNodeShare) public onlyOwner returns (bool) {
-        require(_reputationIRNNodeShare > 0, "new share must be larger than zero");
-        require(_reputationIRNNodeShare <= 100, "new share must be less than or equal to 100");
-        require(reputationIRNNodeShare != _reputationIRNNodeShare, "new share must be different");
-        reputationIRNNodeShare = _reputationIRNNodeShare;
-        emit ReputationIRNNodeShareUpdated(msg.sender, _reputationIRNNodeShare);
-        return true;
-    }
-
-    /// @notice sets the global block threshold for rewards
-    /// @param _newBlockThreshold new value for all token pools
-    /// @return true if successful, otherwise false
-    function setRewardBlockThreshold(uint _newBlockThreshold) public onlyOwner returns (bool) {
-        require(_newBlockThreshold != blockThreshold, "must be different");
-        blockThreshold = _newBlockThreshold;
-        emit RewardBlockThresholdChanged(msg.sender, _newBlockThreshold);
-        return true;
-    }
+    /// @notice emitted everytime the default reputation for a manufacturer changes
+    /// @param _sender ethereum account of participant that made the change
+    /// @param _manufacturerId of the manufacturer
+    /// @param _newDefaultScore to use for newly registered devices
+    event DefaultReputationScoreChanged(
+        address indexed _sender,
+        bytes32 indexed _manufacturerId,
+        bytes32 _newDefaultScore
+    );
 
     ///
     /// DEVICE ONBOARDING
@@ -453,6 +343,7 @@ contract Atonomi is Pausable, TokenDestructible {
         bytes32 _devicePublicKey)
         public onlyManufacturer whenNotPaused returns (bool)
     {
+        uint256 registrationFee = settings.registrationFee();
         Device memory d = _registerDevice(msg.sender, _deviceIdHash, _deviceType, _devicePublicKey);
         emit DeviceRegistered(
             msg.sender,
@@ -473,6 +364,7 @@ contract Atonomi is Pausable, TokenDestructible {
     /// @dev tokens will be deducted from the device owner and added to the token pool
     /// @dev owner has ability to pause this operation
     function activateDevice(bytes32 _deviceId) public whenNotPaused returns (bool) {
+        uint256 activationFee = settings.activationFee();
         Device memory d = _activateDevice(_deviceId);
         emit DeviceActivated(msg.sender, activationFee, _deviceId, d.manufacturerId, d.deviceType);
         address manufacturer = manufacturerRewards[d.manufacturerId];
@@ -496,6 +388,9 @@ contract Atonomi is Pausable, TokenDestructible {
         bytes32 _devicePublicKey) 
         public onlyManufacturer whenNotPaused returns (bool)
     {
+        uint256 registrationFee = settings.registrationFee();
+        uint256 activationFee = settings.activationFee();
+
         bytes32 deviceIdHash = keccak256(_deviceId);
         Device memory d = _registerDevice(msg.sender, deviceIdHash, _deviceType, _devicePublicKey);
         bytes32 manufacturerId = d.manufacturerId;
@@ -566,7 +461,7 @@ contract Atonomi is Pausable, TokenDestructible {
             blocks = block.number.sub(lastWrite);
         }
         uint256 totalRewards = calculateReward(pools[manufacturer].rewardAmount, blocks);
-        irnReward = totalRewards.mul(reputationIRNNodeShare).div(100);
+        irnReward = totalRewards.mul(settings.reputationIRNNodeShare()).div(100);
         manufacturerReward = totalRewards.sub(irnReward);
     }
 
@@ -576,6 +471,7 @@ contract Atonomi is Pausable, TokenDestructible {
     /// @return actual reward available
     function calculateReward(uint256 rewardAmount, uint256 blocksSinceLastWrite) public view returns (uint256) {
         uint256 totalReward = rewardAmount;
+        uint256 blockThreshold = settings.blockThreshold();
         if (blocksSinceLastWrite > 0 && blocksSinceLastWrite < blockThreshold) {
             uint256 multiplier = 10 ** uint256(token.decimals());
             totalReward = rewardAmount.mul(blocksSinceLastWrite.mul(multiplier)).div(blockThreshold.mul(multiplier));
@@ -611,6 +507,7 @@ contract Atonomi is Pausable, TokenDestructible {
         );
 
         uint256 runningBalance = 0;
+        uint256 registrationFee = settings.registrationFee();
         for (uint256 i = 0; i < _deviceIdHashes.length; i++) {
             bytes32 deviceIdHash = _deviceIdHashes[i];
             bytes32 deviceType = _deviceTypes[i];
@@ -657,13 +554,15 @@ contract Atonomi is Pausable, TokenDestructible {
         m.memberId = _memberId;
 
         if (m.isManufacturer) {
+            require(_memberId != 0, "manufacturer id is required");
+
             // keep lookup for rewards in sync
             require(manufacturerRewards[m.memberId] == address(0), "manufacturer is already assigned");
             manufacturerRewards[m.memberId] = _member;
 
             // set reputation reward if token pool doesnt exist
             if (pools[_member].rewardAmount == 0) {
-                pools[_member].rewardAmount = defaultReputationReward;
+                pools[_member].rewardAmount = settings.defaultReputationReward();
             }
         }
 
@@ -781,6 +680,25 @@ contract Atonomi is Pausable, TokenDestructible {
         return true;
     }
 
+    /// @notice allows the owner to change the default reputation for manufacturers
+    /// @param _manufacturerId of the manufacturer
+    /// @param _newDefaultScore to use for newly registered devices
+    /// @return true if successful, otherwise false
+    /// @dev owner is the only one with this feature
+    function setDefaultReputationForManufacturer(
+        bytes32 _manufacturerId,
+        bytes32 _newDefaultScore) public onlyOwner returns (bool) {
+        require(_manufacturerId != 0, "_manufacturerId is required");
+        require(
+            _newDefaultScore != defaultManufacturerReputations[_manufacturerId],
+            "_newDefaultScore should be different"
+        );
+
+        defaultManufacturerReputations[_manufacturerId] = _newDefaultScore;
+        emit DefaultReputationScoreChanged(msg.sender, _manufacturerId, _newDefaultScore);
+        return true;
+    }
+
     ///
     /// INTERNAL FUNCTIONS
     ///
@@ -819,7 +737,7 @@ contract Atonomi is Pausable, TokenDestructible {
         d.deviceType = _deviceType;
         d.registered = true;
         d.activated = false;
-        d.reputationScore = "";
+        d.reputationScore = defaultManufacturerReputations[manufacturerId];
         d.devicePublicKey = _devicePublicKey;
         return d;
     }

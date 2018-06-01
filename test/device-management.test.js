@@ -22,8 +22,8 @@ contract('Device Management', accounts => {
   const regFee = 1 * multiplier
   const actFee = 1 * multiplier
   const repReward = 1 * multiplier
-  const blockThreshold = 5760
 
+  const defaultRep = '75-1-9'
   const deviceId = 'apple-iphone1'
   const deviceIdHash = web3Utils.soliditySha3({t: 'bytes32', v: web3.fromAscii(deviceId)})
   const mfgId = 'APPLE'
@@ -39,6 +39,7 @@ contract('Device Management', accounts => {
     await ctx.contracts.token.transfer(ctx.actors.mfg, regFee + actFee, {from: ctx.actors.owner})
     await ctx.contracts.atonomi.addNetworkMember(ctx.actors.mfg, false, true, false, mfgId, {from: ctx.actors.owner})
     await ctx.contracts.atonomi.addNetworkMember(ctx.actors.irnNode, false, false, true, '', {from: ctx.actors.owner})
+    await ctx.contracts.atonomi.setDefaultReputationForManufacturer(mfgId, defaultRep, {from: ctx.actors.owner})
   })
 
   describe('hashing', () => {
@@ -92,7 +93,7 @@ contract('Device Management', accounts => {
       expect(deviceType).to.be.equal(web3.toAscii(device[1]).replace(/\u0000/g, ''))
       expect(device[2]).to.be.equal(true)
       expect(device[3]).to.be.equal(false)
-      expect(device[4]).to.be.equal('0x0000000000000000000000000000000000000000000000000000000000000000')
+      expect(web3.toAscii(device[4]).replace(/\u0000/g, '')).to.be.equal(defaultRep)
       expect(device[5]).to.be.equal(devicePublicKey)
 
       const mfgWallet = await ctx.contracts.atonomi.manufacturerRewards(mfgId)
@@ -179,7 +180,7 @@ contract('Device Management', accounts => {
       expect(deviceType).to.be.equal(web3.toAscii(device[1]).replace(/\u0000/g, ''))
       expect(device[2]).to.be.equal(true)
       expect(device[3]).to.be.equal(true)
-      expect(device[4]).to.be.equal('0x0000000000000000000000000000000000000000000000000000000000000000')
+      expect(web3.toAscii(device[4]).replace(/\u0000/g, '')).to.be.equal(defaultRep)
       expect(device[5]).to.be.equal(devicePublicKey)
 
       const mfgWallet = await ctx.contracts.atonomi.manufacturerRewards(mfgId)
@@ -284,7 +285,7 @@ contract('Device Management', accounts => {
       expect(deviceType).to.be.equal(web3.toAscii(device[1]).replace(/\u0000/g, ''))
       expect(device[2]).to.be.equal(true)
       expect(device[3]).to.be.equal(true)
-      expect(device[4]).to.be.equal('0x0000000000000000000000000000000000000000000000000000000000000000')
+      expect(web3.toAscii(device[4]).replace(/\u0000/g, '')).to.be.equal(defaultRep)
       expect(device[5]).to.be.equal(devicePublicKey)
 
       const mfgWallet = await ctx.contracts.atonomi.manufacturerRewards(mfgId)
@@ -433,6 +434,7 @@ contract('Device Management', accounts => {
       expect(myNewReward.toString(10)).to.be.equal('104166666666666')
     })
 
+    /*
     it('later score update should yeild medium reward', async () => {
       await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, regFee + actFee, {from: ctx.actors.mfg})
       await ctx.contracts.atonomi.registerAndActivateDevice(deviceId, deviceType, devicePublicKey, {from: ctx.actors.mfg})
@@ -466,6 +468,7 @@ contract('Device Management', accounts => {
       const myNewReward = await ctx.contracts.atonomi.rewards(ctx.actors.irnNode)
       expect(myNewReward.toString(10)).to.be.equal((repReward * 0.2).toString(10))
     })
+    */
 
     it('can not set score for device that is not activated', async () => {
       await ctx.contracts.token.contract.approve(ctx.contracts.atonomi.address, regFee, {from: ctx.actors.mfg})
@@ -536,7 +539,7 @@ contract('Device Management', accounts => {
         expect(deviceType).to.be.equal(web3.toAscii(device[1]).replace(/\u0000/g, ''))
         expect(device[2]).to.be.equal(true)
         expect(device[3]).to.be.equal(false)
-        expect(device[4]).to.be.equal('0x0000000000000000000000000000000000000000000000000000000000000000')
+        expect(web3.toAscii(device[4]).replace(/\u0000/g, '')).to.be.equal(defaultRep)
         expect(device[5]).to.be.equal(devicePublicKey)
 
         const mfgWallet = await ctx.contracts.atonomi.manufacturerRewards(mfgId)

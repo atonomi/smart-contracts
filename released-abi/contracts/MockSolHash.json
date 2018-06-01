@@ -21,24 +21,24 @@
       "type": "function"
     }
   ],
-  "bytecode": "0x608060405234801561001057600080fd5b5060e18061001f6000396000f300608060405260043610603f576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff1680636a7c2036146044575b600080fd5b348015604f57600080fd5b5060706004803603810190808035600019169060200190929190505050608e565b60405180826000191660001916815260200191505060405180910390f35b600081604051808260001916600019168152602001915050604051809103902090509190505600a165627a7a72305820957d18bce7d018ffb0e283a8130183ea81992688e7637600988992ed635c46ff0029",
-  "deployedBytecode": "0x608060405260043610603f576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff1680636a7c2036146044575b600080fd5b348015604f57600080fd5b5060706004803603810190808035600019169060200190929190505050608e565b60405180826000191660001916815260200191505060405180910390f35b600081604051808260001916600019168152602001915050604051809103902090509190505600a165627a7a72305820957d18bce7d018ffb0e283a8130183ea81992688e7637600988992ed635c46ff0029",
-  "sourceMap": "27:139:4:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;27:139:4;;;;;;;",
-  "deployedSourceMap": "27:139:4:-;;;;;;;;;;;;;;;;;;;;;;;;54:110;;8:9:-1;5:2;;;30:1;27;20:12;5:2;54:110:4;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;111:7;147:9;137:20;;;;;;;;;;;;;;;;;;;;;;;;130:27;;54:110;;;:::o",
+  "bytecode": "0x608060405234801561001057600080fd5b5060e18061001f6000396000f300608060405260043610603f576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff1680636a7c2036146044575b600080fd5b348015604f57600080fd5b5060706004803603810190808035600019169060200190929190505050608e565b60405180826000191660001916815260200191505060405180910390f35b600081604051808260001916600019168152602001915050604051809103902090509190505600a165627a7a723058200e7c3a98ee15597ca87c3ea7f657472afd643ea3ca7503a0ef6d330f284dc98a0029",
+  "deployedBytecode": "0x608060405260043610603f576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff1680636a7c2036146044575b600080fd5b348015604f57600080fd5b5060706004803603810190808035600019169060200190929190505050608e565b60405180826000191660001916815260200191505060405180910390f35b600081604051808260001916600019168152602001915050604051809103902090509190505600a165627a7a723058200e7c3a98ee15597ca87c3ea7f657472afd643ea3ca7503a0ef6d330f284dc98a0029",
+  "sourceMap": "27:139:5:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;27:139:5;;;;;;;",
+  "deployedSourceMap": "27:139:5:-;;;;;;;;;;;;;;;;;;;;;;;;54:110;;8:9:-1;5:2;;;30:1;27;20:12;5:2;54:110:5;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;111:7;147:9;137:20;;;;;;;;;;;;;;;;;;;;;;;;130:27;;54:110;;;:::o",
   "source": "pragma solidity ^0.4.23;\n\n\ncontract MockSolHash {\n    function solHash(bytes32 clearText) public pure returns (bytes32) {\n        return keccak256(clearText);\n    }\n}",
-  "sourcePath": "/Users/fil.capiral/dev/github.com/atonomi/smart-contracts/contracts/mocks/MockSolHash.sol",
+  "sourcePath": "/Users/fil.capiral/dev/github.com/filcap/atonomi-smart-contracts/contracts/mocks/MockSolHash.sol",
   "ast": {
-    "absolutePath": "/Users/fil.capiral/dev/github.com/atonomi/smart-contracts/contracts/mocks/MockSolHash.sol",
+    "absolutePath": "/Users/fil.capiral/dev/github.com/filcap/atonomi-smart-contracts/contracts/mocks/MockSolHash.sol",
     "exportedSymbols": {
       "MockSolHash": [
-        2167
+        2326
       ]
     },
-    "id": 2168,
+    "id": 2327,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 2154,
+        "id": 2313,
         "literals": [
           "solidity",
           "^",
@@ -46,7 +46,7 @@
           ".23"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:24:4"
+        "src": "0:24:5"
       },
       {
         "baseContracts": [],
@@ -54,18 +54,18 @@
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": true,
-        "id": 2167,
+        "id": 2326,
         "linearizedBaseContracts": [
-          2167
+          2326
         ],
         "name": "MockSolHash",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "body": {
-              "id": 2165,
+              "id": 2324,
               "nodeType": "Block",
-              "src": "120:44:4",
+              "src": "120:44:5",
               "statements": [
                 {
                   "expression": {
@@ -73,12 +73,12 @@
                     "arguments": [
                       {
                         "argumentTypes": null,
-                        "id": 2162,
+                        "id": 2321,
                         "name": "clearText",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2156,
-                        "src": "147:9:4",
+                        "referencedDeclaration": 2315,
+                        "src": "147:9:5",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes32",
                           "typeString": "bytes32"
@@ -92,18 +92,18 @@
                           "typeString": "bytes32"
                         }
                       ],
-                      "id": 2161,
+                      "id": 2320,
                       "name": "keccak256",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 3845,
-                      "src": "137:9:4",
+                      "referencedDeclaration": 4004,
+                      "src": "137:9:5",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_sha3_pure$__$returns$_t_bytes32_$",
                         "typeString": "function () pure returns (bytes32)"
                       }
                     },
-                    "id": 2163,
+                    "id": 2322,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -111,21 +111,21 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "137:20:4",
+                    "src": "137:20:5",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
                     }
                   },
-                  "functionReturnParameters": 2160,
-                  "id": 2164,
+                  "functionReturnParameters": 2319,
+                  "id": 2323,
                   "nodeType": "Return",
-                  "src": "130:27:4"
+                  "src": "130:27:5"
                 }
               ]
             },
             "documentation": null,
-            "id": 2166,
+            "id": 2325,
             "implemented": true,
             "isConstructor": false,
             "isDeclaredConst": true,
@@ -133,16 +133,16 @@
             "name": "solHash",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 2157,
+              "id": 2316,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2156,
+                  "id": 2315,
                   "name": "clearText",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2166,
-                  "src": "71:17:4",
+                  "scope": 2325,
+                  "src": "71:17:5",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -150,10 +150,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 2155,
+                    "id": 2314,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "71:7:4",
+                    "src": "71:7:5",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -163,20 +163,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "70:19:4"
+              "src": "70:19:5"
             },
             "payable": false,
             "returnParameters": {
-              "id": 2160,
+              "id": 2319,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2159,
+                  "id": 2318,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2166,
-                  "src": "111:7:4",
+                  "scope": 2325,
+                  "src": "111:7:5",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -184,10 +184,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 2158,
+                    "id": 2317,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "111:7:4",
+                    "src": "111:7:5",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -197,33 +197,33 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "110:9:4"
+              "src": "110:9:5"
             },
-            "scope": 2167,
-            "src": "54:110:4",
+            "scope": 2326,
+            "src": "54:110:5",
             "stateMutability": "pure",
             "superFunction": null,
             "visibility": "public"
           }
         ],
-        "scope": 2168,
-        "src": "27:139:4"
+        "scope": 2327,
+        "src": "27:139:5"
       }
     ],
-    "src": "0:166:4"
+    "src": "0:166:5"
   },
   "legacyAST": {
-    "absolutePath": "/Users/fil.capiral/dev/github.com/atonomi/smart-contracts/contracts/mocks/MockSolHash.sol",
+    "absolutePath": "/Users/fil.capiral/dev/github.com/filcap/atonomi-smart-contracts/contracts/mocks/MockSolHash.sol",
     "exportedSymbols": {
       "MockSolHash": [
-        2167
+        2326
       ]
     },
-    "id": 2168,
+    "id": 2327,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 2154,
+        "id": 2313,
         "literals": [
           "solidity",
           "^",
@@ -231,7 +231,7 @@
           ".23"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:24:4"
+        "src": "0:24:5"
       },
       {
         "baseContracts": [],
@@ -239,18 +239,18 @@
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": true,
-        "id": 2167,
+        "id": 2326,
         "linearizedBaseContracts": [
-          2167
+          2326
         ],
         "name": "MockSolHash",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "body": {
-              "id": 2165,
+              "id": 2324,
               "nodeType": "Block",
-              "src": "120:44:4",
+              "src": "120:44:5",
               "statements": [
                 {
                   "expression": {
@@ -258,12 +258,12 @@
                     "arguments": [
                       {
                         "argumentTypes": null,
-                        "id": 2162,
+                        "id": 2321,
                         "name": "clearText",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2156,
-                        "src": "147:9:4",
+                        "referencedDeclaration": 2315,
+                        "src": "147:9:5",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes32",
                           "typeString": "bytes32"
@@ -277,18 +277,18 @@
                           "typeString": "bytes32"
                         }
                       ],
-                      "id": 2161,
+                      "id": 2320,
                       "name": "keccak256",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 3845,
-                      "src": "137:9:4",
+                      "referencedDeclaration": 4004,
+                      "src": "137:9:5",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_sha3_pure$__$returns$_t_bytes32_$",
                         "typeString": "function () pure returns (bytes32)"
                       }
                     },
-                    "id": 2163,
+                    "id": 2322,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -296,21 +296,21 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "137:20:4",
+                    "src": "137:20:5",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
                     }
                   },
-                  "functionReturnParameters": 2160,
-                  "id": 2164,
+                  "functionReturnParameters": 2319,
+                  "id": 2323,
                   "nodeType": "Return",
-                  "src": "130:27:4"
+                  "src": "130:27:5"
                 }
               ]
             },
             "documentation": null,
-            "id": 2166,
+            "id": 2325,
             "implemented": true,
             "isConstructor": false,
             "isDeclaredConst": true,
@@ -318,16 +318,16 @@
             "name": "solHash",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 2157,
+              "id": 2316,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2156,
+                  "id": 2315,
                   "name": "clearText",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2166,
-                  "src": "71:17:4",
+                  "scope": 2325,
+                  "src": "71:17:5",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -335,10 +335,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 2155,
+                    "id": 2314,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "71:7:4",
+                    "src": "71:7:5",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -348,20 +348,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "70:19:4"
+              "src": "70:19:5"
             },
             "payable": false,
             "returnParameters": {
-              "id": 2160,
+              "id": 2319,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2159,
+                  "id": 2318,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2166,
-                  "src": "111:7:4",
+                  "scope": 2325,
+                  "src": "111:7:5",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -369,10 +369,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 2158,
+                    "id": 2317,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "111:7:4",
+                    "src": "111:7:5",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -382,26 +382,26 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "110:9:4"
+              "src": "110:9:5"
             },
-            "scope": 2167,
-            "src": "54:110:4",
+            "scope": 2326,
+            "src": "54:110:5",
             "stateMutability": "pure",
             "superFunction": null,
             "visibility": "public"
           }
         ],
-        "scope": 2168,
-        "src": "27:139:4"
+        "scope": 2327,
+        "src": "27:139:5"
       }
     ],
-    "src": "0:166:4"
+    "src": "0:166:5"
   },
   "compiler": {
     "name": "solc",
-    "version": "0.4.23+commit.124ca40d.Emscripten.clang"
+    "version": "0.4.24+commit.e67f0147.Emscripten.clang"
   },
   "networks": {},
   "schemaVersion": "2.0.0",
-  "updatedAt": "2018-05-30T16:40:14.656Z"
+  "updatedAt": "2018-06-01T21:12:27.540Z"
 }

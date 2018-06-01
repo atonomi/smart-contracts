@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-const Atonomi = artifacts.require('Atonomi')
+const NetworkSettings = artifacts.require('NetworkSettings')
 const errors = require('./helpers/errors')
 const init = require('./helpers/init')
 
@@ -8,7 +8,8 @@ contract('Network Management', accounts => {
     actors: init.getTestActorsContext(accounts),
     contracts: {
       token: null,
-      atonomi: null
+      atonomi: null,
+      settings: null
     }
   }
 
@@ -94,6 +95,7 @@ contract('Network Management', accounts => {
   beforeEach(async () => {
     ctx.contracts.token = await init.getAtonomiTokenContract(ctx.actors.owner, ctx.actors.releaseAgent)
     ctx.contracts.atonomi = await init.getAtonomiContract(ctx.actors.owner, ctx.contracts.token.address)
+    ctx.contracts.settings = await NetworkSettings.at(await ctx.contracts.atonomi.settings())
   })
 
   describe('initialized', () => {
@@ -108,17 +110,17 @@ contract('Network Management', accounts => {
     })
 
     it('has registration fee', async () => {
-      const fee = await ctx.contracts.atonomi.registrationFee.call()
+      const fee = await ctx.contracts.settings.registrationFee.call()
       expect(fee.toString(10)).to.be.equal(regFee.toString(10))
     })
 
     it('has activation fee', async () => {
-      const fee = await ctx.contracts.atonomi.activationFee.call()
+      const fee = await ctx.contracts.settings.activationFee.call()
       expect(fee.toString(10)).to.be.equal(actFee.toString(10))
     })
 
     it('has default reputation reward', async () => {
-      const fee = await ctx.contracts.atonomi.defaultReputationReward.call()
+      const fee = await ctx.contracts.settings.defaultReputationReward.call()
       expect(fee.toString(10)).to.be.equal(repReward.toString(10))
     })
 
@@ -149,8 +151,7 @@ contract('Network Management', accounts => {
 
       for (let i = 0; i < fees.length; i++) {
         const testCase = fees[i]
-        const fn = Atonomi.new(
-          ctx.contracts.token.address,
+        const fn = NetworkSettings.new(
           testCase.reg,
           testCase.act,
           testCase.reward,
@@ -458,114 +459,114 @@ contract('Network Management', accounts => {
 
     describe('registrations fee', () => {
       it('owner can set fee', async () => {
-        const success = await ctx.contracts.atonomi.setRegistrationFee.call(newRegFee, {from: ctx.actors.owner})
+        const success = await ctx.contracts.settings.setRegistrationFee.call(newRegFee, {from: ctx.actors.owner})
         expect(success).to.be.equal(true)
 
-        const tx = await ctx.contracts.atonomi.setRegistrationFee(newRegFee, {from: ctx.actors.owner})
+        const tx = await ctx.contracts.settings.setRegistrationFee(newRegFee, {from: ctx.actors.owner})
         expect(tx.logs.length).to.be.equal(1)
         expect(tx.logs[0].event).to.be.equal('RegistrationFeeUpdated')
         expect(tx.logs[0].args._sender).to.be.equal(ctx.actors.owner)
         expect(tx.logs[0].args._amount.toString(10)).to.be.equal(newRegFee.toString(10))
 
-        const fee = await ctx.contracts.atonomi.registrationFee()
+        const fee = await ctx.contracts.settings.registrationFee()
         expect(fee.toString(10)).to.be.equal(newRegFee.toString(10))
       })
 
       it('can not set fee to 0', async () => {
-        const fn = ctx.contracts.atonomi.setRegistrationFee(0, {from: ctx.actors.owner})
+        const fn = ctx.contracts.settings.setRegistrationFee(0, {from: ctx.actors.owner})
         await errors.expectRevert(fn)
       })
 
       it('can not set fee to same value', async () => {
-        const fn = ctx.contracts.atonomi.setRegistrationFee(regFee, {from: ctx.actors.owner})
+        const fn = ctx.contracts.settings.setRegistrationFee(regFee, {from: ctx.actors.owner})
         await errors.expectRevert(fn)
       })
 
       it('IRN admin can not set fee', async () => {
         await ctx.contracts.atonomi.addNetworkMember(ctx.actors.admin, true, false, false, '', {from: ctx.actors.owner})
 
-        const fn = ctx.contracts.atonomi.setRegistrationFee(newRegFee, {from: ctx.actors.admin})
+        const fn = ctx.contracts.settings.setRegistrationFee(newRegFee, {from: ctx.actors.admin})
         await errors.expectRevert(fn)
       })
 
       it('external accounts cannot set fee', async () => {
-        const fn = ctx.contracts.atonomi.setRegistrationFee(newRegFee, {from: ctx.actors.alice})
+        const fn = ctx.contracts.settings.setRegistrationFee(newRegFee, {from: ctx.actors.alice})
         await errors.expectRevert(fn)
       })
     })
 
     describe('activation fee', () => {
       it('owner can set fee', async () => {
-        const success = await ctx.contracts.atonomi.setActivationFee.call(newActFee, {from: ctx.actors.owner})
+        const success = await ctx.contracts.settings.setActivationFee.call(newActFee, {from: ctx.actors.owner})
         expect(success).to.be.equal(true)
 
-        const tx = await ctx.contracts.atonomi.setActivationFee(newActFee, {from: ctx.actors.owner})
+        const tx = await ctx.contracts.settings.setActivationFee(newActFee, {from: ctx.actors.owner})
         expect(tx.logs.length).to.be.equal(1)
         expect(tx.logs[0].event).to.be.equal('ActivationFeeUpdated')
         expect(tx.logs[0].args._sender).to.be.equal(ctx.actors.owner)
         expect(tx.logs[0].args._amount.toString(10)).to.be.equal(newActFee.toString(10))
 
-        const fee = await ctx.contracts.atonomi.activationFee()
+        const fee = await ctx.contracts.settings.activationFee()
         expect(fee.toString(10)).to.be.equal(newActFee.toString(10))
       })
 
       it('can not set fee to 0', async () => {
-        const fn = ctx.contracts.atonomi.setActivationFee(0, {from: ctx.actors.owner})
+        const fn = ctx.contracts.settings.setActivationFee(0, {from: ctx.actors.owner})
         await errors.expectRevert(fn)
       })
 
       it('can not set fee to same value', async () => {
-        const fn = ctx.contracts.atonomi.setActivationFee(actFee, {from: ctx.actors.owner})
+        const fn = ctx.contracts.settings.setActivationFee(actFee, {from: ctx.actors.owner})
         await errors.expectRevert(fn)
       })
 
       it('IRN admin can not set fee', async () => {
         await ctx.contracts.atonomi.addNetworkMember(ctx.actors.admin, true, false, false, '', {from: ctx.actors.owner})
 
-        const fn = ctx.contracts.atonomi.setActivationFee(newActFee, {from: ctx.actors.admin})
+        const fn = ctx.contracts.settings.setActivationFee(newActFee, {from: ctx.actors.admin})
         await errors.expectRevert(fn)
       })
 
       it('external accounts cannot set fee', async () => {
-        const fn = ctx.contracts.atonomi.setActivationFee(newActFee, {from: ctx.actors.alice})
+        const fn = ctx.contracts.settings.setActivationFee(newActFee, {from: ctx.actors.alice})
         await errors.expectRevert(fn)
       })
     })
 
     describe('default reputation reward', () => {
       it('owner can set default reward', async () => {
-        const success = await ctx.contracts.atonomi.setDefaultReputationReward.call(newRepReward, {from: ctx.actors.owner})
+        const success = await ctx.contracts.settings.setDefaultReputationReward.call(newRepReward, {from: ctx.actors.owner})
         expect(success).to.be.equal(true)
 
-        const tx = await ctx.contracts.atonomi.setDefaultReputationReward(newRepReward, {from: ctx.actors.owner})
+        const tx = await ctx.contracts.settings.setDefaultReputationReward(newRepReward, {from: ctx.actors.owner})
         expect(tx.logs.length).to.be.equal(1)
         expect(tx.logs[0].event).to.be.equal('DefaultReputationRewardUpdated')
         expect(tx.logs[0].args._sender).to.be.equal(ctx.actors.owner)
         expect(tx.logs[0].args._amount.toString(10)).to.be.equal(newRepReward.toString(10))
 
-        const fee = await ctx.contracts.atonomi.defaultReputationReward()
+        const fee = await ctx.contracts.settings.defaultReputationReward()
         expect(fee.toString(10)).to.be.equal(newRepReward.toString(10))
       })
 
       it('can not set fee to 0', async () => {
-        const fn = ctx.contracts.atonomi.setDefaultReputationReward(0, {from: ctx.actors.owner})
+        const fn = ctx.contracts.settings.setDefaultReputationReward(0, {from: ctx.actors.owner})
         await errors.expectRevert(fn)
       })
 
       it('can not set fee to same value', async () => {
-        const fn = ctx.contracts.atonomi.setDefaultReputationReward(repReward, {from: ctx.actors.owner})
+        const fn = ctx.contracts.settings.setDefaultReputationReward(repReward, {from: ctx.actors.owner})
         await errors.expectRevert(fn)
       })
 
       it('IRN admin can not set default reward', async () => {
         await ctx.contracts.atonomi.addNetworkMember(ctx.actors.admin, true, false, false, '', {from: ctx.actors.owner})
 
-        const fn = ctx.contracts.atonomi.setDefaultReputationReward(newRepReward, {from: ctx.actors.admin})
+        const fn = ctx.contracts.settings.setDefaultReputationReward(newRepReward, {from: ctx.actors.admin})
         await errors.expectRevert(fn)
       })
 
       it('external accounts cannot set default reward', async () => {
-        const fn = ctx.contracts.atonomi.setDefaultReputationReward(newRepReward, {from: ctx.actors.alice})
+        const fn = ctx.contracts.settings.setDefaultReputationReward(newRepReward, {from: ctx.actors.alice})
         await errors.expectRevert(fn)
       })
     })
@@ -576,10 +577,10 @@ contract('Network Management', accounts => {
       const newIrnReward = repReward - newContributionReward
 
       it('owner can set reward', async () => {
-        const success = await ctx.contracts.atonomi.setReputationIRNNodeShare.call(newShare, {from: ctx.actors.owner})
+        const success = await ctx.contracts.settings.setReputationIRNNodeShare.call(newShare, {from: ctx.actors.owner})
         expect(success).to.be.equal(true)
 
-        const tx = await ctx.contracts.atonomi.setReputationIRNNodeShare(newShare, {from: ctx.actors.owner})
+        const tx = await ctx.contracts.settings.setReputationIRNNodeShare(newShare, {from: ctx.actors.owner})
         expect(tx.logs.length).to.be.equal(1)
         expect(tx.logs[0].event).to.be.equal('ReputationIRNNodeShareUpdated')
         expect(tx.logs[0].args._sender).to.be.equal(ctx.actors.owner)
@@ -597,29 +598,29 @@ contract('Network Management', accounts => {
       })
 
       it('can not set share to 0%', async () => {
-        const fn = ctx.contracts.atonomi.setReputationIRNNodeShare(0, {from: ctx.actors.owner})
+        const fn = ctx.contracts.settings.setReputationIRNNodeShare(0, {from: ctx.actors.owner})
         await errors.expectRevert(fn)
       })
 
       it('can not set share over 100%', async () => {
-        const fn = ctx.contracts.atonomi.setReputationIRNNodeShare(101, {from: ctx.actors.owner})
+        const fn = ctx.contracts.settings.setReputationIRNNodeShare(101, {from: ctx.actors.owner})
         await errors.expectRevert(fn)
       })
 
       it('can not set share to same value', async () => {
-        const fn = ctx.contracts.atonomi.setReputationIRNNodeShare(20, {from: ctx.actors.owner})
+        const fn = ctx.contracts.settings.setReputationIRNNodeShare(20, {from: ctx.actors.owner})
         await errors.expectRevert(fn)
       })
 
       it('IRN admin can not set split', async () => {
         await ctx.contracts.atonomi.addNetworkMember(ctx.actors.admin, true, false, false, '', {from: ctx.actors.owner})
 
-        const fn = ctx.contracts.atonomi.setReputationIRNNodeShare(newShare, {from: ctx.actors.admin})
+        const fn = ctx.contracts.settings.setReputationIRNNodeShare(newShare, {from: ctx.actors.admin})
         await errors.expectRevert(fn)
       })
 
       it('external accounts cannot set split', async () => {
-        const fn = ctx.contracts.atonomi.setReputationIRNNodeShare(newShare, {from: ctx.actors.alice})
+        const fn = ctx.contracts.settings.setReputationIRNNodeShare(newShare, {from: ctx.actors.alice})
         await errors.expectRevert(fn)
       })
     })
@@ -666,16 +667,16 @@ contract('Network Management', accounts => {
     describe('block threshold', () => {
       it('owner can set fee', async () => {
         const newBlockThreshold = 240
-        const success = await ctx.contracts.atonomi.setRewardBlockThreshold.call(newBlockThreshold, {from: ctx.actors.owner})
+        const success = await ctx.contracts.settings.setRewardBlockThreshold.call(newBlockThreshold, {from: ctx.actors.owner})
         expect(success).to.be.equal(true)
 
-        const tx = await ctx.contracts.atonomi.setRewardBlockThreshold(newBlockThreshold, {from: ctx.actors.owner})
+        const tx = await ctx.contracts.settings.setRewardBlockThreshold(newBlockThreshold, {from: ctx.actors.owner})
         expect(tx.logs.length).to.be.equal(1)
         expect(tx.logs[0].event).to.be.equal('RewardBlockThresholdChanged')
         expect(tx.logs[0].args._sender).to.be.equal(ctx.actors.owner)
         expect(tx.logs[0].args._newBlockThreshold.toString(10)).to.be.equal(newBlockThreshold.toString(10))
 
-        const threshold = await ctx.contracts.atonomi.blockThreshold()
+        const threshold = await ctx.contracts.settings.blockThreshold()
         expect(threshold.toString(10)).to.be.equal(newBlockThreshold.toString(10))
       })
     })

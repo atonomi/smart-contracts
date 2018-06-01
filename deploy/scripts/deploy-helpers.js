@@ -1,5 +1,5 @@
 // helper function to wait for mining times
-function waitForTransactionReceipt (hash) {
+function getTransactionReceipt (hash) {
   var receipt = web3.eth.getTransactionReceipt(hash)
   if (receipt === null) {
     console.log('not found, retry later')
@@ -7,4 +7,12 @@ function waitForTransactionReceipt (hash) {
     console.log(receipt)
   }
   return receipt
+}
+
+function isSyncing() {
+  if (eth.syncing === false) {
+    console.log("Synchronized!")
+  } else {
+    console.log(eth.syncing.currentBlock / eth.syncing.highestBlock, "%")
+  }
 }

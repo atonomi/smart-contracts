@@ -52,24 +52,24 @@
       "type": "function"
     }
   ],
-  "bytecode": "0x608060405234801561001057600080fd5b5061018b806100206000396000f30060806040526004361061004c576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff168063a8ab15cd14610051578063e9b0b3e214610096575b600080fd5b34801561005d57600080fd5b5061007c600480360381019080803590602001909291905050506100db565b604051808215151515815260200191505060405180910390f35b3480156100a257600080fd5b506100c16004803603810190808035906020019092919050505061011d565b604051808215151515815260200191505060405180910390f35b60007fc9a2166775dcce465c3dc43d6ad4e991fef0c0cb017ad4533430a332a10276f9826040518082815260200191505060405180910390a160019050919050565b60007fc9a2166775dcce465c3dc43d6ad4e991fef0c0cb017ad4533430a332a10276f9826040518082815260200191505060405180910390a1600190509190505600a165627a7a72305820db7a56c5346e84174d8a22bce9e90e99a50c79d05947dbf20e742ddcd8bec4180029",
-  "deployedBytecode": "0x60806040526004361061004c576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff168063a8ab15cd14610051578063e9b0b3e214610096575b600080fd5b34801561005d57600080fd5b5061007c600480360381019080803590602001909291905050506100db565b604051808215151515815260200191505060405180910390f35b3480156100a257600080fd5b506100c16004803603810190808035906020019092919050505061011d565b604051808215151515815260200191505060405180910390f35b60007fc9a2166775dcce465c3dc43d6ad4e991fef0c0cb017ad4533430a332a10276f9826040518082815260200191505060405180910390a160019050919050565b60007fc9a2166775dcce465c3dc43d6ad4e991fef0c0cb017ad4533430a332a10276f9826040518082815260200191505060405180910390a1600190509190505600a165627a7a72305820db7a56c5346e84174d8a22bce9e90e99a50c79d05947dbf20e742ddcd8bec4180029",
-  "sourceMap": "27:287:2:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;27:287:2;;;;;;;",
-  "deployedSourceMap": "27:287:2:-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;91:108;;8:9:-1;5:2;;;30:1;27;20:12;5:2;91:108:2;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;205:107;;8:9:-1;5:2;;;30:1;27;20:12;5:2;205:107:2;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;91:108;140:4;161:10;169:1;161:10;;;;;;;;;;;;;;;;;;188:4;181:11;;91:108;;;:::o;205:107::-;253:4;274:10;282:1;274:10;;;;;;;;;;;;;;;;;;301:4;294:11;;205:107;;;:::o",
+  "bytecode": "0x608060405234801561001057600080fd5b5061018b806100206000396000f30060806040526004361061004c576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff168063a8ab15cd14610051578063e9b0b3e214610096575b600080fd5b34801561005d57600080fd5b5061007c600480360381019080803590602001909291905050506100db565b604051808215151515815260200191505060405180910390f35b3480156100a257600080fd5b506100c16004803603810190808035906020019092919050505061011d565b604051808215151515815260200191505060405180910390f35b60007fc9a2166775dcce465c3dc43d6ad4e991fef0c0cb017ad4533430a332a10276f9826040518082815260200191505060405180910390a160019050919050565b60007fc9a2166775dcce465c3dc43d6ad4e991fef0c0cb017ad4533430a332a10276f9826040518082815260200191505060405180910390a1600190509190505600a165627a7a7230582080d4e74dd40f09e4f62bcdb768acc9ab5c7f9ff2d570b126572f53640f4818d90029",
+  "deployedBytecode": "0x60806040526004361061004c576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff168063a8ab15cd14610051578063e9b0b3e214610096575b600080fd5b34801561005d57600080fd5b5061007c600480360381019080803590602001909291905050506100db565b604051808215151515815260200191505060405180910390f35b3480156100a257600080fd5b506100c16004803603810190808035906020019092919050505061011d565b604051808215151515815260200191505060405180910390f35b60007fc9a2166775dcce465c3dc43d6ad4e991fef0c0cb017ad4533430a332a10276f9826040518082815260200191505060405180910390a160019050919050565b60007fc9a2166775dcce465c3dc43d6ad4e991fef0c0cb017ad4533430a332a10276f9826040518082815260200191505060405180910390a1600190509190505600a165627a7a7230582080d4e74dd40f09e4f62bcdb768acc9ab5c7f9ff2d570b126572f53640f4818d90029",
+  "sourceMap": "27:287:3:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;27:287:3;;;;;;;",
+  "deployedSourceMap": "27:287:3:-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;91:108;;8:9:-1;5:2;;;30:1;27;20:12;5:2;91:108:3;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;205:107;;8:9:-1;5:2;;;30:1;27;20:12;5:2;205:107:3;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;91:108;140:4;161:10;169:1;161:10;;;;;;;;;;;;;;;;;;188:4;181:11;;91:108;;;:::o;205:107::-;253:4;274:10;282:1;274:10;;;;;;;;;;;;;;;;;;301:4;294:11;;205:107;;;:::o",
   "source": "pragma solidity ^0.4.23;\n\n\ncontract MockContractReceiver {\n    event TestLog(uint n);\n\n    function onTokenTransfer(uint n) public returns (bool) {\n        emit TestLog(n);\n        return true;\n    }\n\n    function onTokenApprove(uint n) public returns (bool) {\n        emit TestLog(n);\n        return true;\n    }\n}",
-  "sourcePath": "/Users/fil.capiral/dev/github.com/atonomi/smart-contracts/contracts/mocks/MockContractReceiver.sol",
+  "sourcePath": "/Users/fil.capiral/dev/github.com/filcap/atonomi-smart-contracts/contracts/mocks/MockContractReceiver.sol",
   "ast": {
-    "absolutePath": "/Users/fil.capiral/dev/github.com/atonomi/smart-contracts/contracts/mocks/MockContractReceiver.sol",
+    "absolutePath": "/Users/fil.capiral/dev/github.com/filcap/atonomi-smart-contracts/contracts/mocks/MockContractReceiver.sol",
     "exportedSymbols": {
       "MockContractReceiver": [
-        2085
+        2244
       ]
     },
-    "id": 2086,
+    "id": 2245,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 2052,
+        "id": 2211,
         "literals": [
           "solidity",
           "^",
@@ -77,7 +77,7 @@
           ".23"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:24:2"
+        "src": "0:24:3"
       },
       {
         "baseContracts": [],
@@ -85,9 +85,9 @@
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": true,
-        "id": 2085,
+        "id": 2244,
         "linearizedBaseContracts": [
-          2085
+          2244
         ],
         "name": "MockContractReceiver",
         "nodeType": "ContractDefinition",
@@ -95,21 +95,21 @@
           {
             "anonymous": false,
             "documentation": null,
-            "id": 2056,
+            "id": 2215,
             "name": "TestLog",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 2055,
+              "id": 2214,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2054,
+                  "id": 2213,
                   "indexed": false,
                   "name": "n",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2056,
-                  "src": "77:6:2",
+                  "scope": 2215,
+                  "src": "77:6:3",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -117,10 +117,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 2053,
+                    "id": 2212,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "77:4:2",
+                    "src": "77:4:3",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -130,15 +130,15 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "76:8:2"
+              "src": "76:8:3"
             },
-            "src": "63:22:2"
+            "src": "63:22:3"
           },
           {
             "body": {
-              "id": 2069,
+              "id": 2228,
               "nodeType": "Block",
-              "src": "146:53:2",
+              "src": "146:53:3",
               "statements": [
                 {
                   "eventCall": {
@@ -146,12 +146,12 @@
                     "arguments": [
                       {
                         "argumentTypes": null,
-                        "id": 2064,
+                        "id": 2223,
                         "name": "n",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2058,
-                        "src": "169:1:2",
+                        "referencedDeclaration": 2217,
+                        "src": "169:1:3",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
@@ -165,18 +165,18 @@
                           "typeString": "uint256"
                         }
                       ],
-                      "id": 2063,
+                      "id": 2222,
                       "name": "TestLog",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 2056,
-                      "src": "161:7:2",
+                      "referencedDeclaration": 2215,
+                      "src": "161:7:3",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_event_nonpayable$_t_uint256_$returns$__$",
                         "typeString": "function (uint256)"
                       }
                     },
-                    "id": 2065,
+                    "id": 2224,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -184,28 +184,28 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "161:10:2",
+                    "src": "161:10:3",
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 2066,
+                  "id": 2225,
                   "nodeType": "EmitStatement",
-                  "src": "156:15:2"
+                  "src": "156:15:3"
                 },
                 {
                   "expression": {
                     "argumentTypes": null,
                     "hexValue": "74727565",
-                    "id": 2067,
+                    "id": 2226,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": true,
                     "kind": "bool",
                     "lValueRequested": false,
                     "nodeType": "Literal",
-                    "src": "188:4:2",
+                    "src": "188:4:3",
                     "subdenomination": null,
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
@@ -213,15 +213,15 @@
                     },
                     "value": "true"
                   },
-                  "functionReturnParameters": 2062,
-                  "id": 2068,
+                  "functionReturnParameters": 2221,
+                  "id": 2227,
                   "nodeType": "Return",
-                  "src": "181:11:2"
+                  "src": "181:11:3"
                 }
               ]
             },
             "documentation": null,
-            "id": 2070,
+            "id": 2229,
             "implemented": true,
             "isConstructor": false,
             "isDeclaredConst": false,
@@ -229,16 +229,16 @@
             "name": "onTokenTransfer",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 2059,
+              "id": 2218,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2058,
+                  "id": 2217,
                   "name": "n",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2070,
-                  "src": "116:6:2",
+                  "scope": 2229,
+                  "src": "116:6:3",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -246,10 +246,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 2057,
+                    "id": 2216,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "116:4:2",
+                    "src": "116:4:3",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -259,20 +259,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "115:8:2"
+              "src": "115:8:3"
             },
             "payable": false,
             "returnParameters": {
-              "id": 2062,
+              "id": 2221,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2061,
+                  "id": 2220,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2070,
-                  "src": "140:4:2",
+                  "scope": 2229,
+                  "src": "140:4:3",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -280,10 +280,10 @@
                     "typeString": "bool"
                   },
                   "typeName": {
-                    "id": 2060,
+                    "id": 2219,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
-                    "src": "140:4:2",
+                    "src": "140:4:3",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
@@ -293,19 +293,19 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "139:6:2"
+              "src": "139:6:3"
             },
-            "scope": 2085,
-            "src": "91:108:2",
+            "scope": 2244,
+            "src": "91:108:3",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "public"
           },
           {
             "body": {
-              "id": 2083,
+              "id": 2242,
               "nodeType": "Block",
-              "src": "259:53:2",
+              "src": "259:53:3",
               "statements": [
                 {
                   "eventCall": {
@@ -313,12 +313,12 @@
                     "arguments": [
                       {
                         "argumentTypes": null,
-                        "id": 2078,
+                        "id": 2237,
                         "name": "n",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2072,
-                        "src": "282:1:2",
+                        "referencedDeclaration": 2231,
+                        "src": "282:1:3",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
@@ -332,18 +332,18 @@
                           "typeString": "uint256"
                         }
                       ],
-                      "id": 2077,
+                      "id": 2236,
                       "name": "TestLog",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 2056,
-                      "src": "274:7:2",
+                      "referencedDeclaration": 2215,
+                      "src": "274:7:3",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_event_nonpayable$_t_uint256_$returns$__$",
                         "typeString": "function (uint256)"
                       }
                     },
-                    "id": 2079,
+                    "id": 2238,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -351,28 +351,28 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "274:10:2",
+                    "src": "274:10:3",
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 2080,
+                  "id": 2239,
                   "nodeType": "EmitStatement",
-                  "src": "269:15:2"
+                  "src": "269:15:3"
                 },
                 {
                   "expression": {
                     "argumentTypes": null,
                     "hexValue": "74727565",
-                    "id": 2081,
+                    "id": 2240,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": true,
                     "kind": "bool",
                     "lValueRequested": false,
                     "nodeType": "Literal",
-                    "src": "301:4:2",
+                    "src": "301:4:3",
                     "subdenomination": null,
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
@@ -380,15 +380,15 @@
                     },
                     "value": "true"
                   },
-                  "functionReturnParameters": 2076,
-                  "id": 2082,
+                  "functionReturnParameters": 2235,
+                  "id": 2241,
                   "nodeType": "Return",
-                  "src": "294:11:2"
+                  "src": "294:11:3"
                 }
               ]
             },
             "documentation": null,
-            "id": 2084,
+            "id": 2243,
             "implemented": true,
             "isConstructor": false,
             "isDeclaredConst": false,
@@ -396,16 +396,16 @@
             "name": "onTokenApprove",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 2073,
+              "id": 2232,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2072,
+                  "id": 2231,
                   "name": "n",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2084,
-                  "src": "229:6:2",
+                  "scope": 2243,
+                  "src": "229:6:3",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -413,10 +413,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 2071,
+                    "id": 2230,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "229:4:2",
+                    "src": "229:4:3",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -426,20 +426,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "228:8:2"
+              "src": "228:8:3"
             },
             "payable": false,
             "returnParameters": {
-              "id": 2076,
+              "id": 2235,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2075,
+                  "id": 2234,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2084,
-                  "src": "253:4:2",
+                  "scope": 2243,
+                  "src": "253:4:3",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -447,10 +447,10 @@
                     "typeString": "bool"
                   },
                   "typeName": {
-                    "id": 2074,
+                    "id": 2233,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
-                    "src": "253:4:2",
+                    "src": "253:4:3",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
@@ -460,33 +460,33 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "252:6:2"
+              "src": "252:6:3"
             },
-            "scope": 2085,
-            "src": "205:107:2",
+            "scope": 2244,
+            "src": "205:107:3",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "public"
           }
         ],
-        "scope": 2086,
-        "src": "27:287:2"
+        "scope": 2245,
+        "src": "27:287:3"
       }
     ],
-    "src": "0:314:2"
+    "src": "0:314:3"
   },
   "legacyAST": {
-    "absolutePath": "/Users/fil.capiral/dev/github.com/atonomi/smart-contracts/contracts/mocks/MockContractReceiver.sol",
+    "absolutePath": "/Users/fil.capiral/dev/github.com/filcap/atonomi-smart-contracts/contracts/mocks/MockContractReceiver.sol",
     "exportedSymbols": {
       "MockContractReceiver": [
-        2085
+        2244
       ]
     },
-    "id": 2086,
+    "id": 2245,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 2052,
+        "id": 2211,
         "literals": [
           "solidity",
           "^",
@@ -494,7 +494,7 @@
           ".23"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:24:2"
+        "src": "0:24:3"
       },
       {
         "baseContracts": [],
@@ -502,9 +502,9 @@
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": true,
-        "id": 2085,
+        "id": 2244,
         "linearizedBaseContracts": [
-          2085
+          2244
         ],
         "name": "MockContractReceiver",
         "nodeType": "ContractDefinition",
@@ -512,21 +512,21 @@
           {
             "anonymous": false,
             "documentation": null,
-            "id": 2056,
+            "id": 2215,
             "name": "TestLog",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 2055,
+              "id": 2214,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2054,
+                  "id": 2213,
                   "indexed": false,
                   "name": "n",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2056,
-                  "src": "77:6:2",
+                  "scope": 2215,
+                  "src": "77:6:3",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -534,10 +534,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 2053,
+                    "id": 2212,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "77:4:2",
+                    "src": "77:4:3",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -547,15 +547,15 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "76:8:2"
+              "src": "76:8:3"
             },
-            "src": "63:22:2"
+            "src": "63:22:3"
           },
           {
             "body": {
-              "id": 2069,
+              "id": 2228,
               "nodeType": "Block",
-              "src": "146:53:2",
+              "src": "146:53:3",
               "statements": [
                 {
                   "eventCall": {
@@ -563,12 +563,12 @@
                     "arguments": [
                       {
                         "argumentTypes": null,
-                        "id": 2064,
+                        "id": 2223,
                         "name": "n",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2058,
-                        "src": "169:1:2",
+                        "referencedDeclaration": 2217,
+                        "src": "169:1:3",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
@@ -582,18 +582,18 @@
                           "typeString": "uint256"
                         }
                       ],
-                      "id": 2063,
+                      "id": 2222,
                       "name": "TestLog",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 2056,
-                      "src": "161:7:2",
+                      "referencedDeclaration": 2215,
+                      "src": "161:7:3",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_event_nonpayable$_t_uint256_$returns$__$",
                         "typeString": "function (uint256)"
                       }
                     },
-                    "id": 2065,
+                    "id": 2224,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -601,28 +601,28 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "161:10:2",
+                    "src": "161:10:3",
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 2066,
+                  "id": 2225,
                   "nodeType": "EmitStatement",
-                  "src": "156:15:2"
+                  "src": "156:15:3"
                 },
                 {
                   "expression": {
                     "argumentTypes": null,
                     "hexValue": "74727565",
-                    "id": 2067,
+                    "id": 2226,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": true,
                     "kind": "bool",
                     "lValueRequested": false,
                     "nodeType": "Literal",
-                    "src": "188:4:2",
+                    "src": "188:4:3",
                     "subdenomination": null,
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
@@ -630,15 +630,15 @@
                     },
                     "value": "true"
                   },
-                  "functionReturnParameters": 2062,
-                  "id": 2068,
+                  "functionReturnParameters": 2221,
+                  "id": 2227,
                   "nodeType": "Return",
-                  "src": "181:11:2"
+                  "src": "181:11:3"
                 }
               ]
             },
             "documentation": null,
-            "id": 2070,
+            "id": 2229,
             "implemented": true,
             "isConstructor": false,
             "isDeclaredConst": false,
@@ -646,16 +646,16 @@
             "name": "onTokenTransfer",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 2059,
+              "id": 2218,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2058,
+                  "id": 2217,
                   "name": "n",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2070,
-                  "src": "116:6:2",
+                  "scope": 2229,
+                  "src": "116:6:3",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -663,10 +663,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 2057,
+                    "id": 2216,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "116:4:2",
+                    "src": "116:4:3",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -676,20 +676,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "115:8:2"
+              "src": "115:8:3"
             },
             "payable": false,
             "returnParameters": {
-              "id": 2062,
+              "id": 2221,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2061,
+                  "id": 2220,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2070,
-                  "src": "140:4:2",
+                  "scope": 2229,
+                  "src": "140:4:3",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -697,10 +697,10 @@
                     "typeString": "bool"
                   },
                   "typeName": {
-                    "id": 2060,
+                    "id": 2219,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
-                    "src": "140:4:2",
+                    "src": "140:4:3",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
@@ -710,19 +710,19 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "139:6:2"
+              "src": "139:6:3"
             },
-            "scope": 2085,
-            "src": "91:108:2",
+            "scope": 2244,
+            "src": "91:108:3",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "public"
           },
           {
             "body": {
-              "id": 2083,
+              "id": 2242,
               "nodeType": "Block",
-              "src": "259:53:2",
+              "src": "259:53:3",
               "statements": [
                 {
                   "eventCall": {
@@ -730,12 +730,12 @@
                     "arguments": [
                       {
                         "argumentTypes": null,
-                        "id": 2078,
+                        "id": 2237,
                         "name": "n",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2072,
-                        "src": "282:1:2",
+                        "referencedDeclaration": 2231,
+                        "src": "282:1:3",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
@@ -749,18 +749,18 @@
                           "typeString": "uint256"
                         }
                       ],
-                      "id": 2077,
+                      "id": 2236,
                       "name": "TestLog",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 2056,
-                      "src": "274:7:2",
+                      "referencedDeclaration": 2215,
+                      "src": "274:7:3",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_event_nonpayable$_t_uint256_$returns$__$",
                         "typeString": "function (uint256)"
                       }
                     },
-                    "id": 2079,
+                    "id": 2238,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -768,28 +768,28 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "274:10:2",
+                    "src": "274:10:3",
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 2080,
+                  "id": 2239,
                   "nodeType": "EmitStatement",
-                  "src": "269:15:2"
+                  "src": "269:15:3"
                 },
                 {
                   "expression": {
                     "argumentTypes": null,
                     "hexValue": "74727565",
-                    "id": 2081,
+                    "id": 2240,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": true,
                     "kind": "bool",
                     "lValueRequested": false,
                     "nodeType": "Literal",
-                    "src": "301:4:2",
+                    "src": "301:4:3",
                     "subdenomination": null,
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
@@ -797,15 +797,15 @@
                     },
                     "value": "true"
                   },
-                  "functionReturnParameters": 2076,
-                  "id": 2082,
+                  "functionReturnParameters": 2235,
+                  "id": 2241,
                   "nodeType": "Return",
-                  "src": "294:11:2"
+                  "src": "294:11:3"
                 }
               ]
             },
             "documentation": null,
-            "id": 2084,
+            "id": 2243,
             "implemented": true,
             "isConstructor": false,
             "isDeclaredConst": false,
@@ -813,16 +813,16 @@
             "name": "onTokenApprove",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 2073,
+              "id": 2232,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2072,
+                  "id": 2231,
                   "name": "n",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2084,
-                  "src": "229:6:2",
+                  "scope": 2243,
+                  "src": "229:6:3",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -830,10 +830,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 2071,
+                    "id": 2230,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "229:4:2",
+                    "src": "229:4:3",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -843,20 +843,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "228:8:2"
+              "src": "228:8:3"
             },
             "payable": false,
             "returnParameters": {
-              "id": 2076,
+              "id": 2235,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2075,
+                  "id": 2234,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2084,
-                  "src": "253:4:2",
+                  "scope": 2243,
+                  "src": "253:4:3",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -864,10 +864,10 @@
                     "typeString": "bool"
                   },
                   "typeName": {
-                    "id": 2074,
+                    "id": 2233,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
-                    "src": "253:4:2",
+                    "src": "253:4:3",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
@@ -877,26 +877,26 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "252:6:2"
+              "src": "252:6:3"
             },
-            "scope": 2085,
-            "src": "205:107:2",
+            "scope": 2244,
+            "src": "205:107:3",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "public"
           }
         ],
-        "scope": 2086,
-        "src": "27:287:2"
+        "scope": 2245,
+        "src": "27:287:3"
       }
     ],
-    "src": "0:314:2"
+    "src": "0:314:3"
   },
   "compiler": {
     "name": "solc",
-    "version": "0.4.23+commit.124ca40d.Emscripten.clang"
+    "version": "0.4.24+commit.e67f0147.Emscripten.clang"
   },
   "networks": {},
   "schemaVersion": "2.0.0",
-  "updatedAt": "2018-05-30T16:40:14.656Z"
+  "updatedAt": "2018-06-01T21:12:27.540Z"
 }
