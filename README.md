@@ -2,6 +2,15 @@
 
 <img src="hosho.png" alt="Hosho audit in process" height="125px"/>
 
+### MainNet Chain
+
+| Contract  | Address |
+| ------------- | ------------- |
+| SafeMathLib (TokenMarket)  | [0x850493fd6f7a92f6d462ccba9e438b76b000bcc1](https://etherscan.io/address/0x850493fd6f7a92f6d462ccba9e438b76b000bcc1) |
+| ATMI Token (TokenMarket)  | [0x97aeb5066e1a590e868b511457beb6fe99d329f5](https://etherscan.io/address/0x97aeb5066e1a590e868b511457beb6fe99d329f5) |
+| Network Settings | Coming Soon |
+| Atonomi | Coming Soon |
+
 ### Kovan Chain
 
 | Contract  | Address |

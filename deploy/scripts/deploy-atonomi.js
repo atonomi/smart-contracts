@@ -10,7 +10,11 @@ var blockThreshold = 5760 // assuming 15s blocks, 1 write per day
 var initalSupply = 1000000000 * multiplier
 
 var chains = {
-  // TODO: add mainnet
+  mainnet: {
+    token: '0x97aeb5066e1a590e868b511457beb6fe99d329f5',
+    atonomi: undefined,
+    settings: undefined
+  },
   kovan: {
     token: '0xe66254d9560c2d030ca5c3439c5d6b58061dd6f7',
     atonomi: '0xbde8f51601e552d620c208049c5970f7b52cd044',
