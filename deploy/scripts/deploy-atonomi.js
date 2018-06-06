@@ -107,23 +107,21 @@ function getSettingsContract(chain) {
 function initTestEnv(chain) {
   var c = getAtonomiContract(chain)
 
-  var ownerAccount = ETHER_ADDR
-  var h = c.addNetworkMember(ownerAccount, true, true, true, 'TEST', {from: ETHER_ADDR})
-  console.log('Owner added to network', h)
-  h = c.setDefaultReputationForManufacturer('TEST', '50-0-0', {from: ETHER_ADDR})
-  console.log('Owner default rep is set', h)
+  var testAccounts = [
+    { address: ETHER_ADDR, mfgId: 'TEST', rep: '50-0-0' },
+    { address: '0x079Df73b5Ce40323020E7064a6De14c1702A8bfD', mfgId: 'LEVK', rep: '50-0-0' },
+    { address: '0xa657926c2180c5ef8469dd3c09e585fb2471f2f9', mfgId: 'SCOT', rep: '50-0-0' },
+    { address: '0xe324e9320c42f4F55dE0B1eF3F5A60029023430E', mfgId: 'FIL', rep: '50-0-0' }
+  ]
 
-  var mikeAccount = '0x079Df73b5Ce40323020E7064a6De14c1702A8bfD'
-  h = c.addNetworkMember(mikeAccount, true, true, true, 'LEVK', {from: ETHER_ADDR})
-  console.log('Mike added to network', h)
-  h = c.setDefaultReputationForManufacturer('LEVK', '50-0-0', {from: ETHER_ADDR})
-  console.log('Mike default rep is set', h)
-
-  var scottAccount = '0xa657926c2180c5ef8469dd3c09e585fb2471f2f9'
-  h = c.addNetworkMember(scottAccount, true, true, true, 'SCOT', {from: ETHER_ADDR})
-  console.log('Scott added to network', h)
-  h = c.setDefaultReputationForManufacturer('SCOT', '50-0-0', {from: ETHER_ADDR})
-  console.log('Scott default rep is set', h)
+  for (var i = 0; i < testAccounts.length; i++) {
+    var account = testAccounts[i]
+    var h = c.addNetworkMember(account.address, true, true, true, testAccounts.mfgId, {from: ETHER_ADDR})
+    console.log(account.mfgId + ' added to network:', h)
+    h = c.setDefaultReputationForManufacturer(account.mfgId, account.rep, {from: ETHER_ADDR})
+    console.log('rep is set:', h)
+    console.log()
+  }
 }
 
 function grantTokens(chain, ethAccount) {
