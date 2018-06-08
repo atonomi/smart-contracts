@@ -23,7 +23,7 @@ contract('Device Management', accounts => {
   const actFee = 1 * multiplier
   const repReward = 1 * multiplier
 
-  const defaultRep = '75-1-9'
+  const defaultRep = '6767-1-1'
   const deviceId = 'apple-iphone1'
   const deviceIdHash = web3Utils.soliditySha3({t: 'bytes32', v: web3.fromAscii(deviceId)})
   const mfgId = 'APPLE'
