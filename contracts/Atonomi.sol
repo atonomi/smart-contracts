@@ -649,7 +649,7 @@ contract Atonomi is Pausable, TokenDestructible {
         return true;
     }
 
-    /// @notice anyone can donate tokens to a manufacturer
+    /// @notice anyone can donate tokens to a manufacturer's pool
     /// @param manufacturerId of the manufacturer to receive the tokens
     /// @param amount of tokens to deposit
     function depositTokens(bytes32 manufacturerId, uint256 amount) public returns (bool) {

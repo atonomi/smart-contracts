@@ -19,6 +19,11 @@ module.exports = {
       port: 8546,
       gas: 0xfffffffffff,
       gasPrice: 0x01
+    },
+    reputation: {
+      host: '127.0.0.1',
+      port: 7999,
+      network_id: '*'
     }
   }
 }
