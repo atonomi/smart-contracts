@@ -10,7 +10,7 @@
   ],
   "dependencies": {
     "csv-writer": "^1.0.0",
-    "moment": "^2.22.1",
+    "moment": "^2.22.2",
     "sha3": "^1.2.2",
     "truffle-blockchain-utils": "^0.0.3",
     "truffle-core": "^4.1.11",
@@ -34,7 +34,7 @@
     "lk-test-helpers": "^0.1.4",
     "snazzy": "^7.1.1",
     "solhint": "git+https://github.com/protofire/solhint.git",
-    "solidity-coverage": "^0.5.0",
+    "solidity-coverage": "^0.5.4",
     "standard": "^10.0.3",
     "truffle": "^4.1.11",
     "truffle-contract": "^3.0.5",
