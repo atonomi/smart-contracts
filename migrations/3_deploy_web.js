@@ -3,10 +3,9 @@ const SafeMathLib = artifacts.require('SafeMathLib')
 const Atonomi = artifacts.require('Atonomi')
 const NetworkSettings = artifacts.require('NetworkSettings')
 const init = require('../test/helpers/init')
-const web3Utils = require('web3-utils')
 
 module.exports = function (deployer, network, accounts) {
-  if (network !== 'development') return
+  if (network !== 'web') return
 
   const actors = init.getTestActorsContext(accounts)
   const owner = actors.owner
@@ -18,11 +17,6 @@ module.exports = function (deployer, network, accounts) {
   const repReward = 1 * multiplier
   const reputationShare = 20
   const blockThreshold = 5760 // assuming 15s blocks, 1 write per day
-  const deviceReg = 'apple-iphone1'
-  const deviceAct = 'apple-iphone2'
-  const deviceRegIdHash = web3Utils.soliditySha3({t: 'bytes32', v: web3.fromAscii(deviceReg)})
-  const deviceRegPubKey = '0x9c274091da1ce47bd321f272d66b6e5514fb82346d7992e2d1a3eefdeffed791'
-  const deviceActPubKey = '0x4a984091da1ce47bd321f272d66b6e5514fb82346d7992e2d1a3eefdeffed353'
 
   let a, t
   deployer.deploy(SafeMathLib)
@@ -39,4 +33,25 @@ module.exports = function (deployer, network, accounts) {
       AtonomiToken.address,
       NetworkSettings.address,
       {from: owner}))
+
+    .then(() => Atonomi.deployed())
+    .then((instance) => { a = instance })
+    .then(() => AtonomiToken.deployed())
+    .then((instance) => { t = instance })
+
+    // for web deployments configure ganache coinbase as a super user
+    .then(() => a.addNetworkMember(
+          owner,
+          true, // irn admin
+          true, // manufacturer
+          true, // irn node
+          'DEV', // manufacturer id
+          { from: owner }))
+    .then((tx) => console.log('Owner set as super user:', tx.receipt.status))
+
+    // for web deployments configure token for release
+    .then(() => t.setReleaseAgent(owner, {from: owner}))
+    .then((tx) => console.log('Owner set as release agent:', tx.receipt.status))
+    .then(() => t.releaseTokenTransfer({from: owner}))
+    .then((tx) => console.log('Token transfers enabled:', tx.receipt.status))
 }
