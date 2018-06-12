@@ -122,7 +122,8 @@ function initTestEnv(chain) {
     { address: '0xa657926c2180c5ef8469dd3c09e585fb2471f2f9', mfgId: 'SCOT', rep: '6767-1-1' },
     { address: '0xe324e9320c42f4F55dE0B1eF3F5A60029023430E', mfgId: 'FIL', rep: '6767-1-1' },
     { address: '0xaFD78041be4b82dFC4535A5cf68187C46d5A1042', mfgId: 'LANC', rep: '6767-1-1' },
-    { address: '0x6BA7277836aFACC81fE92Eaa87472f9D18ffBc30', mfgId: 'JULI', rep: '6767-1-1' }
+    { address: '0x6BA7277836aFACC81fE92Eaa87472f9D18ffBc30', mfgId: 'JULI', rep: '6767-1-1' },
+    { address: '0x3c5D3f0eF2a48379a80b934bfDAe3f7e14Da7d6f', mfgId: 'BRED', rep: '6767-1-1' }
   ]
 
   for (var i = 0; i < testAccounts.length; i++) {
