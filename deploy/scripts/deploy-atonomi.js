@@ -21,9 +21,9 @@ var chains = {
     settings: '0x729a741ce0c776130c50d35906f0dbd248184982'
   },
   ganache: {
-    token: AtonomiTokenJSON.networks[5777].address,
-    atonomi: AtonomiJSON.networks[5777].address,
-    settings: NetworkSettingsJSON.networks[5777].address
+    token: AtonomiTokenJSON.networks[5777] ? AtonomiTokenJSON.networks[5777].address : undefined,
+    atonomi: AtonomiTokenJSON.networks[5777] ? AtonomiJSON.networks[5777].address : undefined,
+    settings: AtonomiTokenJSON.networks[5777] ? NetworkSettingsJSON.networks[5777].address : undefined
   }
 }
 
