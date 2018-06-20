@@ -47,7 +47,7 @@
     "ganache-cli": "ganache-cli -p 8546 -e 1000 -a 15 -l 990000000000000",
     "deploy": "truffle migrate --reset",
     "deploy:web": "truffle migrate --reset --network web && cp -rf ./build/. ../admin-portal/build/",
-    "deploy:reputation": "truffle migrate --reset --network reputation",
+    "deploy:reputation": "truffle migrate --reset --network reputation && cp -f ./build/contracts/Atonomi.json ../reputation-server-api/",
     "copy-contracts": "rm -rf ./released-abi/contracts && cp -rf ./build/. ./released-abi/",
     "test": "(npm run compile) && (ganache-cli -p 8546 -e 1000 -a 15 > /dev/null & truffle test) && (kill -9 $(lsof -ti :8546))",
     "test:single": "(npm run compile) && (ganache-cli -p 8546 -e 1000 -a 15 > /dev/null & truffle test $TESTFILE) && (kill -9 $(lsof -ti :8546))",

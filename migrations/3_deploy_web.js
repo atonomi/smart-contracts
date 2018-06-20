@@ -35,9 +35,9 @@ module.exports = function (deployer, network, accounts) {
       {from: owner}))
 
     .then(() => Atonomi.deployed())
-    .then((instance) => { a = instance })
+    .then(instance => { a = instance })
     .then(() => AtonomiToken.deployed())
-    .then((instance) => { t = instance })
+    .then(instance => { t = instance })
 
     // for web deployments configure ganache coinbase as a super user
     .then(() => a.addNetworkMember(
@@ -47,11 +47,11 @@ module.exports = function (deployer, network, accounts) {
           true, // irn node
           'DEV', // manufacturer id
           { from: owner }))
-    .then((tx) => console.log('Owner set as super user:', tx.receipt.status))
+    .then(tx => console.log('Owner set as super user:', tx.receipt.status))
 
     // for web deployments configure token for release
     .then(() => t.setReleaseAgent(owner, {from: owner}))
-    .then((tx) => console.log('Owner set as release agent:', tx.receipt.status))
+    .then(tx => console.log('Owner set as release agent:', tx.receipt.status))
     .then(() => t.releaseTokenTransfer({from: owner}))
-    .then((tx) => console.log('Token transfers enabled:', tx.receipt.status))
+    .then(tx => console.log('Token transfers enabled:', tx.receipt.status))
 }
