@@ -22,8 +22,8 @@ var chains = {
   },
   ganache: {
     token: AtonomiTokenJSON.networks[5777] ? AtonomiTokenJSON.networks[5777].address : undefined,
-    atonomi: AtonomiTokenJSON.networks[5777] ? AtonomiJSON.networks[5777].address : undefined,
-    settings: AtonomiTokenJSON.networks[5777] ? NetworkSettingsJSON.networks[5777].address : undefined
+    atonomi: AtonomiJSON.networks[5777] ? AtonomiJSON.networks[5777].address : undefined,
+    settings: NetworkSettingsJSON.networks[5777] ? NetworkSettingsJSON.networks[5777].address : undefined
   }
 }
 
@@ -113,26 +113,30 @@ function getSettingsContract(chain) {
   return web3.eth.contract(NetworkSettingsJSON.abi).at(addr)
 }
 
-function initTestEnv(chain) {
-  var c = getAtonomiContract(chain)
+var testAccounts = [
+  { address: ETHER_ADDR, mfgId: 'TEST', rep: '6767-1-1' },
+  { address: '0x079Df73b5Ce40323020E7064a6De14c1702A8bfD', mfgId: 'LEVK', rep: '6767-1-1' },
+  { address: '0xa657926c2180c5ef8469dd3c09e585fb2471f2f9', mfgId: 'SCOT', rep: '6767-1-1' },
+  { address: '0xe324e9320c42f4F55dE0B1eF3F5A60029023430E', mfgId: 'FIL', rep: '6767-1-1' },
+  { address: '0xaFD78041be4b82dFC4535A5cf68187C46d5A1042', mfgId: 'LANC', rep: '6767-1-1' },
+  { address: '0x6BA7277836aFACC81fE92Eaa87472f9D18ffBc30', mfgId: 'JULI', rep: '6767-1-1' },
+  { address: '0x3c5D3f0eF2a48379a80b934bfDAe3f7e14Da7d6f', mfgId: 'BRED', rep: '6767-1-1' },
+  { address: '0x283597a44cFcBb78D02b734c744Ee8d56010E13B', mfgId: 'JACK', rep: '6767-1-1' },
+  { address: '0xd2b26461d769169c7b408b25cf96b23311aa3386', mfgId: 'HENR', rep: '6767-1-1' }
+]
 
-  var testAccounts = [
-    { address: ETHER_ADDR, mfgId: 'TEST', rep: '6767-1-1' },
-    { address: '0x079Df73b5Ce40323020E7064a6De14c1702A8bfD', mfgId: 'LEVK', rep: '6767-1-1' },
-    { address: '0xa657926c2180c5ef8469dd3c09e585fb2471f2f9', mfgId: 'SCOT', rep: '6767-1-1' },
-    { address: '0xe324e9320c42f4F55dE0B1eF3F5A60029023430E', mfgId: 'FIL', rep: '6767-1-1' },
-    { address: '0xaFD78041be4b82dFC4535A5cf68187C46d5A1042', mfgId: 'LANC', rep: '6767-1-1' },
-    { address: '0x6BA7277836aFACC81fE92Eaa87472f9D18ffBc30', mfgId: 'JULI', rep: '6767-1-1' },
-    { address: '0x3c5D3f0eF2a48379a80b934bfDAe3f7e14Da7d6f', mfgId: 'BRED', rep: '6767-1-1' },
-    { address: '0x283597a44cFcBb78D02b734c744Ee8d56010E13B', mfgId: 'JACK', rep: '6767-1-1' },
-    { address: '0xd2b26461d769169c7b408b25cf96b23311aa3386', mfgId: 'HENR', rep: '6767-1-1' }
-  ]
+function loadNetworkParticipants(contractAddress, accounts, isIRNAdmin, isMFG, isIRNNode) {
+  var c = web3.eth.contract(AtonomiJSON.abi).at(contractAddress)
 
-  for (var i = 0; i < testAccounts.length; i++) {
-    var account = testAccounts[i]
-    var h = c.addNetworkMember(account.address, true, true, true, testAccounts.mfgId, {from: ETHER_ADDR})
+  for (var i = 0; i < accounts.length; i++) {
+    var account = accounts[i]
+    var gas = c.addNetworkMember.estimateGas(account.address, isIRNAdmin, isMFG, isIRNNode, account.mfgId, {from: ETHER_ADDR})
+    console.log('gas estimate', gas)
+    var h = c.addNetworkMember(account.address, isIRNAdmin, isMFG, isIRNNode, account.mfgId, {from: ETHER_ADDR, gas: gas})
     console.log(account.mfgId + ' added to network:', h)
-    h = c.setDefaultReputationForManufacturer(account.mfgId, account.rep, {from: ETHER_ADDR})
+    gas = c.setDefaultReputationForManufacturer.estimateGas(account.mfgId, account.rep, {from: ETHER_ADDR})
+    console.log('gas estimate', gas)
+    h = c.setDefaultReputationForManufacturer(account.mfgId, account.rep, {from: ETHER_ADDR, gas: gas})
     console.log('rep is set:', h)
     console.log()
   }
