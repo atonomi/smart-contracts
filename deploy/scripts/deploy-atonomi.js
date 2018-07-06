@@ -2,10 +2,10 @@ var tokenName = 'Atonomi Token'
 var tokenSymbol = 'ATMI'
 var tokenDecimals = 18
 var multiplier = Math.pow(10, tokenDecimals)
-var regFee = 0.25 * multiplier
-var actFee = 0.25 * multiplier
+var regFee = 1 * multiplier
+var actFee = 1 * multiplier
 var repReward = 0.125 * multiplier
-var reputationShare = 20
+var reputationShare = 80
 var blockThreshold = 5760 // assuming 15s blocks, 1 write per day
 var initalSupply = 1000000000 * multiplier
 
