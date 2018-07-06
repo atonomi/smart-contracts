@@ -87,8 +87,8 @@ function initAtonomi(ercAddress, settingsAddress, estimateOnly) {
     {data: AtonomiJSON.bytecode})
 
   // TODO: kovan issue with estimate gas for larger contracts
-  // var gas = web3.eth.estimateGas({from: ETHER_ADDR, data: constructorByteCode})
-  var gas = 6500000
+  // var gas = 6500000
+  var gas = web3.eth.estimateGas({from: ETHER_ADDR, data: constructorByteCode})
   console.log('gas estimate', gas)
 
   if(estimateOnly) return undefined
@@ -125,8 +125,8 @@ var testAccounts = [
   { address: '0xd2b26461d769169c7b408b25cf96b23311aa3386', mfgId: 'HENR', rep: '6767-1-1' }
 ]
 
-function loadNetworkParticipants(contractAddress, accounts, isIRNAdmin, isMFG, isIRNNode) {
-  var c = web3.eth.contract(AtonomiJSON.abi).at(contractAddress)
+function loadNetworkParticipants(chain, accounts, isIRNAdmin, isMFG, isIRNNode) {
+  var c = getAtonomiContract(chain)
 
   for (var i = 0; i < accounts.length; i++) {
     var account = accounts[i]
