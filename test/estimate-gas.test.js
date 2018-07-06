@@ -72,6 +72,12 @@ contract('Gas Estimates', accounts => {
       recordsForCSV.push({scope: 'atonomi', task: 'add mfgr', gas: gasAddMfg})
     })
 
+    it('   ^= to Set Manufacturer Default Reputation', async () => {
+      const gas = await ctx.contracts.atonomi.setDefaultReputationForManufacturer.estimateGas(mfgId, '6767-1-1', {from: ctx.actors.owner})
+      console.log('      ✓ ' + gas + ' wei')
+      recordsForCSV.push({scope: 'atonomi', task: 'set manufacturer default reputation', gas: gas})
+    })
+
     it('   ^= to Add IRN Nodes', async () => {
       var gas = await ctx.contracts.atonomi.addNetworkMember.estimateGas(ctx.actors.irnNode, false, false, true, '', {from: ctx.actors.owner})
       console.log('      ✓ ' + gas + ' wei')
