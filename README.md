@@ -8,7 +8,7 @@
 | ------------- | ------------- |
 | SafeMathLib (TokenMarket)  | [0x850493fd6f7a92f6d462ccba9e438b76b000bcc1](https://etherscan.io/address/0x850493fd6f7a92f6d462ccba9e438b76b000bcc1) |
 | ATMI Token (TokenMarket)  | [0x97aeb5066e1a590e868b511457beb6fe99d329f5](https://etherscan.io/address/0x97aeb5066e1a590e868b511457beb6fe99d329f5) |
-| Network Settings | Coming Soon |
+| Network Settings | [0x2566c658331eac75d3b3ccd0e45c78d9cf6c4c4c](https://etherscan.io/address/0x2566c658331eac75d3b3ccd0e45c78d9cf6c4c4c) |
 | Atonomi | Coming Soon |
 
 ### Kovan Chain
