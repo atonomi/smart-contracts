@@ -144,6 +144,7 @@ function loadNetworkParticipants(chain, accounts, isIRNAdmin, isMFG, isIRNNode) 
       console.log()
     } else {
       console.log(account.address, 'already whitelisted')
+      console.log()
     }
   }
 }
