@@ -60,8 +60,12 @@ function initATMIToken(safeMathAddress, estimateOnly) {
   return hash
 }
 
-function initNetworkSettings(estimateOnly) {
+function initNetworkSettings(estimateOnly, gasPriceGwei) {
   console.log('Configuring Networking Settings...')
+
+  var gasPriceWei = web3.toWei(gasPriceGwei, 'gwei')
+  console.log('gas price', gasPriceWei)
+
   var constructorByteCode = web3.eth.contract(NetworkSettingsJSON.abi).new.getData(
     regFee,
     actFee,
@@ -74,13 +78,17 @@ function initNetworkSettings(estimateOnly) {
 
   if(estimateOnly) return undefined
 
-  var hash = web3.eth.sendTransaction({from: ETHER_ADDR, data: constructorByteCode, gas: gas})
+  var hash = web3.eth.sendTransaction({from: ETHER_ADDR, data: constructorByteCode, gas: gas, gasPrice: gasPriceWei})
   console.log('txn hash', hash)
   return hash
 }
 
-function initAtonomi(ercAddress, settingsAddress, estimateOnly) {
+function initAtonomi(ercAddress, settingsAddress, estimateOnly, gasPriceGwei) {
   console.log('Configuring Atonomi...')
+
+  var gasPriceWei = web3.toWei(gasPriceGwei, 'gwei')
+  console.log('gas price', gasPriceWei)
+
   var constructorByteCode = web3.eth.contract(AtonomiJSON.abi).new.getData(
     ercAddress,
     settingsAddress,
@@ -93,7 +101,7 @@ function initAtonomi(ercAddress, settingsAddress, estimateOnly) {
 
   if(estimateOnly) return undefined
 
-  var hash = web3.eth.sendTransaction({from: ETHER_ADDR, data: constructorByteCode, gas: gas})
+  var hash = web3.eth.sendTransaction({from: ETHER_ADDR, data: constructorByteCode, gas: gas, gasPrice: gasPriceWei})
   console.log('txn hash', hash)
   return hash
 }
