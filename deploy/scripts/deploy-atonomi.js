@@ -133,13 +133,15 @@ function loadNetworkParticipants(chain, accounts, isIRNAdmin, isMFG, isIRNNode, 
 
     var exists = c.network.call(account.address)
     if (!exists[0] && !exists[1] && !exists[2] && exists.memberId !== '0x0000000000000000000000000000000000000000000000000000000000000000') {
+      var gasPriceWei = web3.toWei(gasPriceGwei, 'gwei')
+      console.log('gas price', gasPriceWei)
       var gas = c.addNetworkMember.estimateGas(account.address, isIRNAdmin, isMFG, isIRNNode, account.mfgId, {from: ETHER_ADDR})
       console.log('gas estimate', gas)
-      var h = c.addNetworkMember(account.address, isIRNAdmin, isMFG, isIRNNode, account.mfgId, {from: ETHER_ADDR, gas: gas, gasPrice: web3.toWei(gasPriceGwei, 'gwei')})
+      var h = c.addNetworkMember(account.address, isIRNAdmin, isMFG, isIRNNode, account.mfgId, {from: ETHER_ADDR, gas: gas, gasPrice: gasPriceWei})
       console.log(account.mfgId + ' added to network:', h)
       gas = c.setDefaultReputationForManufacturer.estimateGas(account.mfgId, account.rep, {from: ETHER_ADDR})
       console.log('gas estimate', gas)
-      h = c.setDefaultReputationForManufacturer(account.mfgId, account.rep, {from: ETHER_ADDR, gas: gas, gasPrice: web3.toWei(gasPriceGwei, 'gwei')})
+      h = c.setDefaultReputationForManufacturer(account.mfgId, account.rep, {from: ETHER_ADDR, gas: gas, gasPrice: gasPriceWei})
       console.log('rep is set:', h)
       console.log()
     } else {
