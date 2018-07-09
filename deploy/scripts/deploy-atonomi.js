@@ -125,7 +125,7 @@ var testAccounts = [
   { address: '0xd2b26461d769169c7b408b25cf96b23311aa3386', mfgId: 'HENR', rep: '6767-1-1' }
 ]
 
-function loadNetworkParticipants(chain, accounts, isIRNAdmin, isMFG, isIRNNode) {
+function loadNetworkParticipants(chain, accounts, isIRNAdmin, isMFG, isIRNNode, gasPriceGwei) {
   var c = getAtonomiContract(chain)
 
   for (var i = 0; i < accounts.length; i++) {
@@ -135,11 +135,11 @@ function loadNetworkParticipants(chain, accounts, isIRNAdmin, isMFG, isIRNNode) 
     if (!exists[0] && !exists[1] && !exists[2] && exists.memberId !== '0x0000000000000000000000000000000000000000000000000000000000000000') {
       var gas = c.addNetworkMember.estimateGas(account.address, isIRNAdmin, isMFG, isIRNNode, account.mfgId, {from: ETHER_ADDR})
       console.log('gas estimate', gas)
-      var h = c.addNetworkMember(account.address, isIRNAdmin, isMFG, isIRNNode, account.mfgId, {from: ETHER_ADDR, gas: gas})
+      var h = c.addNetworkMember(account.address, isIRNAdmin, isMFG, isIRNNode, account.mfgId, {from: ETHER_ADDR, gas: gas, gasPrice: web3.toWei(gasPriceGwei, 'gwei')})
       console.log(account.mfgId + ' added to network:', h)
       gas = c.setDefaultReputationForManufacturer.estimateGas(account.mfgId, account.rep, {from: ETHER_ADDR})
       console.log('gas estimate', gas)
-      h = c.setDefaultReputationForManufacturer(account.mfgId, account.rep, {from: ETHER_ADDR, gas: gas})
+      h = c.setDefaultReputationForManufacturer(account.mfgId, account.rep, {from: ETHER_ADDR, gas: gas, gasPrice: web3.toWei(gasPriceGwei, 'gwei')})
       console.log('rep is set:', h)
       console.log()
     } else {
