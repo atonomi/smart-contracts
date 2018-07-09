@@ -1,6 +1,6 @@
 # Atonomi Ethereum Smart Contracts
 
-<img src="hosho.png" alt="Hosho audit in process" height="125px"/>
+<img src="audit/EmblemB.png" alt="Hosho Audited" height="125px"/>
 
 ### MainNet Chain
 
