@@ -12,7 +12,7 @@ var initalSupply = 1000000000 * multiplier
 var chains = {
   mainnet: {
     token: '0x97aeb5066e1a590e868b511457beb6fe99d329f5',
-    atonomi: undefined,
+    atonomi: '0x899f3b22908ff5674f8237c321ab309417887606',
     settings: '0x2566c658331eac75d3b3ccd0e45c78d9cf6c4c4c'
   },
   kovan: {
