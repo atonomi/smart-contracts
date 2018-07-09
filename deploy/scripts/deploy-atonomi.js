@@ -130,15 +130,21 @@ function loadNetworkParticipants(chain, accounts, isIRNAdmin, isMFG, isIRNNode) 
 
   for (var i = 0; i < accounts.length; i++) {
     var account = accounts[i]
-    var gas = c.addNetworkMember.estimateGas(account.address, isIRNAdmin, isMFG, isIRNNode, account.mfgId, {from: ETHER_ADDR})
-    console.log('gas estimate', gas)
-    var h = c.addNetworkMember(account.address, isIRNAdmin, isMFG, isIRNNode, account.mfgId, {from: ETHER_ADDR, gas: gas})
-    console.log(account.mfgId + ' added to network:', h)
-    gas = c.setDefaultReputationForManufacturer.estimateGas(account.mfgId, account.rep, {from: ETHER_ADDR})
-    console.log('gas estimate', gas)
-    h = c.setDefaultReputationForManufacturer(account.mfgId, account.rep, {from: ETHER_ADDR, gas: gas})
-    console.log('rep is set:', h)
-    console.log()
+
+    var exists = c.network.call(account.address)
+    if (!exists[0] && !exists[1] && !exists[2] && exists.memberId !== '0x0000000000000000000000000000000000000000000000000000000000000000') {
+      var gas = c.addNetworkMember.estimateGas(account.address, isIRNAdmin, isMFG, isIRNNode, account.mfgId, {from: ETHER_ADDR})
+      console.log('gas estimate', gas)
+      var h = c.addNetworkMember(account.address, isIRNAdmin, isMFG, isIRNNode, account.mfgId, {from: ETHER_ADDR, gas: gas})
+      console.log(account.mfgId + ' added to network:', h)
+      gas = c.setDefaultReputationForManufacturer.estimateGas(account.mfgId, account.rep, {from: ETHER_ADDR})
+      console.log('gas estimate', gas)
+      h = c.setDefaultReputationForManufacturer(account.mfgId, account.rep, {from: ETHER_ADDR, gas: gas})
+      console.log('rep is set:', h)
+      console.log()
+    } else {
+      console.log(account.address, 'already whitelisted')
+    }
   }
 }
 
