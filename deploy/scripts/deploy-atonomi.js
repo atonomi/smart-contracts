@@ -141,6 +141,11 @@ function loadNetworkParticipants(chain, accounts, isIRNAdmin, isMFG, isIRNNode, 
     var gasPriceWei = web3.toWei(gasPriceGwei, 'gwei')
     console.log('gas price', gasPriceWei)
 
+    if (i % 100 === 0) {
+      // unlock every 100 iterations
+      personal.unlockAccount(ETHER_ADDR, ETHER_PWD, null)
+    }
+
     var exists = c.network.call(account.address)
     if (!exists[0] && !exists[1] && !exists[2] && exists[3] === '0x0000000000000000000000000000000000000000000000000000000000000000') {  
       var gas = c.addNetworkMember.estimateGas(account.address, isIRNAdmin, isMFG, isIRNNode, account.mfgId, {from: ETHER_ADDR})
