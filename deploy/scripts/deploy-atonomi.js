@@ -142,7 +142,7 @@ function loadNetworkParticipants(chain, accounts, isIRNAdmin, isMFG, isIRNNode, 
     console.log('gas price', gasPriceWei)
 
     var exists = c.network.call(account.address)
-    if (!exists[0] && !exists[1] && !exists[2] && exists.memberId === '0x0000000000000000000000000000000000000000000000000000000000000000') {  
+    if (!exists[0] && !exists[1] && !exists[2] && exists[3] === '0x0000000000000000000000000000000000000000000000000000000000000000') {  
       var gas = c.addNetworkMember.estimateGas(account.address, isIRNAdmin, isMFG, isIRNNode, account.mfgId, {from: ETHER_ADDR})
       console.log('gas estimate', gas)
       var h = c.addNetworkMember(account.address, isIRNAdmin, isMFG, isIRNNode, account.mfgId, {from: ETHER_ADDR, gas: gas, gasPrice: gasPriceWei})
