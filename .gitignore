@@ -12,3 +12,5 @@ deploy/scripts/atonomi-consts.js
 .DS_Store
 .vscode
 output/gasOutput.csv
+deploy/scripts/input.json
+deploy/scripts/output
