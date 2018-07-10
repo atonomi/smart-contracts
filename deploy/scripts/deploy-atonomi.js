@@ -142,7 +142,7 @@ function loadNetworkParticipants(chain, accounts, isIRNAdmin, isMFG, isIRNNode, 
     console.log('gas price', gasPriceWei)
 
     if (i === 0 || i % 10 === 0) {
-      // unlock every 10 iterations
+      console.log("unlocking...")
       personal.unlockAccount(ETHER_ADDR, ETHER_PWD, null)
     }
 
