@@ -137,7 +137,8 @@ function loadNetworkParticipants(chain, accounts, startIdx, endIdx, isIRNAdmin, 
   var c = getAtonomiContract(chain)
 
   for (var i = startIdx; i <= endIdx; i++) {
-    if (i === startIdx || i % 10 === 0) {
+    console.log("index", i)
+    if (i === startIdx || i % 5 === 0) {
       console.log("unlocking...")
       personal.unlockAccount(ETHER_ADDR, ETHER_PWD, null)
     }
@@ -154,7 +155,6 @@ function loadNetworkParticipants(chain, accounts, startIdx, endIdx, isIRNAdmin, 
       console.log(account.mfgId + ' added to network:', h)
     } else {
       console.log(account.address, 'already whitelisted')
-      console.log()
     }
 
     var score = c.defaultManufacturerReputations.call(account.mfgId)
