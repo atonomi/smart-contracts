@@ -141,7 +141,7 @@ function loadNetworkParticipants(chain, accounts, startIdx, isIRNAdmin, isMFG, i
     var gasPriceWei = web3.toWei(gasPriceGwei, 'gwei')
     console.log('gas price', gasPriceWei)
 
-    if (i === 0 || i % 10 === 0) {
+    if (i === startIdx || i % 10 === 0) {
       console.log("unlocking...")
       personal.unlockAccount(ETHER_ADDR, ETHER_PWD, null)
     }
