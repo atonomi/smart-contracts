@@ -133,9 +133,8 @@ var testAccounts = [
   { address: '0xd2b26461d769169c7b408b25cf96b23311aa3386', mfgId: 'HENR' }
 ]
 
-function loadNetworkParticipants(chain, accounts, startIdx, endIdx, isIRNAdmin, isMFG, isIRNNode, gasPriceGwei) {
+function loadNetworkParticipants(chain, accounts, startIdx, endIdx, isIRNAdmin, isMFG, isIRNNode, gasPriceGwei, nonce) {
   var c = getAtonomiContract(chain)
-
   for (var i = startIdx; i <= endIdx; i++) {
     console.log("index", i)
     if (i === startIdx || i % 5 === 0) {
@@ -149,9 +148,10 @@ function loadNetworkParticipants(chain, accounts, startIdx, endIdx, isIRNAdmin, 
 
     var exists = c.network.call(account.address)
     if (!exists[0] && !exists[1] && !exists[2] && exists[3] === '0x0000000000000000000000000000000000000000000000000000000000000000') {  
+      console.log("nonce", nonce)
       var gas = c.addNetworkMember.estimateGas(account.address, isIRNAdmin, isMFG, isIRNNode, account.mfgId, {from: ETHER_ADDR})
       console.log('gas estimate', gas)
-      var h = c.addNetworkMember(account.address, isIRNAdmin, isMFG, isIRNNode, account.mfgId, {from: ETHER_ADDR, gas: gas, gasPrice: gasPriceWei})
+      var h = c.addNetworkMember(account.address, isIRNAdmin, isMFG, isIRNNode, account.mfgId, {from: ETHER_ADDR, gas: gas, gasPrice: gasPriceWei, nonce: nonce++ })
       console.log(account.mfgId + ' added to network:', h)
     } else {
       console.log(account.address, 'already whitelisted')
@@ -159,10 +159,11 @@ function loadNetworkParticipants(chain, accounts, startIdx, endIdx, isIRNAdmin, 
 
     var score = c.defaultManufacturerReputations.call(account.mfgId)
     if(score === "0x0000000000000000000000000000000000000000000000000000000000000000") {
+      console.log("nonce", nonce)
       var defaultReputation = '6767-1-1'
       var gas = c.setDefaultReputationForManufacturer.estimateGas(account.mfgId, defaultReputation, {from: ETHER_ADDR})
       console.log('gas estimate', gas)
-      h = c.setDefaultReputationForManufacturer(account.mfgId, defaultReputation, {from: ETHER_ADDR, gas: gas, gasPrice: gasPriceWei})
+      h = c.setDefaultReputationForManufacturer(account.mfgId, defaultReputation, {from: ETHER_ADDR, gas: gas, gasPrice: gasPriceWei, nonce: nonce++})
       console.log('rep is set:', h)
       console.log()
     } else {
