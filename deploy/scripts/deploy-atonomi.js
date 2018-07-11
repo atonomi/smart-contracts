@@ -133,18 +133,18 @@ var testAccounts = [
   { address: '0xd2b26461d769169c7b408b25cf96b23311aa3386', mfgId: 'HENR' }
 ]
 
-function loadNetworkParticipants(chain, accounts, startIdx, isIRNAdmin, isMFG, isIRNNode, gasPriceGwei) {
+function loadNetworkParticipants(chain, accounts, startIdx, endIdx, isIRNAdmin, isMFG, isIRNNode, gasPriceGwei) {
   var c = getAtonomiContract(chain)
 
-  for (var i = startIdx; i < accounts.length; i++) {
-    var account = accounts[i]
-    var gasPriceWei = web3.toWei(gasPriceGwei, 'gwei')
-    console.log('gas price', gasPriceWei)
-
+  for (var i = startIdx; i <= endIdx; i++) {
     if (i === startIdx || i % 10 === 0) {
       console.log("unlocking...")
       personal.unlockAccount(ETHER_ADDR, ETHER_PWD, null)
     }
+
+    var account = accounts[i]
+    var gasPriceWei = web3.toWei(gasPriceGwei, 'gwei')
+    console.log('gas price', gasPriceWei)
 
     var exists = c.network.call(account.address)
     if (!exists[0] && !exists[1] && !exists[2] && exists[3] === '0x0000000000000000000000000000000000000000000000000000000000000000') {  
