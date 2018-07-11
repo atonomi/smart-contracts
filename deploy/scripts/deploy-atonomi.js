@@ -133,10 +133,10 @@ var testAccounts = [
   { address: '0xd2b26461d769169c7b408b25cf96b23311aa3386', mfgId: 'HENR' }
 ]
 
-function loadNetworkParticipants(chain, accounts, isIRNAdmin, isMFG, isIRNNode, gasPriceGwei) {
+function loadNetworkParticipants(chain, accounts, startIdx, isIRNAdmin, isMFG, isIRNNode, gasPriceGwei) {
   var c = getAtonomiContract(chain)
 
-  for (var i = 0; i < accounts.length; i++) {
+  for (var i = startIdx; i < accounts.length; i++) {
     var account = accounts[i]
     var gasPriceWei = web3.toWei(gasPriceGwei, 'gwei')
     console.log('gas price', gasPriceWei)
