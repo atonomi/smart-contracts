@@ -198,3 +198,16 @@ function getAtonomiState(chain) {
   console.log('Reputation Author Share', reputationAuthorShare + '%')
   console.log('Manufacturer Share', (100 - reputationAuthorShare) + '%')
 }
+
+function getParityPendingTransactions(account, cb) {
+  web3.currentProvider.sendAsync({
+    jsonrpc: '2.0',
+    method: 'parity_pendingTransactions',
+    params: [],
+    id: 1
+  }, function(err, results) {
+    cb(err, results.result.filter(function(item) {
+      return item.from === account
+    }))
+  })
+}
