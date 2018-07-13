@@ -23,7 +23,7 @@
 
 ### Setup
 
-Download and install the latest version of Solidity here: https://solidity.readthedocs.io/en/v0.4.22/installing-solidity.html (use Homebrew)
+Download and install the latest version of Solidity here: https://solidity.readthedocs.io/en/v0.4.23/installing-solidity.html (use Homebrew)
 
 Download and install the latest LTS version of Node.js here: https://nodejs.org/en/
 
@@ -89,11 +89,17 @@ This will drop you into a geth console that will have preloaded the Atonomi cons
 
 To deploy the Atonomi contracts run the following:
 ```
-> hash = initSafeMathLib()
-> hash = initATMIToken("address of safemathlib", false)
-> hash = initNetworkSettings(false)
-> hash = initAtonomi("address of erc token", "address of network settings contract", false)
+> var estimateOnly = false
+> var gasPriceGwei = 10
+> hash = initSafeMathLib(estimateOnly)
+> hash = initATMIToken("address of safemathlib", estimateOnly)
+> hash = initNetworkSettings(estimateOnly, gasPriceGwei)
+> hash = initAtonomi("address of erc token", "address of network settings contract", estimateOnly, gasPriceGwei)
 > receipt = getTransactionReceipt('txn hash')  // use this to ping if the transaction has been confirmed
+
+// to view pending transactions in mempool
+> var myPending = []
+> getParityPendingTransactions(ETHER_ADDR, function(err, results) { myPending = results })
 ```
 
 ### Unit Tests
