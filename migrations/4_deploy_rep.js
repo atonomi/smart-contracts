@@ -75,6 +75,7 @@ module.exports = function (deployer, network, accounts) {
       port: 9009,
       host: 'localhost',
       gas: 150000,
+      gasPrice: 10,
       abiFilePath: '../AtonomiGanache.json'
     }, null, 2))
     .then(irnconfig => fs.writeFile('../reputation-server-api/irn-config.json', irnconfig, 'utf8', function (err) {
