@@ -101,6 +101,7 @@ contract('Network Management', accounts => {
   beforeEach(async () => {
     app = await TestApp({ from: ctx.actors.owner })
     ctx.contracts.settings = await app.createProxy(NetworkSettings, 'NetworkSettings', 'initialize', [
+      ctx.actors.owner,
       regFee, actFee,
       repReward, repShare, blockThreshold]
     )
@@ -110,8 +111,17 @@ contract('Network Management', accounts => {
   })
 
   describe('proxy cannot be initialized', () => {
+    it('owner cannot be 0x0', async () => {
+      const fn = app.createProxy(NetworkSettings, 'NetworkSettings', 'initialize', [
+        0x0,
+        regFee, actFee,
+        repReward, repShare, blockThreshold])
+        await errors.expectRevert(fn)
+    })
+
     it('regFee cannot be 0', async () => {
       const fn = app.createProxy(NetworkSettings, 'NetworkSettings', 'initialize', [
+        ctx.actors.owner,
         0, actFee,
         repReward, repShare, blockThreshold])
       await errors.expectRevert(fn)
@@ -119,6 +129,7 @@ contract('Network Management', accounts => {
 
     it('actFee cannot be 0', async () => {
       const fn = app.createProxy(NetworkSettings, 'NetworkSettings', 'initialize', [
+        ctx.actors.owner,
         regFee, 0,
         repReward, repShare, blockThreshold])
       await errors.expectRevert(fn)
@@ -126,6 +137,7 @@ contract('Network Management', accounts => {
 
     it('repReward cannot be 0', async () => {
       const fn = app.createProxy(NetworkSettings, 'NetworkSettings', 'initialize', [
+        ctx.actors.owner,
         regFee, actFee,
         0, repShare, blockThreshold])
       await errors.expectRevert(fn)
@@ -133,6 +145,7 @@ contract('Network Management', accounts => {
 
     it('repShare must be greater than 0', async () => {
       const fn = app.createProxy(NetworkSettings, 'NetworkSettings', 'initialize', [
+        ctx.actors.owner,
         regFee, actFee,
         repReward, 0, blockThreshold])
       await errors.expectRevert(fn)
@@ -140,6 +153,7 @@ contract('Network Management', accounts => {
 
     it('repShare must be less than 100', async () => {
       const fn = app.createProxy(NetworkSettings, 'NetworkSettings', 'initialize', [
+        ctx.actors.owner,
         regFee, actFee,
         repReward, 100, blockThreshold])
       await errors.expectRevert(fn)

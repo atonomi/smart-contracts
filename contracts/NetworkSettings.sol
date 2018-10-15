@@ -75,18 +75,21 @@ contract NetworkSettings is Migratable, Ownable {
     /// @param _reputationIRNNodeShare share that the reputation author recieves (remaining goes to manufacturer)
     /// @param _blockThreshold the number of blocks that need to pass to receive the full reward
     function initialize(
+        address _owner,
         uint256 _registrationFee,
         uint256 _activationFee,
         uint256 _defaultReputationReward,
         uint256 _reputationIRNNodeShare,
         uint256 _blockThreshold
     ) public isInitializer("NetworkSettings", "0.0.1") {
+        require(_owner != address(0), "owner cannot be 0x0");
         require(_activationFee > 0, "activation fee must be greater than 0");
         require(_registrationFee > 0, "registration fee must be greater than 0");
         require(_defaultReputationReward > 0, "default reputation reward must be greater than 0");
         require(_reputationIRNNodeShare > 0, "new share must be larger than zero");
         require(_reputationIRNNodeShare < 100, "new share must be less than 100");
 
+        owner = _owner;
         activationFee = _activationFee;
         registrationFee = _registrationFee;
         defaultReputationReward = _defaultReputationReward;
