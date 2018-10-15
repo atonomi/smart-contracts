@@ -2,7 +2,7 @@ import { TestApp } from 'zos'
 import { expect } from 'chai'
 // import { DESTRUCTION } from 'dns';
 const NetworkSettings = artifacts.require('NetworkSettings')
-// const errors = require('./helpers/errors')
+const errors = require('./helpers/errors')
 const init = require('./helpers/init')
 
 contract('Network Management', accounts => {
@@ -107,6 +107,43 @@ contract('Network Management', accounts => {
     // ctx.contracts.token = await init.getAtonomiTokenContract(ctx.actors.owner, ctx.actors.releaseAgent)
     // ctx.contracts.atonomi = await init.getAtonomiContract(ctx.actors.owner, ctx.contracts.token.address)
     // ctx.contracts.settings = await NetworkSettings.at(await ctx.contracts.atonomi.settings())
+  })
+
+  describe('proxy cannot be initialized', () => {
+    it('regFee cannot be 0', async () => {
+      const fn = app.createProxy(NetworkSettings, 'NetworkSettings', 'initialize', [
+        0, actFee,
+        repReward, repShare, blockThreshold])
+      await errors.expectRevert(fn)
+    })
+
+    it('actFee cannot be 0', async () => {
+      const fn = app.createProxy(NetworkSettings, 'NetworkSettings', 'initialize', [
+        regFee, 0,
+        repReward, repShare, blockThreshold])
+      await errors.expectRevert(fn)
+    })
+
+    it('repReward cannot be 0', async () => {
+      const fn = app.createProxy(NetworkSettings, 'NetworkSettings', 'initialize', [
+        regFee, actFee,
+        0, repShare, blockThreshold])
+      await errors.expectRevert(fn)
+    })
+
+    it('repShare must be greater than 0', async () => {
+      const fn = app.createProxy(NetworkSettings, 'NetworkSettings', 'initialize', [
+        regFee, actFee,
+        repReward, 0, blockThreshold])
+      await errors.expectRevert(fn)
+    })
+
+    it('repShare must be less than 100', async () => {
+      const fn = app.createProxy(NetworkSettings, 'NetworkSettings', 'initialize', [
+        regFee, actFee,
+        repReward, 100, blockThreshold])
+      await errors.expectRevert(fn)
+    })
   })
 
   describe('proxy initialized', () => {
