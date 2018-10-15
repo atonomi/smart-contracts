@@ -116,7 +116,7 @@ contract('Network Management', accounts => {
         0x0,
         regFee, actFee,
         repReward, repShare, blockThreshold])
-        await errors.expectRevert(fn)
+      await errors.expectRevert(fn)
     })
 
     it('regFee cannot be 0', async () => {
