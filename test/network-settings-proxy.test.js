@@ -24,8 +24,8 @@ contract('Network Management', accounts => {
   const repReward = 1 * multiplier
   const repShare = 20
   const blockThreshold = 5760
-  const contributorReward = repReward * 0.2
-  const irnReward = repReward - contributorReward
+  // const contributorReward = repReward * 0.2
+  // const irnReward = repReward - contributorReward
 
   /*
   const testAdd = async (newMember, isIrnAdmin, isMFG, isIrnNode, memberId, from) => {
@@ -100,9 +100,10 @@ contract('Network Management', accounts => {
 
   beforeEach(async () => {
     app = await TestApp({ from: ctx.actors.owner })
-    ctx.contracts.settings = await app.createProxy(NetworkSettings, "NetworkSettings", "initialize", [
-        regFee, actFee,
-        repReward, repShare, blockThreshold])
+    ctx.contracts.settings = await app.createProxy(NetworkSettings, 'NetworkSettings', 'initialize', [
+      regFee, actFee,
+      repReward, repShare, blockThreshold]
+    )
     // ctx.contracts.token = await init.getAtonomiTokenContract(ctx.actors.owner, ctx.actors.releaseAgent)
     // ctx.contracts.atonomi = await init.getAtonomiContract(ctx.actors.owner, ctx.contracts.token.address)
     // ctx.contracts.settings = await NetworkSettings.at(await ctx.contracts.atonomi.settings())
@@ -115,9 +116,9 @@ contract('Network Management', accounts => {
     })
 
     it('has registration fee', async () => {
-        const fee = await ctx.contracts.settings.registrationFee.call()
-        expect(fee.toString(10)).to.be.equal(regFee.toString(10))
-      })
+      const fee = await ctx.contracts.settings.registrationFee.call()
+      expect(fee.toString(10)).to.be.equal(regFee.toString(10))
+    })
   })
 
   /*
