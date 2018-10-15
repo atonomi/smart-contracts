@@ -4,7 +4,7 @@ const NetworkSettings = artifacts.require('NetworkSettings')
 const errors = require('./helpers/errors')
 const init = require('./helpers/init')
 
-contract('Network Management', accounts => {
+contract('Network Settings', accounts => {
   let app
 
   const ctx = {

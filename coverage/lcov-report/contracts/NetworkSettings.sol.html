@@ -22,12 +22,12 @@
       <div class='fl pad1y space-right2'>
         <span class="strong">100% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>35/35</span>
+        <span class='fraction'>37/37</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">93.33% </span>
+        <span class="strong">100% </span>
         <span class="quiet">Branches</span>
-        <span class='fraction'>28/30</span>
+        <span class='fraction'>32/32</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">100% </span>
@@ -37,7 +37,7 @@
       <div class='fl pad1y space-right2'>
         <span class="strong">100% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>35/35</span>
+        <span class='fraction'>37/37</span>
       </div>
     </div>
   </div>
@@ -192,7 +192,12 @@
 147
 148
 149
-150</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+150
+151
+152
+153
+154
+155</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -273,17 +278,22 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">95×</span>
-<span class="cline-any cline-yes">94×</span>
-<span class="cline-any cline-yes">93×</span>
-<span class="cline-any cline-yes">92×</span>
-<span class="cline-any cline-yes">91×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">91×</span>
-<span class="cline-any cline-yes">91×</span>
-<span class="cline-any cline-yes">91×</span>
-<span class="cline-any cline-yes">91×</span>
-<span class="cline-any cline-yes">91×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">68×</span>
+<span class="cline-any cline-yes">67×</span>
+<span class="cline-any cline-yes">66×</span>
+<span class="cline-any cline-yes">65×</span>
+<span class="cline-any cline-yes">64×</span>
+<span class="cline-any cline-yes">63×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">62×</span>
+<span class="cline-any cline-yes">62×</span>
+<span class="cline-any cline-yes">62×</span>
+<span class="cline-any cline-yes">62×</span>
+<span class="cline-any cline-yes">62×</span>
+<span class="cline-any cline-yes">62×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -335,7 +345,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">3×</span>
 <span class="cline-any cline-yes">2×</span>
 <span class="cline-any cline-yes">2×</span>
 <span class="cline-any cline-yes">2×</span>
@@ -343,12 +353,13 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">pragma solidity ^0.4.23; // solhint-disable-line
 &nbsp;
+import "zos-lib/contracts/migrations/Migratable.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 &nbsp;
 &nbsp;
 /// @title Atonomi Network Settings
 /// @notice This contract controls all owner configurable variables in the network
-contract NetworkSettings is Ownable {
+contract NetworkSettings is Migratable, Ownable {
     /// @title Registration Fee
     /// @notice Manufacturer pays token to register a device
     /// @notice Manufacturer will recieve a share in any reputation updates for a device
@@ -416,18 +427,22 @@ contract NetworkSettings is Ownable {
     /// @param _defaultReputationReward initial reputation reward on the network
     /// @param _reputationIRNNodeShare share that the reputation author recieves (remaining goes to manufacturer)
     /// @param _blockThreshold the number of blocks that need to pass to receive the full reward
-    constructor(
+    function initialize(
+        address _owner,
         uint256 _registrationFee,
         uint256 _activationFee,
         uint256 _defaultReputationReward,
         uint256 _reputationIRNNodeShare,
-        uint256 _blockThreshold) public {
+        uint256 _blockThreshold
+    ) public isInitializer("NetworkSettings", "0.0.1") {
+        require(_owner != address(0), "owner cannot be 0x0");
         require(_activationFee &gt; 0, "activation fee must be greater than 0");
         require(_registrationFee &gt; 0, "registration fee must be greater than 0");
         require(_defaultReputationReward &gt; 0, "default reputation reward must be greater than 0");
         require(_reputationIRNNodeShare &gt; 0, "new share must be larger than zero");
-        <span class="missing-if-branch" title="else path not taken" >E</span>require(_reputationIRNNodeShare &lt; 100, "new share must be less than 100");
+        require(_reputationIRNNodeShare &lt; 100, "new share must be less than 100");
 &nbsp;
+        owner = _owner;
         activationFee = _activationFee;
         registrationFee = _registrationFee;
         defaultReputationReward = _defaultReputationReward;
@@ -484,7 +499,7 @@ contract NetworkSettings is Ownable {
     /// @param _newBlockThreshold new value for all token pools
     /// @return true if successful, otherwise false
     function setRewardBlockThreshold(uint _newBlockThreshold) public onlyOwner returns (bool) {
-        <span class="missing-if-branch" title="else path not taken" >E</span>require(_newBlockThreshold != blockThreshold, "must be different");
+        require(_newBlockThreshold != blockThreshold, "must be different");
         blockThreshold = _newBlockThreshold;
         emit RewardBlockThresholdChanged(msg.sender, _newBlockThreshold);
         return true;
@@ -496,7 +511,7 @@ contract NetworkSettings is Ownable {
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Jun 08 2018 10:53:59 GMT-0700 (PDT)
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Mon Oct 15 2018 15:07:01 GMT-0700 (PDT)
 </div>
 </div>
 <script src="../prettify.js"></script>
