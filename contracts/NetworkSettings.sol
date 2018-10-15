@@ -1,11 +1,12 @@
 pragma solidity ^0.4.23; // solhint-disable-line
 
+import "zos-lib/contracts/migrations/Migratable.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 
 
 /// @title Atonomi Network Settings
 /// @notice This contract controls all owner configurable variables in the network
-contract NetworkSettings is Ownable {
+contract NetworkSettings is Migratable, Ownable {
     /// @title Registration Fee
     /// @notice Manufacturer pays token to register a device
     /// @notice Manufacturer will recieve a share in any reputation updates for a device
@@ -73,12 +74,13 @@ contract NetworkSettings is Ownable {
     /// @param _defaultReputationReward initial reputation reward on the network
     /// @param _reputationIRNNodeShare share that the reputation author recieves (remaining goes to manufacturer)
     /// @param _blockThreshold the number of blocks that need to pass to receive the full reward
-    constructor(
+    function initialize(
         uint256 _registrationFee,
         uint256 _activationFee,
         uint256 _defaultReputationReward,
         uint256 _reputationIRNNodeShare,
-        uint256 _blockThreshold) public {
+        uint256 _blockThreshold
+    ) public isInitializer("NetworkSettings", "0.0.1") {
         require(_activationFee > 0, "activation fee must be greater than 0");
         require(_registrationFee > 0, "registration fee must be greater than 0");
         require(_defaultReputationReward > 0, "default reputation reward must be greater than 0");

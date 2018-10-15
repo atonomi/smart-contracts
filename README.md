@@ -27,9 +27,10 @@ Download and install the latest version of Solidity here: https://solidity.readt
 
 Download and install the latest LTS version of Node.js here: https://nodejs.org/en/
 
-Also have `truffle` and `ganache-cli` installed globally
+Also have `zos`, `truffle` and `ganache-cli` installed globally
 
 ```
+$ npm install --global zos
 $ npm install -g truffle
 $ npm install -g ganache-cli
 ```
