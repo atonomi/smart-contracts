@@ -1,6 +1,5 @@
 import { TestApp } from 'zos'
 import { expect } from 'chai'
-// import { DESTRUCTION } from 'dns';
 const NetworkSettings = artifacts.require('NetworkSettings')
 const errors = require('./helpers/errors')
 const init = require('./helpers/init')
@@ -11,8 +10,6 @@ contract('Network Management', accounts => {
   const ctx = {
     actors: init.getTestActorsContext(accounts),
     contracts: {
-      token: null,
-      atonomi: null,
       settings: null
     }
   }
@@ -24,79 +21,6 @@ contract('Network Management', accounts => {
   const repReward = 1 * multiplier
   const repShare = 20
   const blockThreshold = 5760
-  // const contributorReward = repReward * 0.2
-  // const irnReward = repReward - contributorReward
-
-  /*
-  const testAdd = async (newMember, isIrnAdmin, isMFG, isIrnNode, memberId, from) => {
-    const success = await ctx.contracts.atonomi.addNetworkMember.call(
-      newMember,
-      isIrnAdmin,
-      isMFG,
-      isIrnNode,
-      memberId,
-      { from: from })
-    expect(success).to.be.equal(true)
-
-    const tx = await ctx.contracts.atonomi.addNetworkMember(
-      newMember,
-      isIrnAdmin,
-      isMFG,
-      isIrnNode,
-      memberId,
-      { from: from })
-
-    expect(tx.logs.length).to.be.equal(1)
-    const log = tx.logs[0]
-    expect(log.event).to.be.equal('NetworkMemberAdded')
-    expect(log.args._sender).to.be.equal(from)
-    expect(log.args._member).to.be.equal(newMember)
-    expect(memberId).to.be.equal(web3.toAscii(log.args._memberId).replace(/\u0000/g, ''))
-
-    const m = await ctx.contracts.atonomi.network(newMember)
-    expect(m[0]).to.be.equal(isIrnAdmin)
-    expect(m[1]).to.be.equal(isMFG)
-    expect(m[2]).to.be.equal(isIrnNode)
-    expect(memberId).to.be.equal(web3.toAscii(m[3]).replace(/\u0000/g, ''))
-
-    const wallet = await ctx.contracts.atonomi.manufacturerRewards(memberId)
-    const pool = await ctx.contracts.atonomi.pools(newMember)
-    if (isMFG) {
-      expect(wallet).to.be.equal(newMember)
-      expect(pool[0].toString(10)).to.be.equal('0')
-      expect(pool[1].toString(10)).to.be.equal(repReward.toString(10))
-    } else {
-      expect(wallet).to.be.equal('0x0000000000000000000000000000000000000000')
-      expect(pool[0].toString(10)).to.be.equal('0')
-      expect(pool[1].toString(10)).to.be.equal('0')
-    }
-  }
-
-  const testRemove = async (member, memberId, from) => {
-    const success = await ctx.contracts.atonomi.removeNetworkMember.call(member, {from: from})
-    expect(success).to.be.equal(true)
-
-    const tx = await ctx.contracts.atonomi.removeNetworkMember(member, {from: from})
-    expect(tx.logs.length).to.be.equal(1)
-    expect(tx.logs[0].event).to.be.equal('NetworkMemberRemoved')
-    expect(tx.logs[0].args._sender).to.be.equal(from)
-    expect(tx.logs[0].args._member).to.be.equal(member)
-    expect(web3.toAscii(tx.logs[0].args._memberId).replace(/\u0000/g, '')).to.be.equal(memberId)
-
-    const m = await ctx.contracts.atonomi.network(member)
-    expect(m[0]).to.be.equal(false)
-    expect(m[1]).to.be.equal(false)
-    expect(m[2]).to.be.equal(false)
-    expect(web3.toAscii(m[3]).replace(/\u0000/g, '')).to.be.equal('')
-
-    const wallet = await ctx.contracts.atonomi.manufacturerRewards(memberId)
-    expect(wallet).to.be.equal('0x0000000000000000000000000000000000000000')
-
-    const pool = await ctx.contracts.atonomi.pools(member)
-    expect(pool[0].toString(10)).to.be.equal('0')
-    expect(pool[1].toString(10)).to.be.equal('0')
-  }
-  */
 
   beforeEach(async () => {
     app = await TestApp({ from: ctx.actors.owner })
@@ -192,71 +116,25 @@ contract('Network Management', accounts => {
     })
   })
 
-  /*
-  describe('initialized', () => {
-    it('has owner', async () => {
-      const owner = await ctx.contracts.atonomi.owner.call()
-      expect(owner).to.be.equal(ctx.actors.owner)
-    })
+  describe('registration fees', () => {
+    const newRegFee = regFee * 2
 
-    it('has token', async () => {
-      const token = await ctx.contracts.atonomi.token.call()
-      expect(token).to.be.equal(ctx.contracts.token.address)
-    })
+    it('owner can set fee', async () => {
+      const success = await ctx.contracts.settings.setRegistrationFee.call(newRegFee, {from: ctx.actors.owner})
+      expect(success).to.be.equal(true)
 
-    it('has registration fee', async () => {
-      const fee = await ctx.contracts.settings.registrationFee.call()
-      expect(fee.toString(10)).to.be.equal(regFee.toString(10))
-    })
+      const tx = await ctx.contracts.settings.setRegistrationFee(newRegFee, {from: ctx.actors.owner})
+      expect(tx.logs.length).to.be.equal(1)
+      expect(tx.logs[0].event).to.be.equal('RegistrationFeeUpdated')
+      expect(tx.logs[0].args._sender).to.be.equal(ctx.actors.owner)
+      expect(tx.logs[0].args._amount.toString(10)).to.be.equal(newRegFee.toString(10))
 
-    it('has activation fee', async () => {
-      const fee = await ctx.contracts.settings.activationFee.call()
-      expect(fee.toString(10)).to.be.equal(actFee.toString(10))
-    })
-
-    it('has default reputation reward', async () => {
-      const fee = await ctx.contracts.settings.defaultReputationReward.call()
-      expect(fee.toString(10)).to.be.equal(repReward.toString(10))
-    })
-
-    it('has correct reward split with contributor and irn node', async () => {
-      const deviceId = 'somedeviceid'
-      const isIrnAdmin = false
-      const isMFG = true
-      const isIrnNode = false
-      const memberId = 'APPLE'
-      await testAdd(ctx.actors.alice, isIrnAdmin, isMFG, isIrnNode, memberId, ctx.actors.owner)
-      const rewards = await ctx.contracts.atonomi.getReputationRewards(ctx.actors.irnNode, ctx.actors.alice, deviceId)
-      expect(rewards[0].toString(10)).to.be.equal(contributorReward.toString(10))
-      expect(rewards[1].toString(10)).to.be.equal(irnReward.toString(10))
-    })
-
-    it('cannot deploy with 0x0 token', async () => {
-      const fn = init.getAtonomiContract(ctx.actors.owner, '0x0')
-      await errors.expectRevert(fn)
-    })
-
-    it('cannot deploy with 0 token fees', async () => {
-      const fees = [
-        {reg: 0, act: actFee, reward: repReward, share: repShare, block: blockThreshold},
-        {reg: regFee, act: 0, reward: repReward, share: repShare, block: blockThreshold},
-        {reg: regFee, act: actFee, reward: 0, share: repShare, block: blockThreshold},
-        {reg: regFee, act: actFee, reward: repReward, share: 0, block: blockThreshold}
-      ]
-
-      for (let i = 0; i < fees.length; i++) {
-        const testCase = fees[i]
-        const fn = NetworkSettings.new(
-          testCase.reg,
-          testCase.act,
-          testCase.reward,
-          testCase.share,
-          testCase.block, {from: ctx.actors.owner})
-        await errors.expectRevert(fn)
-      }
+      const fee = await ctx.contracts.settings.registrationFee()
+      expect(fee.toString(10)).to.be.equal(newRegFee.toString(10))
     })
   })
 
+  /*
   describe('IRN Admins', () => {
     describe('add IRN admin', () => {
       it('owner can add', async () => {
