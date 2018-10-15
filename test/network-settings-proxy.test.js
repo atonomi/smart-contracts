@@ -119,6 +119,11 @@ contract('Network Management', accounts => {
       const fee = await ctx.contracts.settings.registrationFee.call()
       expect(fee.toString(10)).to.be.equal(regFee.toString(10))
     })
+
+    it('has activation fee', async () => {
+      const fee = await ctx.contracts.settings.activationFee.call()
+      expect(fee.toString(10)).to.be.equal(actFee.toString(10))
+    })
   })
 
   /*
