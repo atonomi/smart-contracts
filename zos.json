@@ -4,6 +4,7 @@
   "contracts": {
     "NetworkSettings": "NetworkSettings",
     "ReputationManager": "ReputationManager",
-    "NetworkMemberManager": "NetworkMemberManager"
+    "NetworkMemberManager": "NetworkMemberManager",
+    "TokenPool": "TokenPool"
   }
 }
