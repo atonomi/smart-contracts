@@ -108,7 +108,9 @@ To deploy the Atonomi contracts run the following:
 To execute the full unit test truffle suite: 
 
 ```
+$ export NODE_ENV=test truffle test
 $ npm test
+$ TESTFILE=test/filename.test.js npm run test:single
 ```
 
 ### Unit Test Coverage Report
@@ -116,6 +118,7 @@ $ npm test
 To execute the full unit test truffle suite and generate test coverage report:
 
 ```
+$ export NODE_ENV=test truffle test
 $ npm run test:coverage
 ```
 

@@ -1,4 +1,4 @@
-pragma solidity ^0.4.23; // solhint-disable-line
+pragma solidity ^0.4.24;
 
 import "zos-lib/contracts/migrations/Migratable.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
@@ -69,6 +69,7 @@ contract NetworkSettings is Migratable, Ownable {
     );
 
     /// @notice Constructor for Atonomi Reputation contract
+    /// @param _owner initial owner of the contract
     /// @param _registrationFee initial registration fee on the network
     /// @param _activationFee initial activation fee on the network
     /// @param _defaultReputationReward initial reputation reward on the network
