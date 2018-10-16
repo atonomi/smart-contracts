@@ -77,4 +77,7 @@ contract('Reputation Manager', accounts => {
       expect(tokenAddr).to.be.equal(ctx.contracts.token.address)
     })
   })
+
+  describe('update reputation', () => {
+  })
 })
