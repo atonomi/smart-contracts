@@ -1,5 +1,4 @@
 import { expect } from 'chai'
-const EternalStorage = artifacts.require('EternalStorage')
 const init = require('./helpers/init')
 
 contract('EternalStorage', accounts => {
@@ -11,7 +10,7 @@ contract('EternalStorage', accounts => {
   }
 
   beforeEach(async () => {
-    ctx.contracts.storage = await EternalStorage.new({from: ctx.actors.owner})
+    ctx.contracts.storage = await init.getStorageContract(ctx.actors.owner)
   })
 
   const testCases = [

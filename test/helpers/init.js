@@ -28,6 +28,11 @@ export async function getAtonomiTokenContract (owner, releaseAgent) {
   return c
 }
 
+export async function getStorageContract (owner) {
+  const EternalStorage = artifacts.require('EternalStorage')
+  return EternalStorage.new({from: owner})
+}
+
 export async function getAtonomiContract (owner, tokenAddr) {
   const Atonomi = artifacts.require('Atonomi')
   const NetworkSettings = artifacts.require('NetworkSettings')

@@ -2,6 +2,7 @@
   "name": "atonomi-smart-contracts",
   "version": "0.1.0",
   "contracts": {
-    "NetworkSettings": "NetworkSettings"
+    "NetworkSettings": "NetworkSettings",
+    "ReputationManager": "ReputationManager"
   }
 }
