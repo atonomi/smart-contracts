@@ -1,0 +1,467 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for contracts/NetworkMemberManager.sol</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../index.html">all files</a> / <a href="index.html">contracts/</a> NetworkMemberManager.sol
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>0/21</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>0/26</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>0/4</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>0/35</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line low'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">pragma solidity ^0.4.24;
+&nbsp;
+import "zos-lib/contracts/migrations/Migratable.sol";
+import "zeppelin-solidity/contracts/ownership/Ownable.sol";
+import "./EternalStorage.sol";
+&nbsp;
+&nbsp;
+contract NetworkMemberManager is Migratable, Ownable {
+    /// @notice emitted on successful addition of network member address
+    /// @param _sender ethereum account of participant that made the change
+    /// @param _member address of added member
+    /// @param _memberId manufacturer id for manufacturer, otherwise 0x0
+    event NetworkMemberAdded(
+        address indexed _sender,
+        address indexed _member,
+        bytes32 indexed _memberId
+    );
+&nbsp;
+    /// @notice emitted on successful removal of network member address
+    /// @param _sender ethereum account of participant that made the change
+    /// @param _member address of removed member
+    /// @param _memberId manufacturer id for manufacturer, otherwise 0x0
+    event NetworkMemberRemoved(
+        address indexed _sender,
+        address indexed _member,
+        bytes32 indexed _memberId
+    );
+&nbsp;
+    /// @title Atonomi Storage
+    EternalStorage public atonomiStorage;
+&nbsp;
+    ///MODIFIERS///
+    /// @notice only IRNAdmins or Owner can call, otherwise throw
+<span class="fstat-no" title="function not covered" >    modifier onlyIRN(</span>) {
+<span class="cstat-no" title="statement not covered" >        require(owner == msg.sender || atonomiStorage.getBool(</span>
+            keccak256("network", msg.sender, "isIRNAdmin")),
+            "must be owner or an irn admin");
+        _;
+    }
+&nbsp;
+    /// @notice Initialize the Network Member Manager Contract
+    /// @param _owner is the owner of the contract
+    /// @param _storage is the Eternal Storage contract address
+<span class="fstat-no" title="function not covered" >    function initialize (</span>
+        address _owner,
+        address _storage)
+    public isInitializer("NetworkMemberManager", "0.0.1") {
+<span class="cstat-no" title="statement not covered" >        require(_owner != address(0), "owner cannot be 0x0")</span>;
+<span class="cstat-no" title="statement not covered" >        require(_storage != address(0), "storage address cannot be 0x0")</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        owner = _owner</span>;
+<span class="cstat-no" title="statement not covered" >        atonomiStorage = EternalStorage(_storage)</span>;
+    }
+&nbsp;
+    ///
+    /// WHITELIST PARTICIPANT MANAGEMENT
+    ///
+    /// @notice add a member to the network
+    /// @param _member ethereum address of member to be added
+    /// @param _isIRNAdmin true if an irn admin, otherwise false
+    /// @param _isManufacturer true if an manufactuter, otherwise false
+    /// @param _memberId manufacturer id for manufacturers, otherwise 0x0
+    /// @return true if successful, otherwise false
+    /// @dev _memberId is only relevant for manufacturer, but is flexible to allow use for other purposes
+    /// @dev msg.sender is expected to be either owner or irn admin
+<span class="fstat-no" title="function not covered" >    function addNetworkMember(</span>
+        address _member,
+        bool _isIRNAdmin,
+        bool _isManufacturer,
+        bool _isIRNNode,
+        bytes32 _memberId)
+        public onlyIRN returns(bool)
+    {
+<span class="cstat-no" title="statement not covered" >        require(!atonomiStorage.getBool(keccak256("network", _member, "isIRNAdmin")), "already an irn admin")</span>;
+<span class="cstat-no" title="statement not covered" >        require(!atonomiStorage.getBool(keccak256("network", _member, "isManufacturer")), "already a manufacturer")</span>;
+<span class="cstat-no" title="statement not covered" >        require(!atonomiStorage.getBool(keccak256("network", _member, "isIRNNode")), "already an irn node")</span>;
+<span class="cstat-no" title="statement not covered" >        require(atonomiStorage.getUint(keccak256("network", _member, "memberId")) != 0, "already assigned a member id")</span>;
+&nbsp;
+        atonomiStorage.setBool(keccak256("network", _member, "isIRNAdmin"), _isIRNAdmin);
+        atonomiStorage.setBool(keccak256("network", _member, "isManufacturer"), _isManufacturer);
+        atonomiStorage.setBool(keccak256("network", _member, "isIRNNode"), _isIRNNode);
+        atonomiStorage.setBytes32(keccak256("network", _member, "memberId"), _memberId);
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        if (_isManufacturer) {</span>
+<span class="cstat-no" title="statement not covered" >            require(_memberId != 0, "manufacturer id is required")</span>;
+&nbsp;
+            // keep lookup for rewards in sync
+<span class="cstat-no" title="statement not covered" >            require(atonomiStorage.getAddress(</span>
+                keccak256("manufacturerRewards", _memberId)) == address(0), "manufacturer is already assigned");
+            atonomiStorage.setAddress(
+                keccak256("manufacturerRewards", _memberId), _member);
+&nbsp;
+            // set reputation reward if token pool doesnt exist
+<span class="cstat-no" title="statement not covered" >            if (atonomiStorage.getAddress(</span>
+                keccak256("pools", _member, "rewardAmount")) == 0) {
+                //TODO This check may need revision
+                atonomiStorage.setUint(
+                    keccak256("pools", _member, "rewardAmount"),
+                    atonomiStorage.getUint(keccak256("defaultReputationReward")));
+            }
+        }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        emit NetworkMemberAdded(msg.sender, _member, _memberId);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        return true;</span>
+    }
+&nbsp;
+    /// @notice remove a member from the network
+    /// @param _member ethereum address of member to be removed
+    /// @return true if successful, otherwise false
+    /// @dev msg.sender is expected to be either owner or irn admin
+<span class="fstat-no" title="function not covered" >    function removeNetworkMember(address _member) public onlyIRN returns(bool</span>) {
+<span class="cstat-no" title="statement not covered" >        bytes32 memberId = atonomiStorage.getBytes32(keccak256("network", _member, "memberId"))</span>;
+<span class="cstat-no" title="statement not covered" >        bool isManufacturer = atonomiStorage.getBool(keccak256("network", _member, "isManufacturer"))</span>;
+<span class="cstat-no" title="statement not covered" >        if (isManufacturer) {</span>
+            // remove token pool if there is a zero balance
+<span class="cstat-no" title="statement not covered" >            if (atonomiStorage.getAddress(keccak256("pools", _member, "balance")) == 0) {</span>
+                atonomiStorage.deleteUint(keccak256("pools", _member, "balance"));
+                atonomiStorage.deleteUint(keccak256("pools", _member, "rewardAmount"));
+            }
+&nbsp;
+            // keep lookup with rewards in sync
+            atonomiStorage.deleteUint(keccak256("manufacturerRewards", memberId));
+        }
+&nbsp;
+        atonomiStorage.deleteBool(keccak256("network", _member, "isIRNAdmin"));
+        atonomiStorage.deleteBool(keccak256("network", _member, "isManufacturer"));
+        atonomiStorage.deleteBool(keccak256("network", _member, "isIRNNode"));
+        atonomiStorage.deleteBytes32(keccak256("network", _member, "memberId"));
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        emit NetworkMemberRemoved(msg.sender, _member, memberId);</span>
+<span class="cstat-no" title="statement not covered" >        return true;</span>
+    }
+}
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Tue Oct 16 2018 16:13:09 GMT-0700 (PDT)
+</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>

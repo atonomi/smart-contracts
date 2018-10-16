@@ -14,6 +14,11 @@ export function getTestActorsContext (accounts) {
 
 const tokenDecimals = 18
 const multiplier = 10 ** tokenDecimals
+const regFee = 1 * multiplier
+const actFee = 1 * multiplier
+const repReward = 1 * multiplier
+const repShare = 20
+const blockThreshold = 5760
 
 export async function getAtonomiTokenContract (owner, releaseAgent) {
   const AtonomiToken = artifacts.require('AMLToken')
@@ -26,6 +31,15 @@ export async function getAtonomiTokenContract (owner, releaseAgent) {
   await c.setReleaseAgent(releaseAgent, {from: owner})
   await c.releaseTokenTransfer({from: releaseAgent})
   return c
+}
+
+export async function getNetworkSettingsContract (app, owner) {
+  const NetworkSettings = artifacts.require('NetworkSettings')
+  return app.createProxy(NetworkSettings, 'NetworkSettings', 'initialize', [
+    owner,
+    regFee, actFee,
+    repReward, repShare, blockThreshold]
+  )
 }
 
 export async function getStorageContract (owner) {

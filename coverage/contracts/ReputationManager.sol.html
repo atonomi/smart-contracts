@@ -1,0 +1,734 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for contracts/ReputationManager.sol</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../index.html">all files</a> / <a href="index.html">contracts/</a> ReputationManager.sol
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>0/42</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>0/30</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>0/8</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>0/50</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line low'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">pragma solidity ^0.4.24;
+&nbsp;
+import "zos-lib/contracts/migrations/Migratable.sol";
+import "zeppelin-solidity/contracts/lifecycle/Pausable.sol";
+import "zeppelin-solidity/contracts/math/SafeMath.sol";
+import "./EternalStorage.sol";
+&nbsp;
+&nbsp;
+/// @title ERC-20 Token Standard
+/// @author Fabian Vogelsteller &lt;fabian@ethereum.org&gt;, Vitalik Buterin &lt;vitalik.buterin@ethereum.org&gt;
+/// @dev https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20.md
+interface ERC20Interface {
+    function decimals() public constant returns (uint8);
+    function totalSupply() public constant returns (uint);
+    function balanceOf(address tokenOwner) public constant returns (uint balance);
+    function allowance(address tokenOwner, address spender) public constant returns (uint remaining);
+    function transfer(address to, uint tokens) public returns (bool success);
+    function approve(address spender, uint tokens) public returns (bool success);
+    function transferFrom(address from, address to, uint tokens) public returns (bool success);
+&nbsp;
+    event Transfer(address indexed from, address indexed to, uint tokens);
+    event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
+}
+&nbsp;
+&nbsp;
+contract ReputationManager is Migratable, Ownable, Pausable {
+    using SafeMath for uint256;
+&nbsp;
+    /// @title ATMI Token
+    /// @notice Standard ERC20 Token
+    /// @dev AMLToken source: https://github.com/TokenMarketNet/ico/blob/master/contracts/AMLToken.sol
+    ERC20Interface public token;
+&nbsp;
+    ///
+    /// EVENTS 
+    ///
+    /// @notice emitted on reputation change for a device
+    /// @param _deviceId device id of the target device
+    /// @param _deviceType is the type of device categorized by the manufacturer
+    /// @param _newScore updated reputation score
+    /// @param _irnNode IRN node submitting the new reputation
+    /// @param _irnReward tokens awarded to irn node
+    /// @param _manufacturerWallet manufacturer associated with the device is rewared a share of tokens
+    /// @param _manufacturerReward tokens awarded to contributor
+    event ReputationScoreUpdated(
+        bytes32 indexed _deviceId,
+        bytes32 _deviceType,
+        bytes32 _newScore,
+        address indexed _irnNode,
+        uint256 _irnReward,
+        address indexed _manufacturerWallet,
+        uint256 _manufacturerReward
+    );
+&nbsp;
+    /// @notice emitted everytime the default reputation for a manufacturer changes
+    /// @param _sender ethereum account of participant that made the change
+    /// @param _manufacturerId of the manufacturer
+    /// @param _newDefaultScore to use for newly registered devices
+    event DefaultReputationScoreChanged(
+        address indexed _sender,
+        bytes32 indexed _manufacturerId,
+        bytes32 _newDefaultScore
+    );
+&nbsp;
+    /// @title Atonomi Storage
+    EternalStorage public atonomiStorage;
+&nbsp;
+    ///
+    /// MODIFIERS
+    ///
+    /// @notice only IRN Nodes can call, otherwise throw
+<span class="fstat-no" title="function not covered" >    modifier onlyIRNNode(</span>) {
+<span class="cstat-no" title="statement not covered" >        require(atonomiStorage.getBool(keccak256("network", "msg.sender", "isIRNNode")), "must be an irn node")</span>;
+        _;
+    }
+&nbsp;
+    /// @notice Initialize the Reputation Manager Contract
+    /// @param _owner is the owner of the contract
+    /// @param _storage is the Eternal Storage contract address
+    /// @param _token is the Atonomi Token contract address (must be ERC20)
+<span class="fstat-no" title="function not covered" >    function initialize(</span>
+        address _owner,
+        address _storage,
+        address _token)
+    public isInitializer("ReputationManager", "0.0.1") {
+<span class="cstat-no" title="statement not covered" >        require(_owner != address(0), "owner cannot be 0x0")</span>;
+<span class="cstat-no" title="statement not covered" >        require(_storage != address(0), "storage address cannot be 0x0")</span>;
+<span class="cstat-no" title="statement not covered" >        require(_token != address(0), "token address cannot be 0x0")</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        owner = _owner</span>;
+<span class="cstat-no" title="statement not covered" >        atonomiStorage = EternalStorage(_storage)</span>;
+<span class="cstat-no" title="statement not covered" >        token = ERC20Interface(_token)</span>;
+    }
+&nbsp;
+    ///
+    /// REPUTATION MANAGEMENT
+    ///
+    /// @notice updates reputation for a device
+    /// @param _deviceId target device Id
+    /// @param _reputationScore updated reputation score computed by the author
+    /// @return true if successful, otherwise false
+    /// @dev msg.sender is expected to be the reputation author (either irn node or the reputation auditor)
+    /// @dev tokens will be deducted from the contract pool
+    /// @dev author and manufacturer will be rewarded a split of the tokens
+    /// @dev owner has ability to pause this operation
+<span class="fstat-no" title="function not covered" >    function updateReputationScore(</span>
+        bytes32 _deviceId,
+        bytes32 _reputationScore)
+        public onlyIRNNode whenNotPaused returns (bool)
+    {
+<span class="cstat-no" title="statement not covered" >        _updateReputationScore(_deviceId, _reputationScore)</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        bytes32 manufacturerId = atonomiStorage.getBytes32(keccak256("devices", _deviceId, "manufacturerId"))</span>;
+<span class="cstat-no" title="statement not covered" >        bytes32 deviceType = atonomiStorage.getBytes32(keccak256("devices", _deviceId, "deviceType"))</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        address _manufacturerWallet = atonomiStorage.getAddress(keccak256("manufacturerRewards", manufacturerId))</span>;
+<span class="cstat-no" title="statement not covered" >        require(_manufacturerWallet != address(0), "_manufacturerWallet cannot be 0x0")</span>;
+<span class="cstat-no" title="statement not covered" >        require(_manufacturerWallet != msg.sender, "manufacturers cannot collect the full reward")</span>;
+&nbsp;
+        uint256 irnReward;
+        uint256 manufacturerReward;
+<span class="cstat-no" title="statement not covered" >        (irnReward, manufacturerReward) = getReputationRewards(msg.sender, _manufacturerWallet, _deviceId)</span>;
+<span class="cstat-no" title="statement not covered" >        _distributeRewards(_manufacturerWallet, msg.sender, irnReward)</span>;
+<span class="cstat-no" title="statement not covered" >        _distributeRewards(_manufacturerWallet, _manufacturerWallet, manufacturerReward)</span>;
+<span class="cstat-no" title="statement not covered" >        emit ReputationScoreUpdated(</span>
+            _deviceId,
+            deviceType,
+            _reputationScore,
+            msg.sender,
+            irnReward,
+            _manufacturerWallet,
+            manufacturerReward);
+        atonomiStorage.setUint(keccak256("authorWrites", msg.sender, _deviceId), block.number);
+<span class="cstat-no" title="statement not covered" >        return true;</span>
+    }
+&nbsp;
+    /// @notice computes the portion of the reputation reward allotted to the manufacturer and author
+    /// @param author is the reputation node submitting the score
+    /// @param manufacturer is the token pool owner
+    /// @param deviceId of the device being updated
+    /// @return irnReward and manufacturerReward
+<span class="fstat-no" title="function not covered" >    function getReputationRewards(</span>
+        address author,
+        address manufacturer,
+        bytes32 deviceId)
+        public view returns (uint256 irnReward, uint256 manufacturerReward)
+    {
+<span class="cstat-no" title="statement not covered" >        uint256 lastWrite = atonomiStorage.getUint(keccak256("authorWrites", author, deviceId))</span>;
+<span class="cstat-no" title="statement not covered" >        uint256 blocks = 0</span>;
+<span class="cstat-no" title="statement not covered" >        if (lastWrite &gt; 0) {</span>
+<span class="cstat-no" title="statement not covered" >            blocks = block.number.sub(lastWrite)</span>;
+        }
+<span class="cstat-no" title="statement not covered" >        uint256 totalRewards = calculateReward(</span>
+            atonomiStorage.getUint(keccak256("pools", manufacturer, "rewardAmount")), blocks);
+<span class="cstat-no" title="statement not covered" >        irnReward = totalRewards.mul(atonomiStorage.getUint(keccak256("reputationIRNNodeShare"))).div(100)</span>;
+<span class="cstat-no" title="statement not covered" >        manufacturerReward = totalRewards.sub(irnReward)</span>;
+    }
+&nbsp;
+    /// @notice computes total reward based on the authors last submission
+    /// @param rewardAmount total amount available for reward
+    /// @param blocksSinceLastWrite number of blocks since last write
+    /// @return actual reward available
+<span class="fstat-no" title="function not covered" >    function calculateReward(uint256 rewardAmount, uint256 blocksSinceLastWrite) public view returns (uint256</span>) {
+<span class="cstat-no" title="statement not covered" >        uint256 totalReward = rewardAmount</span>;
+<span class="cstat-no" title="statement not covered" >        uint256 blockThreshold = atonomiStorage.getUint(keccak256("blockThreshold"))</span>;
+<span class="cstat-no" title="statement not covered" >        if (blocksSinceLastWrite &gt; 0 &amp;&amp; blocksSinceLastWrite &lt; blockThreshold) {</span>
+<span class="cstat-no" title="statement not covered" >            uint256 multiplier = 10 ** uint256(token.decimals())</span>;
+<span class="cstat-no" title="statement not covered" >            totalReward = rewardAmount.mul(blocksSinceLastWrite.mul(multiplier)).div(blockThreshold.mul(multiplier))</span>;
+        }
+<span class="cstat-no" title="statement not covered" >        return totalReward;</span>
+    }
+&nbsp;
+    /// @notice allows the owner to change the default reputation for manufacturers
+    /// @param _manufacturerId of the manufacturer
+    /// @param _newDefaultScore to use for newly registered devices
+    /// @return true if successful, otherwise false
+    /// @dev owner is the only one with this feature
+<span class="fstat-no" title="function not covered" >    function setDefaultReputationForManufacturer(</span>
+        bytes32 _manufacturerId,
+        bytes32 _newDefaultScore) public onlyOwner returns (bool) {
+<span class="cstat-no" title="statement not covered" >        require(_manufacturerId != 0, "_manufacturerId is required")</span>;
+<span class="cstat-no" title="statement not covered" >        require(</span>
+            _newDefaultScore != atonomiStorage.getBytes32(keccak256("defaultManufacturerReputations", _manufacturerId)),
+            "_newDefaultScore should be different"
+        );
+&nbsp;
+        atonomiStorage.setBytes32(keccak256("defaultManufacturerReputations", _manufacturerId), _newDefaultScore);
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        emit DefaultReputationScoreChanged(msg.sender, _manufacturerId, _newDefaultScore);</span>
+<span class="cstat-no" title="statement not covered" >        return true;</span>
+    }
+&nbsp;
+    ///
+    /// INTERNAL FUNCTIONS
+    ///
+    /// @dev track balances of any rewards going out of the token pool
+<span class="fstat-no" title="function not covered" >    function _distributeRewards(address _manufacturer, address _owner, uint256 _amount) interna</span>l {
+<span class="cstat-no" title="statement not covered" >        require(_amount &gt; 0, "_amount is required")</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        uint256 balance = atonomiStorage.getUint(keccak256("pools", _manufacturer, "balance"))</span>;
+        atonomiStorage.setUint(keccak256("pools", _manufacturer, "balance"), balance.sub(_amount));
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        uint256 reward = atonomiStorage.getUint(keccak256("rewards", _owner))</span>;
+        atonomiStorage.setUint(keccak256("rewards", _owner), reward.add(_amount));
+    }
+&nbsp;
+    /// @dev ensure a device is validated for a new reputation score
+    /// @dev updates device registry
+<span class="fstat-no" title="function not covered" >    function _updateReputationScore(bytes32 _deviceId, bytes32 _reputationScore) interna</span>l {
+<span class="cstat-no" title="statement not covered" >        require(_deviceId != 0, "device id is empty")</span>;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        require(atonomiStorage.getBool(</span>
+            keccak256("devices", _deviceId, "registered")), "not registered");
+<span class="cstat-no" title="statement not covered" >        require(atonomiStorage.getBool(</span>
+            keccak256("devices", _deviceId, "activated")), "not activated");
+<span class="cstat-no" title="statement not covered" >        require(atonomiStorage.getBytes32(</span>
+            keccak256("devices", _deviceId, "reputationScore")) != _reputationScore, "new score needs to be different");
+&nbsp;
+        atonomiStorage.setBytes32(keccak256("devices", _deviceId, "reputationScore"), _reputationScore);
+    }
+}
+&nbsp;
+&nbsp;
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Tue Oct 16 2018 16:13:09 GMT-0700 (PDT)
+</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>

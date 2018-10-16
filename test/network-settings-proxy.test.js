@@ -24,11 +24,7 @@ contract('Network Settings', accounts => {
 
   beforeEach(async () => {
     app = await TestApp({ from: ctx.actors.owner })
-    ctx.contracts.settings = await app.createProxy(NetworkSettings, 'NetworkSettings', 'initialize', [
-      ctx.actors.owner,
-      regFee, actFee,
-      repReward, repShare, blockThreshold]
-    )
+    ctx.contracts.settings = await init.getNetworkSettingsContract(app, ctx.actors.owner)
   })
 
   describe('proxy cannot be initialized', () => {

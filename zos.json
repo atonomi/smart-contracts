@@ -5,6 +5,7 @@
     "NetworkSettings": "NetworkSettings",
     "ReputationManager": "ReputationManager",
     "NetworkMemberManager": "NetworkMemberManager",
-    "TokenPool": "TokenPool"
+    "TokenPool": "TokenPool",
+    "DeviceManager": "DeviceManager"
   }
 }
