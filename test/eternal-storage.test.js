@@ -21,7 +21,7 @@ contract('EternalStorage', accounts => {
     { name: 'Bytes', key: 'mybyteskey', value: 0x123456, deleteValue: '0x' },
     { name: 'Bytes32', key: 'mybytes32key', value: 0x1234567890, deleteValue: '0x0000000000000000000000000000000000000000000000000000000000000000' },
     { name: 'Bool', key: 'myboolkey', value: true, deleteValue: 'false' },
-    { name: 'Int', key: 'myintkey', value: 82501, deleteValue: '0' },
+    { name: 'Int', key: 'myintkey', value: 82501, deleteValue: '0' }
   ]
   testCases.forEach((testCase) => {
     describe(testCase.name, () => {
