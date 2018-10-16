@@ -3,7 +3,7 @@ pragma solidity ^0.4.23; // solhint-disable-line
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 
 
-contract AtonomiEternalStorage is Ownable {
+contract EternalStorage is Ownable {
     ///
     /// Storage Types
     ///
