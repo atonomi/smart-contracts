@@ -15,7 +15,9 @@
     "truffle-blockchain-utils": "^0.0.3",
     "truffle-core": "^4.1.11",
     "truffle-hdwallet-provider": "^0.0.3",
-    "zeppelin-solidity": "1.9.0"
+    "zeppelin-solidity": "1.9.0",
+    "zos": "^1.4.3",
+    "zos-lib": "^1.4.1"
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",
@@ -40,9 +42,7 @@
     "truffle-contract": "^3.0.5",
     "truffle-ext": "0.1.8",
     "truffle-flattener": "^1.2.5",
-    "web3-utils": "^1.0.0-beta.34",
-    "zos": "^1.4.3",
-    "zos-lib": "^1.4.1"
+    "web3-utils": "^1.0.0-beta.34"
   },
   "scripts": {
     "compile": "truffle compile --all",
