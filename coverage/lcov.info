@@ -274,11 +274,11 @@ TN:
 SF:/Users/fil.capiral/dev/github.com/atonomi/smart-contracts/contracts/mocks/MockSolHash.sol
 FN:5,solHash
 FNF:1
-FNH:0
-FNDA:0,solHash
-DA:6,0
+FNH:1
+FNDA:3,solHash
+DA:6,3
 LF:1
-LH:0
+LH:1
 BRF:0
 BRH:0
 end_of_record
