@@ -60,7 +60,7 @@ contract DeviceManager is Migratable, Pausable, TokenDestructible {
     ///
     /// @notice only manufacturers can call, otherwise throw
     modifier onlyManufacturer() {
-        require(atonomiStorage.getBool(keccak256("network", "msg.sender", "isManufacturer")), "must be a manufacturer");
+        require(isManufacturer(msg.sender), "must be a manufacturer");
         _;
     }
 
@@ -75,6 +75,54 @@ contract DeviceManager is Migratable, Pausable, TokenDestructible {
     modifier onlyIRNNode() {
         require(atonomiStorage.getBool(keccak256("network", "msg.sender", "isIRNNode")), "must be an irn node");
         _;
+    }
+
+    ///
+    /// STORAGE GETTERS
+    ///
+    /// @notice checks if an account is a manufacturer
+    function isManufacturer(address _account) public view returns(bool) {
+        return atonomiStorage.getBool(
+            keccak256(
+                "network",
+                _account,
+                "isManufacturer")
+        );
+    }
+
+    function poolBalance(address _owner) public view returns (uint256) {
+        return atonomiStorage.getUint(
+            keccak256(
+                "pools",
+                _owner,
+                "balance")
+        );
+    }
+
+    function getDeviceStorageKey(bytes32 _deviceIdHash, string _name) public view returns (bytes32) {
+        return keccak256(
+            "devices",
+            _deviceIdHash,
+            _name
+        );
+    }
+
+    /// @notice get accounts manufacturer id
+    function networkMemberId(address _account) public view returns(bytes32) {
+        return atonomiStorage.getBytes32(
+            keccak256(
+                "network",
+                _account,
+                "memberId")
+        );
+    }
+
+    function defaultManufacturerReputation(bytes32 _memberId) public view returns(bytes32) {
+        return atonomiStorage.getBytes32(
+            keccak256(
+                "defaultManufacturerReputation",
+                _memberId)
+        );
     }
 
     /// @notice Initialize the Atonomi Smart Contract
@@ -168,15 +216,16 @@ contract DeviceManager is Migratable, Pausable, TokenDestructible {
         public onlyManufacturer whenNotPaused returns (bool)
     {
         uint256 registrationFee = settings.registrationFee();
-        
-        _registerDevice(msg.sender, _deviceIdHash, _deviceType, _devicePublicKey);
+
+        bytes32 manufacturerId = _registerDevice(msg.sender, _deviceIdHash, _deviceType, _devicePublicKey);
 
         emit DeviceRegistered(
             msg.sender,
             registrationFee,
-            atonomiStorage.getBytes32(keccak256("devices", _deviceIdHash)),
-            atonomiStorage.getBytes32(keccak256("devices", "manufacturerId")),
-            atonomiStorage.getBytes32(keccak256("devices", _deviceType)));
+            _deviceIdHash,
+            manufacturerId,
+            _deviceType
+        );
         _depositTokens(msg.sender, registrationFee);
         require(token.transferFrom(msg.sender, address(this), registrationFee), "transferFrom failed");
         return true;
@@ -328,8 +377,13 @@ contract DeviceManager is Migratable, Pausable, TokenDestructible {
     ///
     /// @dev track balances of any deposits going into a token pool
     function _depositTokens(address _owner, uint256 _amount) internal {
-        uint256 balance = atonomiStorage.getUint(keccak256("pools", _owner, "balance"));
-        atonomiStorage.setUint(keccak256("pools", _owner, "balance"), balance.add(_amount));
+        uint256 balance = poolBalance(_owner);
+        atonomiStorage.setUint(keccak256(
+            "pools",
+            _owner,
+            "balance"),
+            balance.add(_amount)
+        );
     }
 
     /// @dev track balances of any rewards going out of the token pool
@@ -349,28 +403,52 @@ contract DeviceManager is Migratable, Pausable, TokenDestructible {
         address _manufacturer,
         bytes32 _deviceIdHash,
         bytes32 _deviceType,
-        bytes32 _devicePublicKey) internal {
+        bytes32 _devicePublicKey) internal returns (bytes32) {
         require(_manufacturer != address(0), "manufacturer is required");
         require(_deviceIdHash != 0, "device id hash is required");
         require(_deviceType != 0, "device type is required");
         require(_devicePublicKey != 0, "device public key is required");
 
-        require(!atonomiStorage.getBool(
-            keccak256("devices", _deviceIdHash, "registered")), "device is already registered");
-        require(!atonomiStorage.getBool(
-            keccak256("devices", _deviceIdHash, "activated")), "device is already activated");
+        bytes32 registeredKey = getDeviceStorageKey(_deviceIdHash, "registered");
+        require(!atonomiStorage.getBool(registeredKey), "device is already registered");
+        bytes32 activatedKey = getDeviceStorageKey(_deviceIdHash, "activated");
+        require(!atonomiStorage.getBool(activatedKey), "device is already activated");
 
-        bytes32 manufacturerId = atonomiStorage.getBytes32(keccak256("network", _manufacturer, "memberId"));
+        bytes32 manufacturerId = networkMemberId(_manufacturer);
         require(manufacturerId != 0, "manufacturer id is unknown");
 
-        atonomiStorage.setBytes32(keccak256("devices", _deviceIdHash, "manufacturerId"), manufacturerId);
-        atonomiStorage.setBytes32(keccak256("devices", _deviceIdHash, "deviceType"), _deviceType);
-        atonomiStorage.setBool(keccak256("devices", _deviceIdHash, "registered"), true);
-        atonomiStorage.setBool(keccak256("devices", _deviceIdHash, "activated"), false);
-
-        bytes32 newScore = atonomiStorage.getBytes32(keccak256("defaultManufacturerReputations", "manufacturerId"));
-        atonomiStorage.setBytes32(keccak256("devices", _deviceIdHash, "reputationScore"), newScore);
-        atonomiStorage.setBytes32(keccak256("devices", _deviceIdHash, "devicePublicKey"), _devicePublicKey);
+        atonomiStorage.setBytes32(keccak256("devices",
+            _deviceIdHash,
+            "manufacturerId"),
+            manufacturerId
+        );
+        atonomiStorage.setBytes32(keccak256("devices",
+            _deviceIdHash,
+            "deviceType"),
+            _deviceType
+        );
+        atonomiStorage.setBool(keccak256("devices",
+            _deviceIdHash,
+            "registered"),
+            true
+        );
+        atonomiStorage.setBool(keccak256("devices",
+            _deviceIdHash,
+            "activated"),
+            false
+        );
+        bytes32 newScore = defaultManufacturerReputation(manufacturerId);
+        atonomiStorage.setBytes32(keccak256("devices",
+            _deviceIdHash,
+            "reputationScore"),
+            newScore
+        );
+        atonomiStorage.setBytes32(keccak256("devices",
+            _deviceIdHash,
+            "devicePublicKey"),
+            _devicePublicKey
+        );
+        return manufacturerId;
     }
 
     /// @dev ensure a device is validated for activation

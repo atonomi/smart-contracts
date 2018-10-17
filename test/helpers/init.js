@@ -42,6 +42,23 @@ export async function getNetworkSettingsContract (app, owner) {
   )
 }
 
+export async function getNetworkMemberContract (app, owner, storage) {
+  const NetworkMemberManager = artifacts.require('NetworkMemberManager')
+  return app.createProxy(NetworkMemberManager, 'NetworkMemberManager', 'initialize', [
+    owner,
+    storage]
+  )
+}
+
+export async function getReputationManagerContract (app, owner, storage, token) {
+  const ReputationManager = artifacts.require('ReputationManager')
+  return app.createProxy(ReputationManager, 'ReputationManager', 'initialize', [
+    owner,
+    storage,
+    token]
+  )
+}
+
 export async function getStorageContract (owner) {
   const EternalStorage = artifacts.require('EternalStorage')
   return EternalStorage.new({from: owner})

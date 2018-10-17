@@ -74,6 +74,18 @@ contract ReputationManager is Migratable, Ownable, Pausable {
         _;
     }
 
+    ///
+    /// STORAGE GETTERS
+    ///
+    /// @notice get default reputation for manufucturer
+    function defaultManufacturerReputation(bytes32 _memberId) public view returns(bytes32) {
+        return atonomiStorage.getBytes32(
+            keccak256(
+                "defaultManufacturerReputation",
+                _memberId)
+        );
+    }
+
     /// @notice Initialize the Reputation Manager Contract
     /// @param _owner is the owner of the contract
     /// @param _storage is the Eternal Storage contract address
@@ -179,12 +191,14 @@ contract ReputationManager is Migratable, Ownable, Pausable {
         bytes32 _manufacturerId,
         bytes32 _newDefaultScore) public onlyOwner returns (bool) {
         require(_manufacturerId != 0, "_manufacturerId is required");
-        require(
-            _newDefaultScore != atonomiStorage.getBytes32(keccak256("defaultManufacturerReputations", _manufacturerId)),
-            "_newDefaultScore should be different"
-        );
+        require(_newDefaultScore != defaultManufacturerReputation(_manufacturerId),
+            "_newDefaultScore should be different");
 
-        atonomiStorage.setBytes32(keccak256("defaultManufacturerReputations", _manufacturerId), _newDefaultScore);
+        atonomiStorage.setBytes32(keccak256(
+            "defaultManufacturerReputation",
+            _manufacturerId),
+            _newDefaultScore
+        );
 
         emit DefaultReputationScoreChanged(msg.sender, _manufacturerId, _newDefaultScore);
         return true;

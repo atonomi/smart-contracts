@@ -18,10 +18,7 @@ contract('Network Member', accounts => {
   beforeEach(async () => {
     app = await TestApp({ from: ctx.actors.owner })
     ctx.contracts.storage = await init.getStorageContract(ctx.actors.owner)
-    ctx.contracts.members = await app.createProxy(NetworkMemberManager, 'NetworkMemberManager', 'initialize', [
-      ctx.actors.owner,
-      ctx.contracts.storage.address]
-    )
+    ctx.contracts.members = await init.getNetworkMemberContract(app, ctx.actors.owner, ctx.contracts.storage.address)
   })
 
   describe('proxy cannot be initialized', () => {

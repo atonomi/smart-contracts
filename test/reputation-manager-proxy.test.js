@@ -20,11 +20,7 @@ contract('Reputation Manager', accounts => {
     app = await TestApp({ from: ctx.actors.owner })
     ctx.contracts.token = await init.getAtonomiTokenContract(ctx.actors.owner, ctx.actors.releaseAgent)
     ctx.contracts.storage = await init.getStorageContract(ctx.actors.owner)
-    ctx.contracts.reputation = await app.createProxy(ReputationManager, 'ReputationManager', 'initialize', [
-      ctx.actors.owner,
-      ctx.contracts.storage.address,
-      ctx.contracts.token.address]
-    )
+    ctx.contracts.reputation = await init.getReputationManagerContract(app, ctx.actors.owner, ctx.contracts.storage.address, ctx.contracts.token.address)
   })
 
   describe('proxy cannot be initialized', () => {

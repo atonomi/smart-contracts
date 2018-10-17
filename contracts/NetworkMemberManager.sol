@@ -29,13 +29,79 @@ contract NetworkMemberManager is Migratable, Ownable {
     /// @title Atonomi Storage
     EternalStorage public atonomiStorage;
 
-    ///MODIFIERS///
+    ///
+    /// MODIFIERS
     /// @notice only IRNAdmins or Owner can call, otherwise throw
     modifier onlyIRN() {
-        require(owner == msg.sender || atonomiStorage.getBool(
-            keccak256("network", msg.sender, "isIRNAdmin")),
+        require(
+            owner == msg.sender || isIRNAdmin(msg.sender),
             "must be owner or an irn admin");
         _;
+    }
+
+    ///
+    /// STORAGE GETTERS
+    ///
+    /// @notice checks if an account is an IRN Admin
+    function isIRNAdmin(address _account) public view returns(bool) {
+        return atonomiStorage.getBool(
+            keccak256(
+                "network",
+                _account,
+            "isIRNAdmin")
+        );
+    }
+
+    /// @notice checks if an account is a manufacturer
+    function isManufacturer(address _account) public view returns(bool) {
+        return atonomiStorage.getBool(
+            keccak256(
+                "network",
+                _account,
+            "isManufacturer")
+        );
+    }
+
+    /// @notice checks if an account is an IRN node
+    function isIRNNode(address _account) public view returns(bool) {
+        return atonomiStorage.getBool(
+            keccak256(
+                "network",
+                _account,
+            "isIRNNode")
+        );
+    }
+
+    /// @notice get accounts manufacturer id
+    function memberId(address _account) public view returns(bytes32) {
+        return atonomiStorage.getBytes32(
+            keccak256(
+                "network",
+                _account,
+            "memberId")
+        );
+    }
+
+    /// @notice get wallet address of manufacturer given their id
+    function manufacturerRewards(bytes32 _memberId) public view returns(address) {
+        return atonomiStorage.getAddress(
+            keccak256(
+                "manufacturerRewards",
+            _memberId)
+        );
+    }
+
+    /// @notice get reward balance for manufacturer
+    function rewardAmount(address _member) public view returns (uint256) {
+        return atonomiStorage.getUint(keccak256(
+            "pools",
+            _member,
+            "rewardAmount")
+        );
+    }
+
+    function defaultReputationReward() public view returns (uint256) {
+        return atonomiStorage.getUint(keccak256("defaultReputationReward"));
     }
 
     /// @notice Initialize the Network Member Manager Contract
@@ -71,32 +137,49 @@ contract NetworkMemberManager is Migratable, Ownable {
         bytes32 _memberId)
         public onlyIRN returns(bool)
     {
-        require(!atonomiStorage.getBool(keccak256("network", _member, "isIRNAdmin")), "already an irn admin");
-        require(!atonomiStorage.getBool(keccak256("network", _member, "isManufacturer")), "already a manufacturer");
-        require(!atonomiStorage.getBool(keccak256("network", _member, "isIRNNode")), "already an irn node");
-        require(atonomiStorage.getUint(keccak256("network", _member, "memberId")) != 0, "already assigned a member id");
+        require(!isIRNAdmin(_member), "already an irn admin");
+        require(!isManufacturer(_member), "already a manufacturer");
+        require(!isIRNNode(_member), "already an irn node");
+        require(memberId(_member) == 0, "already assigned a member id");
 
-        atonomiStorage.setBool(keccak256("network", _member, "isIRNAdmin"), _isIRNAdmin);
-        atonomiStorage.setBool(keccak256("network", _member, "isManufacturer"), _isManufacturer);
-        atonomiStorage.setBool(keccak256("network", _member, "isIRNNode"), _isIRNNode);
-        atonomiStorage.setBytes32(keccak256("network", _member, "memberId"), _memberId);
+        atonomiStorage.setBool(keccak256("network",
+            _member,
+            "isIRNAdmin"),
+            _isIRNAdmin
+        );
+        atonomiStorage.setBool(keccak256("network",
+            _member,
+            "isManufacturer"),
+            _isManufacturer
+        );
+        atonomiStorage.setBool(keccak256("network",
+            _member,
+            "isIRNNode"),
+            _isIRNNode
+        );
+        atonomiStorage.setBytes32(keccak256("network",
+            _member,
+            "memberId"),
+            _memberId
+        );
 
         if (_isManufacturer) {
             require(_memberId != 0, "manufacturer id is required");
 
             // keep lookup for rewards in sync
-            require(atonomiStorage.getAddress(
-                keccak256("manufacturerRewards", _memberId)) == address(0), "manufacturer is already assigned");
-            atonomiStorage.setAddress(
-                keccak256("manufacturerRewards", _memberId), _member);
+            require(manufacturerRewards(_memberId) == address(0), "manufacturer is already assigned");
+            atonomiStorage.setAddress(keccak256("manufacturerRewards",
+                _memberId),
+                _member
+            );
 
             // set reputation reward if token pool doesnt exist
-            if (atonomiStorage.getAddress(
-                keccak256("pools", _member, "rewardAmount")) == 0) {
-                //TODO This check may need revision
-                atonomiStorage.setUint(
-                    keccak256("pools", _member, "rewardAmount"),
-                    atonomiStorage.getUint(keccak256("defaultReputationReward")));
+            if (rewardAmount(_member) == 0) {
+                atonomiStorage.setUint(keccak256("pools",
+                    _member,
+                    "rewardAmount"),
+                    atonomiStorage.getUint(keccak256("defaultReputationReward"))
+                );
             }
         }
 

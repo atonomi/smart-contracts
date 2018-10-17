@@ -70,7 +70,7 @@ contract EternalStorage {
         return addressStorage[_key];
     }
 
-    function getUint(bytes32 _key) external view returns (uint) {
+    function getUint(bytes32 _key) external view returns (uint256) {
         return uIntStorage[_key];
     }
 
@@ -90,7 +90,7 @@ contract EternalStorage {
         return boolStorage[_key];
     }
 
-    function getInt(bytes32 _key) external view returns (int) {
+    function getInt(bytes32 _key) external view returns (int256) {
         return intStorage[_key];
     }
 }
