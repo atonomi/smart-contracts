@@ -1,0 +1,45 @@
+{
+  "contracts": {
+    "TokenPool": {
+      "address": "0x2998c02487044812bfad8edc87e704b584f69289",
+      "constructorCode": "608060405234801561001057600080fd5b506139e8806100206000396000f300",
+      "bodyBytecodeHash": "e96b17297dd39be12d08a51ffbdfe138f258ebc39fef5dc51dea64ff52493b8e",
+      "bytecodeHash": "aba034831a9ab34e5b759766bd7674478ae6157a30310e1a181c69e265e525a2"
+    },
+    "NetworkSettings": {
+      "address": "0x669aa9077d638f80987bfce6fa45f49a78a317a8",
+      "constructorCode": "608060405233600160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff160217905550613183806100546000396000f300",
+      "bodyBytecodeHash": "525669bd936a79b3f351cfe055cc051c31625d48fe637420a199ba554e991c86",
+      "bytecodeHash": "1209d22dd81ee02c468f59d86494c96eef0121dee949fc5c3ddcb01a9636c325"
+    },
+    "ReputationManager": {
+      "address": "0xa06719319d6a764ca508cae2498ffb3267ba96b6",
+      "constructorCode": "60806040526000600160146101000a81548160ff02191690831515021790555033600160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055506136768061006f6000396000f300",
+      "bodyBytecodeHash": "e66e096f6417dd21fed3228951511cfa674eb68252c47d57cc0047cc6d90e724",
+      "bytecodeHash": "4c19b545b8cdefa55fbcb3eee1e9541a5481cf5871458a7f0250c2249b03e981"
+    },
+    "NetworkMemberManager": {
+      "address": "0xeafc4fe245e5001ed54f7f2fd343ac46ded43e4d",
+      "constructorCode": "608060405233600160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff160217905550613906806100546000396000f300",
+      "bodyBytecodeHash": "a4d93d1f83cd8a14d66d3d178067c6f0ddbad9bc1d73c1c8d8e6b427c3cce7fb",
+      "bytecodeHash": "09d7ffa63a9ca5aa9f2ae91c22087f04480fd6eaa714bde04556fb6031f45008"
+    },
+    "DeviceManager": {
+      "address": "0x2bde924ac4cb877b0bdb006b7d8140ee46b20900",
+      "constructorCode": "60806040526000600160146101000a81548160ff02191690831515021790555033600160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055506159fe8061006f6000396000f300",
+      "bodyBytecodeHash": "eb51e85512efc9ee97220bcaa5e16f349d620a6b28d805013816fb237e704adf",
+      "bytecodeHash": "5115f2ea740b4b299237b0041701f1ddbc02ad8327cb867ec7529a2e55130c6c"
+    }
+  },
+  "proxies": {},
+  "app": {
+    "address": "0xc8fda3b282be8f922fdb239a22eaa28012c7dd24"
+  },
+  "version": "0.1.0",
+  "package": {
+    "address": "0x0f794e18043aa1d6942f684a7f73ce41d8ccfc5d"
+  },
+  "provider": {
+    "address": "0xee136da4ff0903c8759b38601940a3d207ce04bd"
+  }
+}
