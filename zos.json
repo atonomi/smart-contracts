@@ -6,6 +6,7 @@
     "ReputationManager": "ReputationManager",
     "NetworkMemberManager": "NetworkMemberManager",
     "TokenPool": "TokenPool",
-    "DeviceManager": "DeviceManager"
+    "DeviceManager": "DeviceManager",
+    "EternalStorage": "EternalStorage"
   }
 }
