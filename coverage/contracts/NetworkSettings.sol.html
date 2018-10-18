@@ -22,7 +22,7 @@
       <div class='fl pad1y space-right2'>
         <span class="strong">100% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>35/35</span>
+        <span class='fraction'>34/34</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">97.06% </span>
@@ -32,12 +32,12 @@
       <div class='fl pad1y space-right2'>
         <span class="strong">100% </span>
         <span class="quiet">Functions</span>
-        <span class='fraction'>12/12</span>
+        <span class='fraction'>11/11</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">100% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>45/45</span>
+        <span class='fraction'>44/44</span>
       </div>
     </div>
   </div>
@@ -231,8 +231,7 @@
 186
 187
 188
-189
-190</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+189</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -346,7 +345,17 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -356,18 +365,6 @@
 <span class="cline-any cline-yes">4×</span>
 <span class="cline-any cline-yes">3×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2×</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2×</span>
-<span class="cline-any cline-yes">2×</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4×</span>
-<span class="cline-any cline-yes">3×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -383,6 +380,7 @@
 <span class="cline-any cline-yes">4×</span>
 <span class="cline-any cline-yes">3×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2×</span>
@@ -406,7 +404,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">7×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -534,16 +532,13 @@ contract NetworkSettings is Migratable, Ownable {
         return true;
     }
 &nbsp;
-    function registrationFee() public view returns (uint256) {
-        return atonomiStorage.getUint(keccak256("registrationFee"));
-    }
-&nbsp;
     /// @notice sets the global activation fee
     /// @param _activationFee new fee for activations in ATMI tokens
     /// @return true if successful, otherwise false
     function setActivationFee(uint256 _activationFee) public onlyOwner returns (bool) {
         require(_activationFee &gt; 0, "new activation fee must be greater than zero");
-        require(_activationFee != atonomiStorage.getUint(keccak256("activationFee")), "new activation fee must be different");
+        require(_activationFee != atonomiStorage.getUint(keccak256("activationFee")), 
+                "new activation fee must be different");
 &nbsp;
         atonomiStorage.setUint(keccak256("activationFee"), _activationFee);
 &nbsp;
@@ -556,7 +551,8 @@ contract NetworkSettings is Migratable, Ownable {
     /// @return true if successful, otherwise false
     function setDefaultReputationReward(uint256 _defaultReputationReward) public onlyOwner returns (bool) {
         require(_defaultReputationReward &gt; 0, "new reputation reward must be greater than zero");
-        require(_defaultReputationReward != atonomiStorage.getUint(keccak256("defaultReputationReward")), "new reputation reward must be different");
+        require(_defaultReputationReward != atonomiStorage.getUint(keccak256("defaultReputationReward")),
+            "new reputation reward must be different");
 &nbsp;
         atonomiStorage.setUint(keccak256("defaultReputationReward"), _defaultReputationReward);
 &nbsp;
@@ -570,7 +566,8 @@ contract NetworkSettings is Migratable, Ownable {
     function setReputationIRNNodeShare(uint256 _reputationIRNNodeShare) public onlyOwner returns (bool) {
         require(_reputationIRNNodeShare &gt; 0, "new share must be larger than zero");
         require(_reputationIRNNodeShare &lt; 100, "new share must be less than to 100");
-        require(atonomiStorage.getUint(keccak256("reputationIRNNodeShare")) != _reputationIRNNodeShare, "new share must be different");
+        require(atonomiStorage.getUint(keccak256("reputationIRNNodeShare")) != _reputationIRNNodeShare,
+            "new share must be different");
 &nbsp;
         atonomiStorage.setUint(keccak256("reputationIRNNodeShare"), _reputationIRNNodeShare);
 &nbsp;
@@ -590,23 +587,23 @@ contract NetworkSettings is Migratable, Ownable {
         return true;
     }
 &nbsp;
-    function getActivationFee() public view returns (uint256) {
+    function activationFee() public view returns (uint256) {
         return atonomiStorage.getUint(keccak256("activationFee"));
     }
 &nbsp;
-    function getRegistrationFee() public view returns (uint256) {
+    function registrationFee() public view returns (uint256) {
         return atonomiStorage.getUint(keccak256("registrationFee"));
     }
     
-    function getDefaultReputationReward() public view returns (uint256) {
+    function defaultReputationReward() public view returns (uint256) {
         return atonomiStorage.getUint(keccak256("defaultReputationReward"));
     }
 &nbsp;
-    function getReputationIRNNodeShare() public view returns (uint256) {
+    function reputationIRNNodeShare() public view returns (uint256) {
         return atonomiStorage.getUint(keccak256("reputationIRNNodeShare"));
     }
 &nbsp;
-    function getBlockThreshold() public view returns (uint256) {
+    function blockThreshold() public view returns (uint256) {
         return atonomiStorage.getUint(keccak256("blockThreshold"));
     }
 }
@@ -616,7 +613,7 @@ contract NetworkSettings is Migratable, Ownable {
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Wed Oct 17 2018 16:51:21 GMT-0700 (PDT)
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Thu Oct 18 2018 12:48:56 GMT-0700 (PDT)
 </div>
 </div>
 <script src="../prettify.js"></script>
