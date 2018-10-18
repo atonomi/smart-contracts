@@ -15,3 +15,4 @@ output/gasOutput.csv
 deploy/scripts/input.json
 deploy/scripts/output
 .zos.session
+zos.local.json
