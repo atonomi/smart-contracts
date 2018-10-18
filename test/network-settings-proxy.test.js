@@ -10,7 +10,8 @@ contract('Network Settings', accounts => {
   const ctx = {
     actors: init.getTestActorsContext(accounts),
     contracts: {
-      settings: null
+      settings: null,
+      storage: null
     }
   }
 
@@ -24,15 +25,17 @@ contract('Network Settings', accounts => {
 
   beforeEach(async () => {
     app = await TestApp({ from: ctx.actors.owner })
-    ctx.contracts.settings = await init.getNetworkSettingsContract(app, ctx.actors.owner)
-  })
 
+    ctx.contracts.storage = await init.getStorageContract(ctx.actors.owner)
+
+    ctx.contracts.settings = await init.getNetworkSettingsContract(app, ctx.actors.owner, ctx.contracts.storage.address)
+  })
   describe('proxy cannot be initialized', () => {
     it('owner cannot be 0x0', async () => {
       const fn = app.createProxy(NetworkSettings, 'NetworkSettings', 'initialize', [
         0x0,
         regFee, actFee,
-        repReward, repShare, blockThreshold])
+        repReward, repShare, blockThreshold, ctx.contracts.storage.address])
       await errors.expectRevert(fn)
     })
 
@@ -40,7 +43,7 @@ contract('Network Settings', accounts => {
       const fn = app.createProxy(NetworkSettings, 'NetworkSettings', 'initialize', [
         ctx.actors.owner,
         0, actFee,
-        repReward, repShare, blockThreshold])
+        repReward, repShare, blockThreshold, ctx.contracts.storage.address])
       await errors.expectRevert(fn)
     })
 
@@ -48,7 +51,7 @@ contract('Network Settings', accounts => {
       const fn = app.createProxy(NetworkSettings, 'NetworkSettings', 'initialize', [
         ctx.actors.owner,
         regFee, 0,
-        repReward, repShare, blockThreshold])
+        repReward, repShare, blockThreshold, ctx.contracts.storage.address])
       await errors.expectRevert(fn)
     })
 
@@ -56,7 +59,7 @@ contract('Network Settings', accounts => {
       const fn = app.createProxy(NetworkSettings, 'NetworkSettings', 'initialize', [
         ctx.actors.owner,
         regFee, actFee,
-        0, repShare, blockThreshold])
+        0, repShare, blockThreshold, ctx.contracts.storage.address])
       await errors.expectRevert(fn)
     })
 
@@ -64,7 +67,7 @@ contract('Network Settings', accounts => {
       const fn = app.createProxy(NetworkSettings, 'NetworkSettings', 'initialize', [
         ctx.actors.owner,
         regFee, actFee,
-        repReward, 0, blockThreshold])
+        repReward, 0, blockThreshold, ctx.contracts.storage.address])
       await errors.expectRevert(fn)
     })
 
@@ -72,7 +75,7 @@ contract('Network Settings', accounts => {
       const fn = app.createProxy(NetworkSettings, 'NetworkSettings', 'initialize', [
         ctx.actors.owner,
         regFee, actFee,
-        repReward, 100, blockThreshold])
+        repReward, 100, blockThreshold, ctx.contracts.storage.address])
       await errors.expectRevert(fn)
     })
   })
