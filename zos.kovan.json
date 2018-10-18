@@ -37,7 +37,48 @@
       "bytecodeHash": "8d25156d201d465bb29d1fc256f3b6b29d5ad771b90222579409b14088932dd9"
     }
   },
-  "proxies": {},
+  "proxies": {
+    "NetworkSettings": [
+      {
+        "address": "0xdce9635a51a76e2b17da1fd4b249ccb83490767d",
+        "version": "0.1.0",
+        "implementation": "0x669aa9077d638f80987bfce6fa45f49a78a317a8"
+      },
+      {
+        "address": "0x048625bd18432ab053e0c8b375175555b84d2b30",
+        "version": "0.1.0",
+        "implementation": "0x669aa9077d638f80987bfce6fa45f49a78a317a8"
+      }
+    ],
+    "TokenPool": [
+      {
+        "address": "0xd5a4d0599cf143c139b56f1b5517859475e1fac7",
+        "version": "0.1.0",
+        "implementation": "0x2998c02487044812bfad8edc87e704b584f69289"
+      }
+    ],
+    "ReputationManager": [
+      {
+        "address": "0x2ae64ff0c4a288b331c35294773f6cec20780ef5",
+        "version": "0.1.0",
+        "implementation": "0xa06719319d6a764ca508cae2498ffb3267ba96b6"
+      }
+    ],
+    "NetworkMemberManager": [
+      {
+        "address": "0x9a79e372a06f684b48884d1b1d602ee54e451a9e",
+        "version": "0.1.0",
+        "implementation": "0xeafc4fe245e5001ed54f7f2fd343ac46ded43e4d"
+      }
+    ],
+    "DeviceManager": [
+      {
+        "address": "0x4c9ce16971f63f5e80371028a31e988e6a6e662d",
+        "version": "0.1.0",
+        "implementation": "0x2bde924ac4cb877b0bdb006b7d8140ee46b20900"
+      }
+    ]
+  },
   "app": {
     "address": "0xc8fda3b282be8f922fdb239a22eaa28012c7dd24"
   },
