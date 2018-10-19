@@ -80,28 +80,11 @@ Make sure you have the latest version of `geth` installed: https://github.com/et
 Then change into the deploy directory:
 
 ```
-$ cd deploy
-$ export PARITY_NODE=http://localhost:8545
-$ export ETHER_ADDR=0xfb0987013cc730d33e537bb0ce61298ab8eb2553
-$ ./geth-attach.sh
+$ zos push --network local    // repeat to upgrade instances
+$ deploy/kovan/zos-deploy.sh  // only do once
 ```
 
-This will drop you into a geth console that will have preloaded the Atonomi constants and abi needed for contract deployment.  Replace ETHER_ADDR with your own account.
-
-To deploy the Atonomi contracts run the following:
-```
-> var estimateOnly = false
-> var gasPriceGwei = 10
-> hash = initSafeMathLib(estimateOnly)
-> hash = initATMIToken("address of safemathlib", estimateOnly)
-> hash = initNetworkSettings(estimateOnly, gasPriceGwei)
-> hash = initAtonomi("address of erc token", "address of network settings contract", estimateOnly, gasPriceGwei)
-> receipt = getTransactionReceipt('txn hash')  // use this to ping if the transaction has been confirmed
-
-// to view pending transactions in mempool
-> var myPending = []
-> getParityPendingTransactions(ETHER_ADDR, function(err, results) { myPending = results })
-```
+Make sure the network profile you are targeting is configured correctly in `truffle.js`.
 
 ### Unit Tests
 
