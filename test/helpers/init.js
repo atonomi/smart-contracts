@@ -60,6 +60,13 @@ export async function getReputationManagerContract (app, owner, storage, token) 
   )
 }
 
+export async function getTokenPoolContract (app, storage) {
+  const TokenPool = artifacts.require('TokenPool')
+  return app.createProxy(TokenPool, 'TokenPool', 'initialize', [
+    storage
+  ])
+}
+
 export async function getStorageContract (owner) {
   const EternalStorage = artifacts.require('EternalStorage')
   return EternalStorage.new({from: owner})

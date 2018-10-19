@@ -78,6 +78,14 @@ contract('Network Settings', accounts => {
         repReward, 100, blockThreshold, ctx.contracts.storage.address])
       await errors.expectRevert(fn)
     })
+
+    it('storage cannot be 0x0', async () => {
+      const fn = app.createProxy(NetworkSettings, 'NetworkSettings', 'initialize', [
+        ctx.actors.owner,
+        regFee, actFee,
+        repReward, repShare, blockThreshold, 0x0])
+      await errors.expectRevert(fn)
+    })
   })
 
   describe('proxy initialized', () => {
