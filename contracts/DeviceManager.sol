@@ -64,19 +64,6 @@ contract DeviceManager is Migratable, Pausable, TokenDestructible {
         _;
     }
 
-    /// @notice only IRNAdmins or Owner can call, otherwise throw
-    modifier onlyIRNorOwner() {
-        require(msg.sender == owner || atonomiStorage.getBool(keccak256("network", "msg.sender", "isIRNAdmin")),
-            "must be owner or an irn admin");
-        _;
-    }
-
-    /// @notice only IRN Nodes can call, otherwise throw
-    modifier onlyIRNNode() {
-        require(atonomiStorage.getBool(keccak256("network", "msg.sender", "isIRNNode")), "must be an irn node");
-        _;
-    }
-
     ///
     /// STORAGE GETTERS
     ///
@@ -107,13 +94,20 @@ contract DeviceManager is Migratable, Pausable, TokenDestructible {
         );
     }
 
-    /// @notice get accounts manufacturer id
     function networkMemberId(address _account) public view returns(bytes32) {
         return atonomiStorage.getBytes32(
             keccak256(
                 "network",
                 _account,
                 "memberId")
+        );
+    }
+
+    function manufacturerRewards(bytes32 _memberId) public view returns(address) {
+        return atonomiStorage.getAddress(
+            keccak256(
+                "manufacturerRewards",
+                _memberId)
         );
     }
 
@@ -178,26 +172,6 @@ contract DeviceManager is Migratable, Pausable, TokenDestructible {
         bytes32 _deviceType
     );
 
-    /// @notice emitted everytime someone donates tokens to a manufacturer
-    /// @param _sender ethereum account of the donater
-    /// @param _manufacturerId of the manufacturer
-    /// @param _manufacturer ethereum account
-    /// @param _amount of tokens deposited
-    event TokensDeposited(
-        address indexed _sender,
-        bytes32 indexed _manufacturerId,
-        address indexed _manufacturer,
-        uint256 _amount
-    );
-    
-    /// @notice emitted everytime a participant withdraws from token pool
-    /// @param _sender ethereum account of participant that made the change
-    /// @param _amount tokens withdrawn
-    event TokensWithdrawn(
-        address indexed _sender,
-        uint256 _amount
-    );
-
     ///
     /// DEVICE ONBOARDING
     ///
@@ -241,10 +215,9 @@ contract DeviceManager is Migratable, Pausable, TokenDestructible {
     function activateDevice(bytes32 _deviceId) public whenNotPaused returns (bool) {
         uint256 activationFee = settings.activationFee();
         
-        _activateDevice(_deviceId);
-
-        bytes32 manufacturerId = atonomiStorage.getBytes32(keccak256("devices", _deviceId, "manufacturerId"));
-        bytes32 deviceType = atonomiStorage.getBytes32(keccak256("devices", _deviceId, "deviceType"));
+        bytes32 manufacturerId;
+        bytes32 deviceType;
+        (manufacturerId, deviceType) = _activateDevice(_deviceId);
 
         emit DeviceActivated(
             msg.sender, 
@@ -253,7 +226,7 @@ contract DeviceManager is Migratable, Pausable, TokenDestructible {
             manufacturerId, 
             deviceType);
 
-        address manufacturer = atonomiStorage.getAddress(keccak256("manufacturerRewards", manufacturerId));
+        address manufacturer = manufacturerRewards(manufacturerId);
         require(manufacturer != address(this), "manufacturer is unknown");
         _depositTokens(manufacturer, activationFee);
         require(token.transferFrom(msg.sender, address(this), activationFee), "transferFrom failed");
@@ -276,16 +249,12 @@ contract DeviceManager is Migratable, Pausable, TokenDestructible {
     {
         uint256 registrationFee = settings.registrationFee();
         uint256 activationFee = settings.activationFee();
-
         bytes32 deviceIdHash = keccak256(_deviceId);
 
-        _registerDevice(msg.sender, deviceIdHash, _deviceType, _devicePublicKey);
-
-        bytes32 manufacturerId = atonomiStorage.getBytes32(keccak256("devices", deviceIdHash, "manufacturerId"));
+        bytes32 manufacturerId = _registerDevice(msg.sender, deviceIdHash, _deviceType, _devicePublicKey);
         emit DeviceRegistered(msg.sender, registrationFee, deviceIdHash, manufacturerId, _deviceType);
 
         _activateDevice(_deviceId);
-
         emit DeviceActivated(msg.sender, activationFee, _deviceId, manufacturerId, _deviceType);
 
         uint256 fee = registrationFee.add(activationFee);
@@ -328,9 +297,7 @@ contract DeviceManager is Migratable, Pausable, TokenDestructible {
             bytes32 deviceType = _deviceTypes[i];
             bytes32 devicePublicKey = _devicePublicKeys[i];
             
-            _registerDevice(msg.sender, deviceIdHash, deviceType, devicePublicKey);
-
-            bytes32 manufacturerId = atonomiStorage.getBytes32(keccak256("devices", deviceIdHash, "manufacturerId"));
+            bytes32 manufacturerId = _registerDevice(msg.sender, deviceIdHash, deviceType, devicePublicKey);
             emit DeviceRegistered(msg.sender, registrationFee, deviceIdHash, manufacturerId, deviceType);
 
             runningBalance = runningBalance.add(registrationFee);
@@ -338,37 +305,6 @@ contract DeviceManager is Migratable, Pausable, TokenDestructible {
 
         _depositTokens(msg.sender, runningBalance);
         require(token.transferFrom(msg.sender, address(this), runningBalance), "transferFrom failed");
-        return true;
-    }
-
-    /// @notice anyone can donate tokens to a manufacturer's pool
-    /// @param manufacturerId of the manufacturer to receive the tokens
-    /// @param amount of tokens to deposit
-    function depositTokens(bytes32 manufacturerId, uint256 amount) public returns (bool) {
-        require(manufacturerId != 0, "manufacturerId is required");
-        require(amount > 0, "amount is required");
-
-        address manufacturer = atonomiStorage.getAddress(keccak256("manufacturerRewards", "manufacturerId"));
-        require(manufacturer != address(0), "manufacturer must have a valid address");
-
-        _depositTokens(manufacturer, amount);
-        emit TokensDeposited(msg.sender, manufacturerId, manufacturer, amount);
-
-        require(token.transferFrom(msg.sender, address(this), amount));
-        return true;
-    }
-
-    /// @notice allows participants in the Atonomi network to claim their rewards
-    /// @return true if successful, otherwise false
-    /// @dev owner has ability to pause this operation
-    function withdrawTokens() public whenNotPaused returns (bool) {
-        uint256 amount = atonomiStorage.getUint(keccak256("rewards", msg.sender));
-        require(amount > 0, "amount is zero");
-
-        atonomiStorage.setUint(keccak256("rewards", msg.sender), 0);
-        emit TokensWithdrawn(msg.sender, amount);
-
-        require(token.transfer(msg.sender, amount), "token transfer failed");
         return true;
     }
 
@@ -384,17 +320,6 @@ contract DeviceManager is Migratable, Pausable, TokenDestructible {
             "balance"),
             balance.add(_amount)
         );
-    }
-
-    /// @dev track balances of any rewards going out of the token pool
-    function _distributeRewards(address _manufacturer, address _owner, uint256 _amount) internal {
-        require(_amount > 0, "_amount is required");
-
-        uint256 balance = atonomiStorage.getUint(keccak256("pools", _manufacturer, "balance"));
-        atonomiStorage.setUint(keccak256("pools", _manufacturer, "balance"), balance.sub(_amount));
-
-        uint256 reward = atonomiStorage.getUint(keccak256("rewards", _owner));
-        atonomiStorage.setUint(keccak256("rewards", _owner), reward.add(_amount));
     }
 
     /// @dev ensure a device is validated for registration
@@ -453,14 +378,26 @@ contract DeviceManager is Migratable, Pausable, TokenDestructible {
 
     /// @dev ensure a device is validated for activation
     /// @dev updates device registry
-    function _activateDevice(bytes32 _deviceId) internal {
+    function _activateDevice(bytes32 _deviceId) internal returns (bytes32 manufacturerId, bytes32 deviceType) {
         bytes32 deviceIdHash = keccak256(_deviceId);
-        
-        require(atonomiStorage.getBool(keccak256("devices", deviceIdHash, "registered")), "not registered");
-        require(!atonomiStorage.getBool(keccak256("devices", deviceIdHash, "activated")), "already activated");
-        require(atonomiStorage.getUint(keccak256("devices", deviceIdHash, "manufacturerId")) != 0,
-            "no manufacturer id was found");
 
-        atonomiStorage.setBool(keccak256("devices", _deviceId, "activated"), true);
+        bytes32 registeredKey = getDeviceStorageKey(deviceIdHash, "registered");
+        require(atonomiStorage.getBool(registeredKey), "not registered");
+
+        bytes32 activatedKey = getDeviceStorageKey(deviceIdHash, "activated");
+        require(!atonomiStorage.getBool(activatedKey), "already activated");
+
+        bytes32 manufacturerIdKey = getDeviceStorageKey(deviceIdHash, "manufacturerId");
+        manufacturerId = atonomiStorage.getBytes32(manufacturerIdKey);
+        require(manufacturerId != 0, "no manufacturer id was found");
+
+        bytes32 deviceTypeKey = getDeviceStorageKey(deviceIdHash, "deviceType");
+        deviceType = atonomiStorage.getBytes32(deviceTypeKey);
+
+        atonomiStorage.setBool(keccak256("devices",
+            deviceIdHash,
+            "activated"),
+            true
+        );
     }
 }

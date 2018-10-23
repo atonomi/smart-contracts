@@ -11,21 +11,33 @@ contract('Token Pool', accounts => {
     actors: init.getTestActorsContext(accounts),
     contracts: {
       storage: null,
-      pool: null
+      pool: null,
+      token: null
     }
   }
 
   beforeEach(async () => {
     app = await TestApp({ from: ctx.actors.owner })
+    ctx.contracts.token = await init.getAtonomiTokenContract(ctx.actors.owner, ctx.actors.releaseAgent)
     ctx.contracts.storage = await init.getStorageContract(ctx.actors.owner)
     ctx.contracts.pool = await app.createProxy(TokenPool, 'TokenPool', 'initialize', [
-      ctx.contracts.storage.address]
+      ctx.contracts.storage.address,
+      ctx.contracts.token.address]
     )
   })
 
   describe('proxy cannot be initialized', () => {
     it('storage cannot be 0x0', async () => {
       const fn = app.createProxy(TokenPool, 'TokenPool', 'initialize', [
+        0x0,
+        ctx.contracts.token.address]
+      )
+      await errors.expectRevert(fn)
+    })
+
+    it('token cannot be 0x0', async () => {
+      const fn = app.createProxy(TokenPool, 'TokenPool', 'initialize', [
+        ctx.contracts.storage.address,
         0x0]
       )
       await errors.expectRevert(fn)
@@ -36,6 +48,9 @@ contract('Token Pool', accounts => {
     it('has storage', async () => {
       const storageAddr = await ctx.contracts.pool.atonomiStorage.call()
       expect(storageAddr).to.be.equal(ctx.contracts.storage.address)
+
+      const tokenAddr = await ctx.contracts.pool.token.call()
+      expect(tokenAddr).to.be.equal(ctx.contracts.token.address)
     })
   })
 })

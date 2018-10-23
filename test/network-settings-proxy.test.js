@@ -89,32 +89,22 @@ contract('Network Settings', accounts => {
   })
 
   describe('proxy initialized', () => {
-    it('has owner', async () => {
+    it('has correct default values', async () => {
       const owner = await ctx.contracts.settings.owner.call()
       expect(owner).to.be.equal(ctx.actors.owner)
-    })
 
-    it('has registration fee', async () => {
-      const fee = await ctx.contracts.settings.registrationFee.call()
-      expect(fee.toString(10)).to.be.equal(regFee.toString(10))
-    })
+      const actRegFee = await ctx.contracts.settings.registrationFee.call()
+      expect(actRegFee.toString(10)).to.be.equal(regFee.toString(10))
 
-    it('has activation fee', async () => {
-      const fee = await ctx.contracts.settings.activationFee.call()
-      expect(fee.toString(10)).to.be.equal(actFee.toString(10))
-    })
+      const actActFee = await ctx.contracts.settings.activationFee.call()
+      expect(actActFee.toString(10)).to.be.equal(actFee.toString(10))
 
-    it('has default reputation reward', async () => {
       const reward = await ctx.contracts.settings.defaultReputationReward.call()
       expect(reward.toString(10)).to.be.equal(repReward.toString(10))
-    })
 
-    it('has default reputation share', async () => {
       const share = await ctx.contracts.settings.reputationIRNNodeShare.call()
       expect(share.toString(10)).to.be.equal(repShare.toString(10))
-    })
 
-    it('has default reputation share', async () => {
       const threshold = await ctx.contracts.settings.blockThreshold.call()
       expect(threshold.toString(10)).to.be.equal(blockThreshold.toString(10))
     })

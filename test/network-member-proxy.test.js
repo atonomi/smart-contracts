@@ -88,19 +88,14 @@ contract('Network Member', accounts => {
   })
 
   describe('proxy initialized', () => {
-    it('has owner', async () => {
+    it('has correct default values', async () => {
       const owner = await ctx.contracts.members.owner.call()
       expect(owner).to.be.equal(ctx.actors.owner)
-    })
 
-    it('has storage', async () => {
       const storageAddr = await ctx.contracts.members.atonomiStorage.call()
       expect(storageAddr).to.be.equal(ctx.contracts.storage.address)
-    })
 
-    it('has default reputation reward', async () => {
       const reward = await ctx.contracts.members.defaultReputationReward.call()
-
       expect(parseInt(reward)).to.be.at.least(0)
     })
   })
