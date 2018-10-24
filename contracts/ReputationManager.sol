@@ -70,7 +70,13 @@ contract ReputationManager is Migratable, Ownable, Pausable {
     ///
     /// @notice only IRN Nodes can call, otherwise throw
     modifier onlyIRNNode() {
-        require(atonomiStorage.getBool(keccak256("network", "msg.sender", "isIRNNode")), "must be an irn node");
+        require(atonomiStorage.getBool(
+            keccak256(
+                "network",
+                msg.sender,
+                "isIRNNode"
+            )
+        ), "must be an irn node");
         _;
     }
 
@@ -84,6 +90,61 @@ contract ReputationManager is Migratable, Ownable, Pausable {
                 "defaultManufacturerReputation",
                 _memberId)
         );
+    }
+
+    function manufacturerRewards(bytes32 _memberId) public view returns(address) {
+        return atonomiStorage.getAddress(
+            keccak256(
+                "manufacturerRewards",
+                _memberId)
+        );
+    }
+
+    function poolBalance(address _owner) public view returns (uint256) {
+        return atonomiStorage.getUint(
+            keccak256(
+                "pools",
+                _owner,
+                "balance")
+        );
+    }
+
+    function poolRewardAmount(address _owner) public view returns (uint256) {
+        return atonomiStorage.getUint(
+            keccak256(
+                "pools",
+                _owner,
+                "rewardAmount")
+        );
+    }
+
+    function rewards(address _owner) public view returns (uint256) {
+        return atonomiStorage.getUint(
+            keccak256(
+                "rewards",
+                _owner
+            )
+        );
+    }
+
+    function getDeviceStorageKey(bytes32 _deviceIdHash, string _name) public view returns (bytes32) {
+        return keccak256(
+            "devices",
+            _deviceIdHash,
+            _name
+        );
+    }
+
+    function authorWrites(address author, bytes32 deviceId) public view returns (uint256) {
+        return atonomiStorage.getUint(keccak256(
+            "authorWrites",
+            author,
+            deviceId
+        ));
+    }
+
+    function reputationIRNNodeShare() public view returns (uint256) {
+        return atonomiStorage.getUint(keccak256("reputationIRNNodeShare"));
     }
 
     /// @notice Initialize the Reputation Manager Contract
@@ -120,20 +181,20 @@ contract ReputationManager is Migratable, Ownable, Pausable {
         bytes32 _reputationScore)
         public onlyIRNNode whenNotPaused returns (bool)
     {
-        _updateReputationScore(_deviceId, _reputationScore);
+        bytes32 manufacturerId;
+        bytes32 deviceType;
+        (manufacturerId, deviceType) = _updateReputationScore(_deviceId, _reputationScore);
 
-        bytes32 manufacturerId = atonomiStorage.getBytes32(keccak256("devices", _deviceId, "manufacturerId"));
-        bytes32 deviceType = atonomiStorage.getBytes32(keccak256("devices", _deviceId, "deviceType"));
-
-        address _manufacturerWallet = atonomiStorage.getAddress(keccak256("manufacturerRewards", manufacturerId));
+        address _manufacturerWallet = manufacturerRewards(manufacturerId);
         require(_manufacturerWallet != address(0), "_manufacturerWallet cannot be 0x0");
-        require(_manufacturerWallet != msg.sender, "manufacturers cannot collect the full reward");
+        require(_manufacturerWallet != msg.sender, "manufacturers cannot collect");
 
         uint256 irnReward;
         uint256 manufacturerReward;
         (irnReward, manufacturerReward) = getReputationRewards(msg.sender, _manufacturerWallet, _deviceId);
         _distributeRewards(_manufacturerWallet, msg.sender, irnReward);
         _distributeRewards(_manufacturerWallet, _manufacturerWallet, manufacturerReward);
+
         emit ReputationScoreUpdated(
             _deviceId,
             deviceType,
@@ -142,7 +203,16 @@ contract ReputationManager is Migratable, Ownable, Pausable {
             irnReward,
             _manufacturerWallet,
             manufacturerReward);
-        atonomiStorage.setUint(keccak256("authorWrites", msg.sender, _deviceId), block.number);
+
+        atonomiStorage.setUint(
+            keccak256(
+                "authorWrites",
+                msg.sender,
+                _deviceId
+            ),
+            block.number
+        );
+
         return true;
     }
 
@@ -157,14 +227,13 @@ contract ReputationManager is Migratable, Ownable, Pausable {
         bytes32 deviceId)
         public view returns (uint256 irnReward, uint256 manufacturerReward)
     {
-        uint256 lastWrite = atonomiStorage.getUint(keccak256("authorWrites", author, deviceId));
+        uint256 lastWrite = authorWrites(author, deviceId);
         uint256 blocks = 0;
         if (lastWrite > 0) {
             blocks = block.number.sub(lastWrite);
         }
-        uint256 totalRewards = calculateReward(
-            atonomiStorage.getUint(keccak256("pools", manufacturer, "rewardAmount")), blocks);
-        irnReward = totalRewards.mul(atonomiStorage.getUint(keccak256("reputationIRNNodeShare"))).div(100);
+        uint256 totalRewards = calculateReward(poolRewardAmount(manufacturer), blocks);
+        irnReward = totalRewards.mul(reputationIRNNodeShare()).div(100);
         manufacturerReward = totalRewards.sub(irnReward);
     }
 
@@ -211,27 +280,58 @@ contract ReputationManager is Migratable, Ownable, Pausable {
     function _distributeRewards(address _manufacturer, address _owner, uint256 _amount) internal {
         require(_amount > 0, "_amount is required");
 
-        uint256 balance = atonomiStorage.getUint(keccak256("pools", _manufacturer, "balance"));
-        atonomiStorage.setUint(keccak256("pools", _manufacturer, "balance"), balance.sub(_amount));
+        uint256 balance = poolBalance(_manufacturer);
+        atonomiStorage.setUint(
+            keccak256(
+                "pools",
+                _manufacturer,
+                "balance"
+            ),
+            balance.sub(_amount)
+        );
 
-        uint256 reward = atonomiStorage.getUint(keccak256("rewards", _owner));
-        atonomiStorage.setUint(keccak256("rewards", _owner), reward.add(_amount));
+        uint256 reward = rewards(_owner);
+        atonomiStorage.setUint(
+            keccak256(
+                "rewards",
+                _owner
+            ),
+            reward.add(_amount)
+        );
     }
 
     /// @dev ensure a device is validated for a new reputation score
     /// @dev updates device registry
-    function _updateReputationScore(bytes32 _deviceId, bytes32 _reputationScore) internal {
+    function _updateReputationScore(bytes32 _deviceId, bytes32 _reputationScore) internal returns (
+        bytes32 manufacturerId,
+        bytes32 deviceType)
+    {
         require(_deviceId != 0, "device id is empty");
 
-        require(atonomiStorage.getBool(
-            keccak256("devices", _deviceId, "registered")), "not registered");
-        require(atonomiStorage.getBool(
-            keccak256("devices", _deviceId, "activated")), "not activated");
-        require(atonomiStorage.getBytes32(
-            keccak256("devices", _deviceId, "reputationScore")) != _reputationScore, "new score needs to be different");
+        bytes32 deviceIdHash = keccak256(_deviceId);
 
-        atonomiStorage.setBytes32(keccak256("devices", _deviceId, "reputationScore"), _reputationScore);
+        bytes32 registeredKey = getDeviceStorageKey(deviceIdHash, "registered");
+        require(atonomiStorage.getBool(registeredKey), "not registered");
+
+        bytes32 activationKey = getDeviceStorageKey(deviceIdHash, "activated");
+        require(atonomiStorage.getBool(activationKey), "not activated");
+
+        bytes32 reputationScoreKey = getDeviceStorageKey(deviceIdHash, "reputationScore");
+        require(atonomiStorage.getBytes32(reputationScoreKey) != _reputationScore, "new score needs to be different");
+
+        atonomiStorage.setBytes32(
+            keccak256(
+                "devices",
+                deviceIdHash,
+                "reputationScore"
+            ),
+            _reputationScore
+        );
+
+        bytes32 manufacturerIdKey = getDeviceStorageKey(deviceIdHash, "manufacturerId");
+        manufacturerId = atonomiStorage.getBytes32(manufacturerIdKey);
+
+        bytes32 deviceTypeKey = getDeviceStorageKey(deviceIdHash, "deviceType");
+        deviceType = atonomiStorage.getBytes32(deviceTypeKey);
     }
 }
-
-
