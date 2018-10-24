@@ -1,5 +1,5 @@
 TN:
-SF:/Users/fil.capiral/dev/github.com/atonomi/smart-contracts/contracts/DeviceManager.sol
+SF:/Users/mike/code/smart-contracts/contracts/DeviceManager.sol
 FN:62,onlyManufacturer
 FN:71,isManufacturer
 FN:80,poolBalance
@@ -173,7 +173,7 @@ BRF:46
 BRH:35
 end_of_record
 TN:
-SF:/Users/fil.capiral/dev/github.com/atonomi/smart-contracts/contracts/EternalStorage.sol
+SF:/Users/mike/code/smart-contracts/contracts/EternalStorage.sol
 FN:13,setAddress
 FN:17,setUint
 FN:21,setString
@@ -245,7 +245,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/Users/fil.capiral/dev/github.com/atonomi/smart-contracts/contracts/mocks/MockSolHash.sol
+SF:/Users/mike/code/smart-contracts/contracts/mocks/MockSolHash.sol
 FN:5,solHash
 FNF:1
 FNH:1
@@ -257,7 +257,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/Users/fil.capiral/dev/github.com/atonomi/smart-contracts/contracts/NetworkMemberManager.sol
+SF:/Users/mike/code/smart-contracts/contracts/NetworkMemberManager.sol
 FN:35,onlyIRN
 FN:46,isIRNAdmin
 FN:56,isManufacturer
@@ -356,7 +356,7 @@ BRF:26
 BRH:18
 end_of_record
 TN:
-SF:/Users/fil.capiral/dev/github.com/atonomi/smart-contracts/contracts/NetworkSettings.sol
+SF:/Users/mike/code/smart-contracts/contracts/NetworkSettings.sol
 FN:62,initialize
 FN:104,setRegistrationFee
 FN:117,setActivationFee
@@ -465,7 +465,7 @@ BRF:34
 BRH:34
 end_of_record
 TN:
-SF:/Users/fil.capiral/dev/github.com/atonomi/smart-contracts/contracts/ReputationManager.sol
+SF:/Users/mike/code/smart-contracts/contracts/ReputationManager.sol
 FN:72,onlyIRNNode
 FN:81,defaultManufacturerReputation
 FN:93,initialize
@@ -573,7 +573,7 @@ BRF:30
 BRH:8
 end_of_record
 TN:
-SF:/Users/fil.capiral/dev/github.com/atonomi/smart-contracts/contracts/TokenPool.sol
+SF:/Users/mike/code/smart-contracts/contracts/TokenPool.sol
 FN:79,onlyManufacturer
 FN:89,poolBalance
 FN:101,initialize
