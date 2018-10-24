@@ -72,6 +72,16 @@ export async function getStorageContract (owner) {
   return EternalStorage.new({from: owner})
 }
 
+export async function getDevicesContract (app, owner, storage, token, settings) {
+  const DeviceManager = artifacts.require('DeviceManager')
+  return app.createProxy(DeviceManager, 'DeviceManager', 'initialize', [
+    owner,
+    storage,
+    token,
+    settings]
+  )
+}
+
 export async function getAtonomiContract (owner, tokenAddr) {
   const Atonomi = artifacts.require('Atonomi')
   const NetworkSettings = artifacts.require('NetworkSettings')

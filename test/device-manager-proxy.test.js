@@ -34,12 +34,12 @@ contract('Device Manager', accounts => {
     ctx.contracts.settings = await init.getNetworkSettingsContract(app, ctx.actors.owner, ctx.contracts.storage.address)
     ctx.contracts.reputation = await init.getReputationManagerContract(app, ctx.actors.owner, ctx.contracts.storage.address, ctx.contracts.token.address)
     ctx.contracts.members = await init.getNetworkMemberContract(app, ctx.actors.owner, ctx.contracts.storage.address)
-    ctx.contracts.devices = await app.createProxy(DeviceManager, 'DeviceManager', 'initialize', [
+    ctx.contracts.devices = await init.getDevicesContract(
+      app,
       ctx.actors.owner,
       ctx.contracts.storage.address,
       ctx.contracts.token.address,
-      ctx.contracts.settings.address]
-    )
+      ctx.contracts.settings.address)
   })
 
   describe('proxy cannot be initialized', () => {
@@ -211,7 +211,7 @@ contract('Device Manager', accounts => {
       // remove funds from mfg wallet
       const from = ctx.actors.mfg
       await ctx.contracts.token.transfer(ctx.actors.alice, regFee, {from: from})
-      await ctx.contracts.token.contract.approve(ctx.contracts.devices.address, regFee, { from: from })
+      await ctx.contracts.token.approve(ctx.contracts.devices.address, regFee, { from: from })
 
       const fn = ctx.contracts.devices.registerDevice(deviceIdHash, deviceType, devicePublicKey, {from: from})
       await errors.expectRevert(fn)
@@ -328,7 +328,7 @@ contract('Device Manager', accounts => {
 
     it('can not activate with insufficent funds', async () => {
       // alice has no funds
-      await ctx.contracts.token.contract.approve(ctx.contracts.devices.address, actFee, { from: ctx.actors.alice })
+      await ctx.contracts.token.approve(ctx.contracts.devices.address, actFee, { from: ctx.actors.alice })
       const fn = ctx.contracts.devices.activateDevice(deviceId, {from: ctx.actors.alice})
       await errors.expectRevert(fn)
     })
