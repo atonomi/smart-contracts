@@ -1,7 +1,9 @@
 import { TestApp } from 'zos'
 import { expect } from 'chai'
+import { createContext } from 'vm';
 const TokenPool = artifacts.require('TokenPool')
 const NetworkMemberManager = artifacts.require('NetworkMemberManager')
+const web3Utils = require('web3-utils')
 const errors = require('./helpers/errors')
 const init = require('./helpers/init')
 
@@ -12,6 +14,7 @@ contract('Token Pool', accounts => {
     actors: init.getTestActorsContext(accounts),
     contracts: {
       storage: null,
+      member: null,
       pool: null,
       token: null
     }
@@ -25,6 +28,12 @@ contract('Token Pool', accounts => {
       ctx.contracts.storage.address,
       ctx.contracts.token.address]
     )
+    ctx.contracts.member = await app.createProxy(NetworkMemberManager, 'NetworkMemberManager', 'initialize', [
+      ctx.actors.owner,
+      ctx.contracts.storage.address
+    ])
+
+    await ctx.contracts.member.addNetworkMember(ctx.actors.mfg, false, true, false, "pool_test", {from: ctx.actors.owner})
   })
 
   describe('proxy cannot be initialized', () => {
@@ -44,7 +53,6 @@ contract('Token Pool', accounts => {
       await errors.expectRevert(fn)
     })
   })
-
   describe('proxy initialized', () => {
     it('has storage', async () => {
       const storageAddr = await ctx.contracts.pool.atonomiStorage.call()
@@ -54,34 +62,51 @@ contract('Token Pool', accounts => {
       expect(tokenAddr).to.be.equal(ctx.contracts.token.address)
     })
   })
-
   describe('change manufacturer wallet', () => {
+
     it("new address cannot be 0x0", async () => {
-      const fn = ctx.contracts.pool.changeManufacturerWallet(0x0)
+
+      const fn = ctx.contracts.pool.changeManufacturerWallet.call(0x0, {from: ctx.actors.mfg})
       await errors.expectRevert(fn)
     })
+    
     it("must be a manufacturer", async () => {
-      const memberManager = await app.createProxy(NetworkMemberManager, 'NetworkMemberManager', 'initialize', [
-        ctx.actors.owner,
-        ctx.contracts.storage.address
-      ])
 
-      const addManufacturer = await memberManager.addNetworkMember.call(ctx.actors.admin, false, false, false, 'test_pools', {from: ctx.actors.owner})
+      await ctx.contracts.member.addNetworkMember(ctx.actors.admin, false, false, false, 'test_pools', {from: ctx.actors.owner})
 
-      const fn = ctx.contracts.pool.changeManufacturerWallet(ctx.actors.admin)
+      const fn = ctx.contracts.pool.changeManufacturerWallet(ctx.actors.admin, {from: ctx.actors.mfg})
       await errors.expectRevert(fn)
     })
-    it("must have valid id", async () => {
-      const memberManager = await app.createProxy(NetworkMemberManager, 'NetworkMemberManager', 'initialize', [
-        ctx.actors.owner,
-        ctx.contracts.storage.address
-      ])
+    it("not already an admin", async () => {
 
-      const addManufacturer = await memberManager.addNetworkMember.call(ctx.actors.admin, false, false, false, '', {from: ctx.actors.owner})
+      await ctx.contracts.member.addNetworkMember(ctx.actors.admin, true, false, false, 'test_pools', {from: ctx.actors.owner})
 
-      const fn = ctx.contracts.pool.changeManufacturerWallet(ctx.actors.admin)
+      const fn = ctx.contracts.pool.changeManufacturerWallet.call(ctx.actors.admin, {from: ctx.actors.mfg})
       await errors.expectRevert(fn)
-    }) 
+    })
+    it("not already an manufacturer", async () => {
+
+      await ctx.contracts.member.addNetworkMember(ctx.actors.admin, false, true, false, 'test_pools', {from: ctx.actors.owner})
+
+      const fn = ctx.contracts.pool.changeManufacturerWallet.call(ctx.actors.admin, {from: ctx.actors.mfg})
+      await errors.expectRevert(fn)
+    })
+    it("not already an irn NODE", async () => {
+      
+      await ctx.contracts.member.addNetworkMember(ctx.actors.admin, false, false, true, 'test_pools', {from: ctx.actors.owner})
+
+      const fn = ctx.contracts.pool.changeManufacturerWallet.call(ctx.actors.admin, {from: ctx.actors.mfg})
+      await errors.expectRevert(fn)
+    })
+    it("token pool doesn't already exist", async () => {
+
+      ctx.contracts.member.addNetworkMember(ctx.actors.alice, false, false, false, 'test_pools', {from: ctx.actors.owner})
+
+      const fn = ctx.contracts.pool.changeManufacturerWallet.call(ctx.actors.alice, {from: ctx.actors.mfg})
+      await errors.expectRevert(fn)
+
+    })
   })
-  
+
+
 })
