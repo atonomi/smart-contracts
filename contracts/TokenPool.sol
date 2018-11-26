@@ -184,10 +184,10 @@ contract TokenPool is Migratable, Pausable {
     function depositTokens(bytes32 manufacturerId, uint256 amount) public returns (bool) {
         require(manufacturerId != 0, "manufacturerId is required");
         require(amount > 0, "amount is required");
-
+        
         address manufacturer = atonomiStorage.getAddress(keccak256("manufacturerRewards", manufacturerId));
         require(manufacturer != address(0), "manufacturer must have a valid address");
-
+        
         uint256 balance = poolBalance(manufacturer);
         atonomiStorage.setUint(keccak256(
             "pools",
@@ -195,9 +195,11 @@ contract TokenPool is Migratable, Pausable {
             "balance"),
             balance.add(amount)
         );
+        
         emit TokensDeposited(msg.sender, manufacturerId, manufacturer, amount);
-
+        
         require(token.transferFrom(msg.sender, address(this), amount));
+        
         return true;
     }
 
@@ -211,7 +213,7 @@ contract TokenPool is Migratable, Pausable {
         atonomiStorage.setUint(keccak256("rewards", msg.sender), 0);
         emit TokensWithdrawn(msg.sender, amount);
 
-        require(token.transfer(msg.sender, amount), "token transfer failed");
+        require(token.transfer(msg.sender, amount), "token transfer failed");*/
         return true;
     }
 }
