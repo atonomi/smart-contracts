@@ -95,7 +95,7 @@ contract('Token Pool', accounts => {
   })
 
   describe('proxy initialized', () => {
-    it('has storage', async () => {
+    it('has correct default values', async () => {
       const storageAddr = await ctx.contracts.pool.atonomiStorage.call()
       expect(storageAddr).to.be.equal(ctx.contracts.storage.address)
 
