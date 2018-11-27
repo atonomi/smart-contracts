@@ -209,11 +209,12 @@ contract TokenPool is Migratable, Pausable {
     function withdrawTokens() public whenNotPaused returns (bool) {
         uint256 amount = atonomiStorage.getUint(keccak256("rewards", msg.sender));
         require(amount > 0, "amount is zero");
-
+        
         atonomiStorage.setUint(keccak256("rewards", msg.sender), 0);
         emit TokensWithdrawn(msg.sender, amount);
 
-        require(token.transfer(msg.sender, amount), "token transfer failed");*/
+        require(token.transfer(msg.sender, amount), "token transfer failed");
+        
         return true;
     }
 }

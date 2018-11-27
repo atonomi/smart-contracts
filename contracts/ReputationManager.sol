@@ -193,7 +193,7 @@ contract ReputationManager is Migratable, Ownable, Pausable {
         uint256 manufacturerReward;
         (irnReward, manufacturerReward) = getReputationRewards(msg.sender, _manufacturerWallet, _deviceId);
         _distributeRewards(_manufacturerWallet, msg.sender, irnReward);
-        _distributeRewards(_manufacturerWallet, _manufacturerWallet, manufacturerReward);
+        /*_distributeRewards(_manufacturerWallet, _manufacturerWallet, manufacturerReward);
 
         emit ReputationScoreUpdated(
             _deviceId,
@@ -212,7 +212,7 @@ contract ReputationManager is Migratable, Ownable, Pausable {
             ),
             block.number
         );
-
+*/
         return true;
     }
 
@@ -298,6 +298,7 @@ contract ReputationManager is Migratable, Ownable, Pausable {
             ),
             reward.add(_amount)
         );
+        
     }
 
     /// @dev ensure a device is validated for a new reputation score
