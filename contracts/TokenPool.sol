@@ -117,7 +117,7 @@ contract TokenPool is Migratable, Pausable {
         require(_new != address(0), "new address cannot be 0x0");
 
         require(atonomiStorage.getBool(keccak256("network", msg.sender, "isManufacturer")), "must be a manufacturer");
-        require(atonomiStorage.getBytes32(keccak256("network", msg.sender, "memberId")) != 0, "must be a manufacturer");
+        require(atonomiStorage.getBytes32(keccak256("network", msg.sender, "memberId")) != 0, "must have a member id");
 
         // copy permissions
 
@@ -131,7 +131,7 @@ contract TokenPool is Migratable, Pausable {
         require(!newIsIRNNode, "already an irn node");
         require(newMemberId == 0, "already assigned a member id");
 
-
+        //CHECK THIS LINE
         atonomiStorage.setBool(keccak256("network", _new, "isIRNAdmin"), newIdIrnAdmin);
         atonomiStorage.setBool(keccak256("network", _new, "isManufacturer"), newIsManufacturer);
         atonomiStorage.setBool(keccak256("network", _new, "isIRNNode"), newIsIRNNode);
@@ -140,7 +140,7 @@ contract TokenPool is Migratable, Pausable {
         
         // transfer balance from old pool to the new pool
         require(atonomiStorage.getUint(keccak256("pools", _new, "balance")) == 0, "new token pool already exists");
-        require(atonomiStorage.getUint(keccak256("pools", _new, "rewardAmount")) == 0, "new token pool already exists");
+        require(atonomiStorage.getUint(keccak256("pools", _new, "rewardAmount")) == 0, "new reward amount is not set");
 
         atonomiStorage.setUint(keccak256("pools", _new, "balance"),
         atonomiStorage.getUint(keccak256("pools", msg.sender, "balance")));
@@ -159,6 +159,7 @@ contract TokenPool is Migratable, Pausable {
         atonomiStorage.deleteBool(keccak256("network", msg.sender, "isIRNNode"));
         atonomiStorage.deleteBytes32(keccak256("network", msg.sender, "memberId"));
 
+        //CHECK THIS LINE
         emit ManufacturerRewardWalletChanged(msg.sender, _new, newMemberId);
         return true;
     }
