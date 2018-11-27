@@ -131,13 +131,16 @@ contract TokenPool is Migratable, Pausable {
         require(!newIsIRNNode, "already an irn node");
         require(newMemberId == 0, "already assigned a member id");
 
-        //CHECK THIS LINE
-        atonomiStorage.setBool(keccak256("network", _new, "isIRNAdmin"), newIdIrnAdmin);
-        atonomiStorage.setBool(keccak256("network", _new, "isManufacturer"), newIsManufacturer);
-        atonomiStorage.setBool(keccak256("network", _new, "isIRNNode"), newIsIRNNode);
-        atonomiStorage.setBytes32(keccak256("network", _new, "memberId"), newMemberId);
+        bool oldIsIrnAdmin = atonomiStorage.getBool(keccak256("network", msg.sender, "isIRNAdmin"));
+        bool oldIsManufacturer = atonomiStorage.getBool(keccak256("network", msg.sender, "isManufacturer"));
+        bool oldIsIRNNode = atonomiStorage.getBool(keccak256("network", msg.sender, "isIRNNode"));
+        bytes32 oldMemberId = atonomiStorage.getBytes32(keccak256("network", msg.sender, "memberId"));
 
-        
+        atonomiStorage.setBool(keccak256("network", _new, "isIRNAdmin"), oldIsIrnAdmin);
+        atonomiStorage.setBool(keccak256("network", _new, "isManufacturer"), oldIsManufacturer);
+        atonomiStorage.setBool(keccak256("network", _new, "isIRNNode"), oldIsIRNNode);
+        atonomiStorage.setBytes32(keccak256("network", _new, "memberId"), oldMemberId);
+
         // transfer balance from old pool to the new pool
         require(atonomiStorage.getUint(keccak256("pools", _new, "balance")) == 0, "new token pool already exists");
         require(atonomiStorage.getUint(keccak256("pools", _new, "rewardAmount")) == 0, "new reward amount is not set");
@@ -159,8 +162,7 @@ contract TokenPool is Migratable, Pausable {
         atonomiStorage.deleteBool(keccak256("network", msg.sender, "isIRNNode"));
         atonomiStorage.deleteBytes32(keccak256("network", msg.sender, "memberId"));
 
-        //CHECK THIS LINE
-        emit ManufacturerRewardWalletChanged(msg.sender, _new, newMemberId);
+        emit ManufacturerRewardWalletChanged(msg.sender, _new, oldMemberId);
         return true;
     }
 
