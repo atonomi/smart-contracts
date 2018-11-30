@@ -67,9 +67,14 @@ export async function getTokenPoolContract (app, storage) {
   ])
 }
 
-export async function getStorageContract (owner) {
+export async function getRegistryContract (owner) {
+  const Registry = artifacts.require('Registry')
+  return Registry.new({from: owner})
+}
+
+export async function getStorageContract (registry, owner) {
   const EternalStorage = artifacts.require('EternalStorage')
-  return EternalStorage.new({from: owner})
+  return EternalStorage.new(registry, {from: owner})
 }
 
 export async function getDevicesContract (app, owner, storage, token, settings) {
