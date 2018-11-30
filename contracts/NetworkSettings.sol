@@ -52,6 +52,9 @@ contract NetworkSettings is Migratable, Ownable {
     /// @title Atonomi Storage
     EternalStorage private atonomiStorage;
 
+    /// @title Atonomi Contract Registry
+    Registry public registry;
+
     /// @notice Constructor for Atonomi Reputation contract
     /// @param _owner initial owner of the contract
     /// @param _registrationFee initial registration fee on the network
@@ -66,7 +69,8 @@ contract NetworkSettings is Migratable, Ownable {
         uint256 _defaultReputationReward,
         uint256 _reputationIRNNodeShare,
         uint256 _blockThreshold,
-        address _storage
+        address _storage,
+        address _registry
     ) public isInitializer("NetworkSettings", "0.0.1") {
         require(_owner != address(0), "owner cannot be 0x0");
         require(_activationFee > 0, "activation fee must be greater than 0");
@@ -75,11 +79,14 @@ contract NetworkSettings is Migratable, Ownable {
         require(_reputationIRNNodeShare > 0, "new share must be larger than zero");
         require(_reputationIRNNodeShare < 100, "new share must be less than 100");
         require(_storage != address(0), "storage cannot be 0x0");
-
+        require(_registry != address(0), "registry address cannot be 0x0");
+        
         owner = _owner;
 
         atonomiStorage = EternalStorage(_storage);
         
+        registry = Registry(_registry);
+
         // Registration Fee
         // Manufacturer pays token to register a device
         // Manufacturer will recieve a share in any reputation updates for a device

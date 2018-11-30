@@ -29,6 +29,9 @@ contract NetworkMemberManager is Migratable, Ownable {
     /// @title Atonomi Storage
     EternalStorage public atonomiStorage;
 
+    /// @title Atonomi Contract Registry
+    Registry public registry;
+    
     ///
     /// MODIFIERS
     /// @notice only IRNAdmins or Owner can call, otherwise throw
@@ -109,13 +112,16 @@ contract NetworkMemberManager is Migratable, Ownable {
     /// @param _storage is the Eternal Storage contract address
     function initialize (
         address _owner,
-        address _storage)
+        address _storage,
+        address _registry)
     public isInitializer("NetworkMemberManager", "0.0.1") {
         require(_owner != address(0), "owner cannot be 0x0");
         require(_storage != address(0), "storage address cannot be 0x0");
-
+        require(_registry != address(0), "registry address cannot be 0x0");
+        
         owner = _owner;
         atonomiStorage = EternalStorage(_storage);
+        registry = Registry(_registry);
     }
 
     ///
