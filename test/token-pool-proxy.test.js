@@ -25,7 +25,7 @@ contract('Token Pool', accounts => {
     }
   }
 
-  const tokenDecimals = 18
+  const tokenDecimals = 3
   const multiplier = 10 ** tokenDecimals
   const regFee = 1 * multiplier
   const actFee = 1 * multiplier
@@ -53,7 +53,7 @@ contract('Token Pool', accounts => {
       regFee,
       actFee,
       repReward,
-      50,
+      40,
       1,
       ctx.contracts.storage.address
     ])
@@ -96,7 +96,7 @@ contract('Token Pool', accounts => {
   })
 
   describe('sets token pool reward', () => {
-    it("doesn't set 0", async () => {
+    it('does not set 0', async () => {
       const tx = ctx.contracts.pool.setTokenPoolReward(0, {from: ctx.actors.mfg})
       await errors.expectRevert(tx)
     })
@@ -106,6 +106,12 @@ contract('Token Pool', accounts => {
       expect(tx.logs.length).to.be.equal(1)
       const log = tx.logs[0]
       expect(log.event).to.be.equal('TokenPoolRewardUpdated')
+      expect(tx.logs[0].args._sender).to.be.equal(ctx.actors.mfg)
+      expect(tx.logs[0].args._newReward.toString(10)).to.be.equal('10')
+
+      const hashKey = web3Utils.soliditySha3('pools', ctx.actors.mfg, 'rewardAmount')
+      const poolValue = await ctx.contracts.storage.getUint(hashKey)
+      expect(poolValue.toString(10)).to.be.equal('10')
     })
     it('does not set same reward as previously set', async () => {
       await ctx.contracts.pool.setTokenPoolReward(10, {from: ctx.actors.mfg})
@@ -118,12 +124,6 @@ contract('Token Pool', accounts => {
   describe('change manufacturer wallet', () => {
     it('new address cannot be 0x0', async () => {
       const fn = ctx.contracts.pool.changeManufacturerWallet(0x0, {from: ctx.actors.mfg})
-      await errors.expectRevert(fn)
-    })
-    it('must be a manufacturer', async () => {
-      await ctx.contracts.member.addNetworkMember(ctx.actors.admin, false, false, false, 'test_pools', {from: ctx.actors.owner})
-
-      const fn = ctx.contracts.pool.changeManufacturerWallet(ctx.actors.admin, {from: ctx.actors.alice})
       await errors.expectRevert(fn)
     })
     it('not already an admin', async () => {
@@ -147,6 +147,9 @@ contract('Token Pool', accounts => {
     it('token pool does not already exist', async () => {
       ctx.contracts.member.addNetworkMember(ctx.actors.alice, false, false, false, 'test_pools', {from: ctx.actors.owner})
 
+      const hashKey = web3Utils.soliditySha3('pools', ctx.actors.alice, 'rewardAmount')
+      ctx.contracts.storage.setUint(hashKey, 10)
+
       const fn = ctx.contracts.pool.changeManufacturerWallet(ctx.actors.alice, {from: ctx.actors.mfg})
       await errors.expectRevert(fn)
     })
@@ -155,21 +158,23 @@ contract('Token Pool', accounts => {
 
       const result = await ctx.contracts.pool.changeManufacturerWallet.call(ctx.actors.alice, {from: ctx.actors.bob})
       expect(result).to.be.equal(true)
+
+      const tx = await ctx.contracts.pool.changeManufacturerWallet(ctx.actors.alice, {from: ctx.actors.bob})
+      expect(tx.logs.length).to.be.equal(1)
+      expect(tx.logs[0].event).to.be.equal('ManufacturerRewardWalletChanged')
+      expect(tx.logs[0].args._old).to.be.equal(ctx.actors.bob)
+      expect(tx.logs[0].args._new).to.be.equal(ctx.actors.alice)
+      expect(web3.toAscii(tx.logs[0].args._manufacturerId).replace(/\u0000/g, '')).to.be.equal('test_pools')
     })
   })
-
   describe('deposit tokens', () => {
     it('manufacturer has a valid address', async () => {
-      const fn = ctx.contracts.pool.depositTokens.call('', 20)
-      await errors.expectRevert(fn)
+      const tx = ctx.contracts.pool.depositTokens('', 20)
+      await errors.expectRevert(tx)
     })
     it('does not deposit 0', async () => {
-      const fn = ctx.contracts.pool.depositTokens.call(ctx.actors.mfg, 0)
-      await errors.expectRevert(fn)
-    })
-    it('does not deposit negative amount', async () => {
-      const fn = ctx.contracts.pool.depositTokens.call(ctx.actors.mfg, -1)
-      await errors.expectRevert(fn)
+      const tx = ctx.contracts.pool.depositTokens('test-pools', 0)
+      await errors.expectRevert(tx)
     })
     it('can deposit tokens', async () => {
       await ctx.contracts.member.addNetworkMember(ctx.actors.bob, false, true, false, 'test_pools', {from: ctx.actors.owner})
@@ -186,9 +191,17 @@ contract('Token Pool', accounts => {
       expect(tx.logs.length).to.be.equal(1)
       const log = tx.logs[0]
       expect(log.event).to.be.equal('TokensDeposited')
+
+      expect(tx.logs[0].args._sender).to.be.equal(ctx.actors.bob)
+      expect(web3.toAscii(tx.logs[0].args._manufacturerId).replace(/\u0000/g, '')).to.be.equal('test_pools')
+      expect(tx.logs[0].args._manufacturer).to.be.equal(ctx.actors.bob)
+      expect(tx.logs[0].args._amount.toString(10)).to.be.equal('10')
+
+      /*
+      TODO: CHECK BALANCES
+      */
     })
   })
-
   describe('withdraw tokens', () => {
     it('can withdraw tokens', async () => {
       await ctx.contracts.member.addNetworkMember(ctx.actors.bob, false, true, false, 'test_pools', {from: ctx.actors.owner})
@@ -211,13 +224,32 @@ contract('Token Pool', accounts => {
 
       await ctx.contracts.reputation.updateReputationScore(web3Utils.toHex('Test_Device_1'), '5555-5-5', {from: ctx.actors.irnNode})
 
-      const tx = await ctx.contracts.pool.withdrawTokens({from: ctx.actors.irnNode})
+      let tx = await ctx.contracts.pool.withdrawTokens({from: ctx.actors.irnNode})
 
       expect(tx.logs.length).to.be.equal(1)
-      const log = tx.logs[0]
+      let log = tx.logs[0]
       expect(log.event).to.be.equal('TokensWithdrawn')
+      expect(log.args._sender).to.be.equal(ctx.actors.irnNode)
+      expect(log.args._amount.toString(10)).to.be.equal('400')
+
+      tx = await ctx.contracts.pool.withdrawTokens({from: ctx.actors.bob})
+
+      expect(tx.logs.length).to.be.equal(1)
+      log = tx.logs[0]
+      expect(log.event).to.be.equal('TokensWithdrawn')
+      expect(log.args._sender).to.be.equal(ctx.actors.bob)
+      expect(log.args._amount.toString(10)).to.be.equal('600')
+
+      let balanceBob = await ctx.contracts.token.balanceOf(ctx.actors.bob)
+      expect(balanceBob.toString(10)).to.be.equal('96600')
+      let balanceIrn = await ctx.contracts.token.balanceOf(ctx.actors.irnNode)
+      expect(balanceIrn.toString(10)).to.be.equal('100400')
+
+      /*
+      TODO: CHECK BALANCES
+      */
     })
-    it("doesn't withdraw twice", async () => {
+    it('does not withdraw twice', async () => {
       await ctx.contracts.member.addNetworkMember(ctx.actors.bob, false, true, false, 'test_pools', {from: ctx.actors.owner})
       await ctx.contracts.member.addNetworkMember(ctx.actors.irnNode, false, false, true, 'test_irn', {from: ctx.actors.owner})
 
