@@ -10,7 +10,7 @@ contract EternalStorage {
     /// @notice Initialize the Atonomi Smart Contract
     /// @param _registry is the Atonomi Contract Registry
     constructor (address _registry){
-        require(_owner != address(0), "registry cannot be 0x0");
+        require(_registry != address(0), "registry cannot be 0x0");
         registry = Registry(_registry);
     }
 

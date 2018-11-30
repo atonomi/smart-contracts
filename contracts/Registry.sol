@@ -3,64 +3,64 @@ pragma solidity ^0.4.24;
 import "zos-lib/contracts/migrations/Migratable.sol";
 import "zeppelin-solidity/contracts/lifecycle/Pausable.sol";
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
-import "zos-lib/contracts/Initializable.sol";
+import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./EternalStorage.sol";
 
 /*
  * @title BasicRegistry
  * @dev A simple implementation of a registry, allows any address to add/remove items
  */
-contract Registry is Initializable, Migratable, Pausable {
+contract Registry is Migratable, Ownable, Pausable {
 
-    mapping(bytes32 => bool) items;
+    mapping(address => bool) items;
 
-    event ItemAdded(bytes32 id);
+    event ItemAdded(address _address);
 
-    event ItemRemoved(bytes32 id);
+    event ItemRemoved(address _address);
 
     /**
      * @dev Adds an item to the registry.
-     * @param id The item to add to the registry, must be unique.
+     * @param _address The item to add to the registry, must be unique.
      */
-    function add(bytes32 id) public {
-        require(!_exists(id));
-        items[id] = true;
-        ItemAdded(id);
+    function add(address _address) public onlyOwner {
+        require(!_exists(_address));
+        items[_address] = true;
+        emit ItemAdded(_address);
     }
 
     /**
      * @dev Removes an item from the registry, reverts if the item does not exist.
-     * @param id The item to remove from the registry.
+     * @param _address The item to remove from the registry.
      */
-    function remove(bytes32 id) public {
-        require(_exists(id));
-        _remove(id);
+    function remove(address _address) public onlyOwner {
+        require(_exists(_address));
+        _remove(_address);
     }
 
     /**
      * @dev Checks if an item exists in the registry.
-     * @param id The item to check.
+     * @param _address The item to check.
      * @return A bool indicating whether the item exists.
      */
-    function exists(bytes32 id) public view returns (bool) {
-        return _exists(id);
+    function exists(address _address) public view returns (bool) {
+        return _exists(_address);
     }
 
     /**
      * @dev Internal function to check if an item exists in the registry.
-     * @param id The item to check.
+     * @param _address The item to check.
      * @return A bool indicating whether the item exists.
      */
-    function _exists(bytes32 id) internal view returns (bool) {
-        return items[id];
+    function _exists(address _address) internal view returns (bool) {
+        return items[_address];
     }
 
     /**
      * @dev Internal function to remove an item from the registry.
-     * @param id The item to remove from the registry.
+     * @param _address The item to remove from the registry.
      */
-    function _remove(bytes32 id) internal {
-        items[id] = false;
-        ItemRemoved(id);
+    function _remove(address _address) internal {
+        items[_address] = false;
+        emit ItemRemoved(_address);
     }
 }
