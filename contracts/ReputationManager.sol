@@ -298,6 +298,7 @@ contract ReputationManager is Migratable, Ownable, Pausable {
             ),
             reward.add(_amount)
         );
+        
     }
 
     /// @dev ensure a device is validated for a new reputation score

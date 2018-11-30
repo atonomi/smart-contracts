@@ -30,6 +30,11 @@ module.exports = {
       port: 8545,
       from: '0x48015f23eb79791050885f9464e6dea7456df60b',
       network_id: '*' // Match any network id
+    },
+    kovan: {
+      host: '10.131.1.91',
+      port: 8545,
+      network_id: '*'
     }
   }
 }
