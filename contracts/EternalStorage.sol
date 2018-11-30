@@ -1,7 +1,19 @@
 pragma solidity ^0.4.24;
+import "./Registry.sol";
 
 
 contract EternalStorage {
+
+    /// @title Atonomi Storage
+    Registry public registry;
+    
+    /// @notice Initialize the Atonomi Smart Contract
+    /// @param _registry is the Atonomi Contract Registry
+    constructor (address _registry){
+        require(_owner != address(0), "registry cannot be 0x0");
+        registry = Registry(_registry);
+    }
+
     mapping(bytes32 => uint256) private uIntStorage;
     mapping(bytes32 => string) private stringStorage;
     mapping(bytes32 => address) private addressStorage;
@@ -10,59 +22,64 @@ contract EternalStorage {
     mapping(bytes32 => bool) private boolStorage;
     mapping(bytes32 => int256) private intStorage;
 
-    function setAddress(bytes32 _key, address _value) external {
+    modifier onlyRegistered(){
+        require(registry.exists(msg.sender), "Must be a registered Atonomi contract");
+        _;
+    }
+
+    function setAddress(bytes32 _key, address _value) external onlyRegistered {
         addressStorage[_key] = _value;
     }
 
-    function setUint(bytes32 _key, uint256 _value) external {
+    function setUint(bytes32 _key, uint256 _value) external onlyRegistered {
         uIntStorage[_key] = _value;
     }
 
-    function setString(bytes32 _key, string _value) external {
+    function setString(bytes32 _key, string _value) external onlyRegistered {
         stringStorage[_key] = _value;
     }
 
-    function setBytes(bytes32 _key, bytes _value) external {
+    function setBytes(bytes32 _key, bytes _value) external onlyRegistered {
         bytesStorage[_key] = _value;
     }
 
-    function setBytes32(bytes32 _key, bytes32 _value) external {
+    function setBytes32(bytes32 _key, bytes32 _value) external onlyRegistered {
         bytes32Storage[_key] = _value;
     }
 
-    function setBool(bytes32 _key, bool _value) external {
+    function setBool(bytes32 _key, bool _value) external onlyRegistered {
         boolStorage[_key] = _value;
     }
 
-    function setInt(bytes32 _key, int _value) external {
+    function setInt(bytes32 _key, int _value) external onlyRegistered {
         intStorage[_key] = _value;
     }
 
-    function deleteAddress(bytes32 _key) external {
+    function deleteAddress(bytes32 _key) external onlyRegistered {
         delete addressStorage[_key];
     }
 
-    function deleteUint(bytes32 _key) external {
+    function deleteUint(bytes32 _key) external onlyRegistered {
         delete uIntStorage[_key];
     }
 
-    function deleteString(bytes32 _key) external {
+    function deleteString(bytes32 _key) external onlyRegistered {
         delete stringStorage[_key];
     }
 
-    function deleteBytes(bytes32 _key) external {
+    function deleteBytes(bytes32 _key) external onlyRegistered {
         delete bytesStorage[_key];
     }
 
-    function deleteBytes32(bytes32 _key) external {
+    function deleteBytes32(bytes32 _key) external onlyRegistered {
         delete bytes32Storage[_key];
     }
 
-    function deleteBool(bytes32 _key) external {
+    function deleteBool(bytes32 _key) external onlyRegistered {
         delete boolStorage[_key];
     }
 
-    function deleteInt(bytes32 _key) external {
+    function deleteInt(bytes32 _key) external onlyRegistered {
         delete intStorage[_key];
     }
 
