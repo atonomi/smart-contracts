@@ -36,7 +36,7 @@ contract('Token Pool', accounts => {
     app = await TestApp({ from: ctx.actors.owner })
     ctx.contracts.token = await init.getAtonomiTokenContract(ctx.actors.owner, ctx.actors.releaseAgent)
     ctx.contracts.registry = await init.getRegistryContract(ctx.actors.owner)
-    ctx.contracts.storage = await init.getStorageContract(ctx.contracts.registry.address, {from: ctx.actors.owner})
+    ctx.contracts.storage = await init.getStorageContract(ctx.contracts.registry.address, ctx.actors.owner)
     
     ctx.contracts.pool = await app.createProxy(TokenPool, 'TokenPool', 'initialize', [
       ctx.contracts.storage.address]
