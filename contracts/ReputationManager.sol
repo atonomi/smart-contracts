@@ -154,7 +154,7 @@ contract ReputationManager is Migratable, Ownable, Pausable {
     function initialize(
         address _owner,
         address _storage,
-        address _token
+        address _token)
     public isInitializer("ReputationManager", "0.0.1") {
         require(_owner != address(0), "owner cannot be 0x0");
         require(_storage != address(0), "storage address cannot be 0x0");

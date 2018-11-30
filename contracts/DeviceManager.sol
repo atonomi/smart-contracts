@@ -171,6 +171,26 @@ contract DeviceManager is Migratable, Pausable, TokenDestructible {
         bytes32 _deviceType
     );
 
+    /// @notice emitted everytime someone donates tokens to a manufacturer
+    /// @param _sender ethereum account of the donater
+    /// @param _manufacturerId of the manufacturer
+    /// @param _manufacturer ethereum account
+    /// @param _amount of tokens deposited
+    event TokensDeposited(
+        address indexed _sender,
+        bytes32 indexed _manufacturerId,
+        address indexed _manufacturer,
+        uint256 _amount
+    );
+
+    /// @notice emitted everytime a participant withdraws from token pool
+    /// @param _sender ethereum account of participant that made the change
+    /// @param _amount tokens withdrawn
+    event TokensWithdrawn(
+        address indexed _sender,
+        uint256 _amount
+    );
+
     ///
     /// DEVICE ONBOARDING
     ///
@@ -304,6 +324,46 @@ contract DeviceManager is Migratable, Pausable, TokenDestructible {
 
         _depositTokens(msg.sender, runningBalance);
         require(token.transferFrom(msg.sender, address(this), runningBalance), "transferFrom failed");
+        return true;
+    }
+
+    /// @notice anyone can donate tokens to a manufacturer's pool
+    /// @param manufacturerId of the manufacturer to receive the tokens
+    /// @param amount of tokens to deposit
+    function depositTokens(bytes32 manufacturerId, uint256 amount) public returns (bool) {
+        require(manufacturerId != 0, "manufacturerId is required");
+        require(amount > 0, "amount is required");
+        
+        address manufacturer = atonomiStorage.getAddress(keccak256("manufacturerRewards", manufacturerId));
+        require(manufacturer != address(0), "manufacturer must have a valid address");
+        
+        uint256 balance = poolBalance(manufacturer);
+        atonomiStorage.setUint(keccak256(
+            "pools",
+            manufacturer,
+            "balance"),
+            balance.add(amount)
+        );
+        
+        emit TokensDeposited(msg.sender, manufacturerId, manufacturer, amount);
+        
+        require(token.transferFrom(msg.sender, address(this), amount));
+        
+        return true;
+    }
+
+    /// @notice allows participants in the Atonomi network to claim their rewards
+    /// @return true if successful, otherwise false
+    /// @dev owner has ability to pause this operation
+    function withdrawTokens() public whenNotPaused returns (bool) {
+        uint256 amount = atonomiStorage.getUint(keccak256("rewards", msg.sender));
+        require(amount > 0, "amount is zero");
+        
+        atonomiStorage.setUint(keccak256("rewards", msg.sender), 0);
+        emit TokensWithdrawn(msg.sender, amount);
+
+        require(token.transfer(msg.sender, amount), "token transfer failed");
+        
         return true;
     }
 

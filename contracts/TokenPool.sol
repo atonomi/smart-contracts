@@ -7,23 +7,6 @@ import "./Registry.sol";
 import "./EternalStorage.sol";
 
 
-/// @title ERC-20 Token Standard
-/// @author Fabian Vogelsteller <fabian@ethereum.org>, Vitalik Buterin <vitalik.buterin@ethereum.org>
-/// @dev https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20.md
-interface ERC20Interface {
-    function decimals() public constant returns (uint8);
-    function totalSupply() public constant returns (uint);
-    function balanceOf(address tokenOwner) public constant returns (uint balance);
-    function allowance(address tokenOwner, address spender) public constant returns (uint remaining);
-    function transfer(address to, uint tokens) public returns (bool success);
-    function approve(address spender, uint tokens) public returns (bool success);
-    function transferFrom(address from, address to, uint tokens) public returns (bool success);
-
-    event Transfer(address indexed from, address indexed to, uint tokens);   // solhint-disable-line
-    event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
-}
-
-
 contract TokenPool is Migratable, Pausable {
     using SafeMath for uint256;
 
@@ -45,33 +28,8 @@ contract TokenPool is Migratable, Pausable {
         uint256 _newReward
     );
 
-    /// @notice emitted everytime someone donates tokens to a manufacturer
-    /// @param _sender ethereum account of the donater
-    /// @param _manufacturerId of the manufacturer
-    /// @param _manufacturer ethereum account
-    /// @param _amount of tokens deposited
-    event TokensDeposited(
-        address indexed _sender,
-        bytes32 indexed _manufacturerId,
-        address indexed _manufacturer,
-        uint256 _amount
-    );
-    
-    /// @notice emitted everytime a participant withdraws from token pool
-    /// @param _sender ethereum account of participant that made the change
-    /// @param _amount tokens withdrawn
-    event TokensWithdrawn(
-        address indexed _sender,
-        uint256 _amount
-    );
-
     /// @title Atonomi Storage
     EternalStorage public atonomiStorage;
-
-    /// @title ATMI Token
-    /// @notice Standard ERC20 Token
-    /// @dev AMLToken source: https://github.com/TokenMarketNet/ico/blob/master/contracts/AMLToken.sol
-    ERC20Interface public token;
 
     ///
     /// MODIFIERS
@@ -96,15 +54,20 @@ contract TokenPool is Migratable, Pausable {
         );
     }
 
+    function poolRewardAmount(address _owner) public view returns (uint256) {
+        return atonomiStorage.getUint(
+            keccak256(
+                "pools",
+                _owner,
+                "rewardAmount")
+        );
+    }
+
     /// @notice Initialize the Reputation Manager Contract
     /// @param _storage is the Eternal Storage contract address
-    /// @param _token is the Atonomi Token contract address (must be ERC20)
-    function initialize(address _storage, address _token) public isInitializer("TokenPool", "0.0.1") {
+    function initialize(address _storage) public isInitializer("TokenPool", "0.0.1") {
         require(_storage != address(0), "storage address cannot be 0x0");
-        require(_token != address(0), "token address cannot be 0x0");
-
         atonomiStorage = EternalStorage(_storage);
-        token = ERC20Interface(_token);
     }
 
     //
@@ -179,46 +142,6 @@ contract TokenPool is Migratable, Pausable {
 
         atonomiStorage.setUint(keccak256("pools", msg.sender, "rewardAmount"), newReward);
         emit TokenPoolRewardUpdated(msg.sender, newReward);
-        return true;
-    }
-
-    /// @notice anyone can donate tokens to a manufacturer's pool
-    /// @param manufacturerId of the manufacturer to receive the tokens
-    /// @param amount of tokens to deposit
-    function depositTokens(bytes32 manufacturerId, uint256 amount) public returns (bool) {
-        require(manufacturerId != 0, "manufacturerId is required");
-        require(amount > 0, "amount is required");
-        
-        address manufacturer = atonomiStorage.getAddress(keccak256("manufacturerRewards", manufacturerId));
-        require(manufacturer != address(0), "manufacturer must have a valid address");
-        
-        uint256 balance = poolBalance(manufacturer);
-        atonomiStorage.setUint(keccak256(
-            "pools",
-            manufacturer,
-            "balance"),
-            balance.add(amount)
-        );
-        
-        emit TokensDeposited(msg.sender, manufacturerId, manufacturer, amount);
-        
-        require(token.transferFrom(msg.sender, address(this), amount));
-        
-        return true;
-    }
-
-    /// @notice allows participants in the Atonomi network to claim their rewards
-    /// @return true if successful, otherwise false
-    /// @dev owner has ability to pause this operation
-    function withdrawTokens() public whenNotPaused returns (bool) {
-        uint256 amount = atonomiStorage.getUint(keccak256("rewards", msg.sender));
-        require(amount > 0, "amount is zero");
-        
-        atonomiStorage.setUint(keccak256("rewards", msg.sender), 0);
-        emit TokensWithdrawn(msg.sender, amount);
-
-        require(token.transfer(msg.sender, amount), "token transfer failed");
-        
         return true;
     }
 }

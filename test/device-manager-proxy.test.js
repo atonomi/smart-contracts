@@ -26,6 +26,9 @@ contract('Device Manager', accounts => {
   const regFee = 1 * multiplier
   const actFee = 1 * multiplier
   const defaultRep = '6767-1-1'
+  const repReward = 1 * multiplier
+  const irnReward = repReward * 0.20
+  const mfgReward = repReward - irnReward
 
   beforeEach(async () => {
     app = await TestApp({ from: ctx.actors.owner })
@@ -576,6 +579,134 @@ contract('Device Manager', accounts => {
 
       const fn = ctx.contracts.devices.registerDevices(deviceIdHashes, deviceTypes, devicePublicKeys, {from: ctx.actors.mfg})
       await errors.expectRevert(fn)
+    })
+  })
+
+  describe('deposit tokens', () => {
+    const mfgId = 'TESTDEP'
+    const amount = 1 * multiplier
+    let beforeContractBal, beforePoolBal, beforeBobBal
+
+    beforeEach(async () => {
+      // fund bob with ATMI
+      await ctx.contracts.token.transfer(ctx.actors.bob, amount, {from: ctx.actors.owner})
+
+      // bob grants erc token transfer for deposit
+      await ctx.contracts.token.approve(ctx.contracts.devices.address, amount, { from: ctx.actors.bob })
+
+      // onboard manufacturer
+      await ctx.contracts.members.addNetworkMember(ctx.actors.mfg, false, true, false, mfgId, {from: ctx.actors.owner})
+      await ctx.contracts.reputation.setDefaultReputationForManufacturer(mfgId, defaultRep, {from: ctx.actors.owner})
+
+      // capture initial balances
+      beforeContractBal = await ctx.contracts.token.balanceOf(ctx.contracts.devices.address)
+      beforeBobBal = await ctx.contracts.token.balanceOf(ctx.actors.bob)
+      beforePoolBal = await ctx.contracts.devices.poolBalance(ctx.actors.mfg)
+    })
+
+    it('must have manufacture prefix', async () => {
+      const badMfgId = ''
+      const tx = ctx.contracts.devices.depositTokens(badMfgId, amount, {from: ctx.actors.bob})
+      await errors.expectRevert(tx)
+    })
+
+    it('deposit must be greater than 0', async () => {
+      const badAmount = 0
+      const tx = ctx.contracts.devices.depositTokens(mfgId, badAmount, {from: ctx.actors.bob})
+      await errors.expectRevert(tx)
+    })
+
+    it('can deposit tokens', async () => {
+      const success = await ctx.contracts.devices.depositTokens.call(mfgId, amount, { from: ctx.actors.bob })
+      expect(success).to.be.equal(true)
+
+      const tx = await ctx.contracts.devices.depositTokens(mfgId, amount, { from: ctx.actors.bob })
+
+      expect(tx.logs.length).to.be.equal(1)
+      expect(tx.logs[0].event).to.be.equal('TokensDeposited')
+      expect(tx.logs[0].args._sender).to.be.equal(ctx.actors.bob)
+      expect(web3.toAscii(tx.logs[0].args._manufacturerId).replace(/\u0000/g, '')).to.be.equal(mfgId)
+      expect(tx.logs[0].args._manufacturer).to.be.equal(ctx.actors.mfg)
+      expect(tx.logs[0].args._amount.toString(10)).to.be.equal(amount.toString(10))
+
+      // check token transfer for contract
+      const afterContractBal = await ctx.contracts.token.balanceOf(ctx.contracts.devices.address)
+      expect((afterContractBal - beforeContractBal).toString(10)).to.be.equal(amount.toString(10))
+
+      // check token transfer for bob
+      const afterBobBal = await ctx.contracts.token.balanceOf(ctx.actors.bob)
+      expect((beforeBobBal - afterBobBal).toString(10)).to.be.equal(amount.toString(10))
+
+      // check storage contract data
+      const afterPoolBal = await ctx.contracts.devices.poolBalance(ctx.actors.mfg)
+      expect((afterPoolBal - beforePoolBal).toString(10)).to.be.equal(amount.toString(10))
+    })
+  })
+
+  describe('withdraw tokens', () => {
+    const mfgId = 'TESTWITH'
+    const deviceId = 'FILDEVICE1'
+    const deviceType = 'SMART-WATCH'
+    const devicePublicKey = '0x9c274091da1ce47bd321f272d66b6e5514fb82346d7992e2d1a3eefdeffed791'
+
+    beforeEach(async () => {
+      // onboard manufacturer
+      await ctx.contracts.members.addNetworkMember(ctx.actors.mfg, false, true, false, mfgId, {from: ctx.actors.owner})
+      await ctx.contracts.reputation.setDefaultReputationForManufacturer(mfgId, defaultRep, {from: ctx.actors.owner})
+
+      // fund mfg so they can register and activate a device
+      await ctx.contracts.token.transfer(ctx.actors.mfg, regFee + actFee, {from: ctx.actors.owner})
+
+      // register and activate a device
+      await ctx.contracts.token.contract.approve(ctx.contracts.devices.address, (regFee + actFee), { from: ctx.actors.mfg })
+      await ctx.contracts.devices.registerAndActivateDevice(deviceId, deviceType, devicePublicKey, {from: ctx.actors.mfg})
+
+      // onboard irn node
+      await ctx.contracts.members.addNetworkMember(ctx.actors.irnNode, false, false, true, '', {from: ctx.actors.owner})
+
+      // perform a reputation write to get a reward
+      const poolBalanceBefore = await ctx.contracts.devices.poolBalance(ctx.actors.mfg)
+      await ctx.contracts.reputation.updateReputationScore(deviceId, '9999-1-1', {from: ctx.actors.irnNode})
+
+      // confirm pool balance is distributed correctly
+      const poolBalanceAfter = await ctx.contracts.devices.poolBalance(ctx.actors.mfg)
+      expect((poolBalanceBefore - poolBalanceAfter).toString(10)).to.be.equal(repReward.toString(10))
+    })
+
+    it('can withdraw tokens', async () => {
+      const testWithdraws = [
+        { account: ctx.actors.mfg, expectedTokens: mfgReward },
+        { account: ctx.actors.irnNode, expectedTokens: irnReward }
+      ]
+
+      for (let i = 0; i < testWithdraws.length; i++) {
+        const from = testWithdraws[i].account
+        const expectTokens = testWithdraws[i].expectedTokens
+        const tokenBefore = await ctx.contracts.token.balanceOf(from)
+        const tokenContractBefore = await ctx.contracts.token.balanceOf(ctx.contracts.devices.address)
+
+        const successWithdraw = await ctx.contracts.devices.withdrawTokens.call({ from: from })
+        expect(successWithdraw).to.be.equal(true)
+
+        const txWithdraw = await ctx.contracts.devices.withdrawTokens({ from: from })
+        expect(txWithdraw.logs.length).to.be.equal(1)
+        expect(txWithdraw.logs[0].event).to.be.equal('TokensWithdrawn')
+        expect(txWithdraw.logs[0].args._sender).to.be.equal(from)
+        expect(txWithdraw.logs[0].args._amount.toString(10)).to.be.equal(expectTokens.toString(10))
+
+        const tokenAfter = await ctx.contracts.token.balanceOf(from)
+        expect((tokenAfter - tokenBefore).toString(10)).to.be.equal(expectTokens.toString(10))
+
+        const tokenContractAfter = await ctx.contracts.token.balanceOf(ctx.contracts.devices.address)
+        expect((tokenContractBefore - tokenContractAfter).toString(10)).to.be.equal(expectTokens.toString(10))
+      }
+
+      // attempt double dips
+      const doubleDip1 = ctx.contracts.devices.withdrawTokens({from: ctx.actors.irnNode})
+      await errors.expectRevert(doubleDip1)
+        
+      const doubleDip2 = ctx.contracts.devices.withdrawTokens({from: ctx.actors.mfg})
+      await errors.expectRevert(doubleDip2)
     })
   })
 })

@@ -1,7 +1,5 @@
 pragma solidity ^0.4.24;
 
-import "zos-lib/contracts/migrations/Migratable.sol";
-import "zeppelin-solidity/contracts/lifecycle/Pausable.sol";
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./EternalStorage.sol";
@@ -10,7 +8,7 @@ import "./EternalStorage.sol";
  * @title BasicRegistry
  * @dev A simple implementation of a registry, allows any address to add/remove items
  */
-contract Registry is Migratable, Ownable, Pausable {
+contract Registry is Ownable {
 
     mapping(address => bool) items;
 
