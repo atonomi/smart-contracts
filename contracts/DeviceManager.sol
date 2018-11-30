@@ -55,9 +55,6 @@ contract DeviceManager is Migratable, Pausable, TokenDestructible {
     /// @title Atonomi Storage
     EternalStorage public atonomiStorage;
 
-    /// @title Atonomi Contract Registry
-    Registry public registry;
-
     ///
     /// MODIFIERS
     ///
@@ -131,20 +128,17 @@ contract DeviceManager is Migratable, Pausable, TokenDestructible {
         address _owner,
         address _storage,
         address _token,
-        address _settings,
-        address _registry)
+        address _settings)
     public isInitializer("DeviceManager", "0.0.1") {
         require(_owner != address(0), "owner cannot be 0x0");
         require(_storage != address(0), "storage address cannot be 0x0");
         require(_token != address(0), "token address cannot be 0x0");
         require(_settings != address(0), "settings address cannot be 0x0");
-        require(_registry != address(0), "registry address cannot be 0x0");
-        
+
         owner = _owner;
         atonomiStorage = EternalStorage(_storage);
         registry = Registry(_registry);
         token = ERC20Interface(_token);
-        settings = SettingsInterface(_settings);
     }
 
     ///

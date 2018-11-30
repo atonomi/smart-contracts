@@ -68,9 +68,6 @@ contract TokenPool is Migratable, Pausable {
     /// @title Atonomi Storage
     EternalStorage public atonomiStorage;
 
-    /// @title Atonomi Contract Registry
-    Registry public registry;
-
     /// @title ATMI Token
     /// @notice Standard ERC20 Token
     /// @dev AMLToken source: https://github.com/TokenMarketNet/ico/blob/master/contracts/AMLToken.sol
@@ -102,14 +99,12 @@ contract TokenPool is Migratable, Pausable {
     /// @notice Initialize the Reputation Manager Contract
     /// @param _storage is the Eternal Storage contract address
     /// @param _token is the Atonomi Token contract address (must be ERC20)
-    function initialize(address _storage, address _token, address _registry) public isInitializer("TokenPool", "0.0.1") {
+    function initialize(address _storage, address _token) public isInitializer("TokenPool", "0.0.1") {
         require(_storage != address(0), "storage address cannot be 0x0");
         require(_token != address(0), "token address cannot be 0x0");
-        require(_registry != address(0), "registry address cannot be 0x0");
 
         atonomiStorage = EternalStorage(_storage);
         token = ERC20Interface(_token);
-        registry = Registry(_registry);
     }
 
     //
