@@ -109,8 +109,7 @@ contract NetworkMemberManager is Migratable, Ownable {
     /// @param _storage is the Eternal Storage contract address
     function initialize (
         address _owner,
-        address _storage,
-        address _registry)
+        address _storage)
     public isInitializer("NetworkMemberManager", "0.0.1") {
         require(_owner != address(0), "owner cannot be 0x0");
         require(_storage != address(0), "storage address cannot be 0x0");

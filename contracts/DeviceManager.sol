@@ -137,7 +137,6 @@ contract DeviceManager is Migratable, Pausable, TokenDestructible {
 
         owner = _owner;
         atonomiStorage = EternalStorage(_storage);
-        registry = Registry(_registry);
         token = ERC20Interface(_token);
     }
 

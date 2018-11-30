@@ -75,7 +75,6 @@ contract NetworkSettings is Migratable, Ownable {
         require(_reputationIRNNodeShare > 0, "new share must be larger than zero");
         require(_reputationIRNNodeShare < 100, "new share must be less than 100");
         require(_storage != address(0), "storage cannot be 0x0");
-        require(_registry != address(0), "registry address cannot be 0x0");
 
         owner = _owner;
 
