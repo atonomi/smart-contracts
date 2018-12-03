@@ -1,12 +1,12 @@
 pragma solidity ^0.4.24;
 
-import "zos-lib/contracts/migrations/Migratable.sol";
+import "zos-lib/contracts/Initializable.sol";
 import "zeppelin-solidity/contracts/lifecycle/Pausable.sol";
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
 import "./EternalStorage.sol";
 
 
-contract TokenPool is Migratable, Pausable {
+contract TokenPool is Initializable, Pausable {
     using SafeMath for uint256;
 
     /// @notice emitted everytime a manufacturer changes their wallet for rewards
@@ -64,7 +64,7 @@ contract TokenPool is Migratable, Pausable {
 
     /// @notice Initialize the Reputation Manager Contract
     /// @param _storage is the Eternal Storage contract address
-    function initialize(address _storage) public isInitializer("TokenPool", "0.0.1") {
+    function initialize(address _storage) public initializer() {
         require(_storage != address(0), "storage address cannot be 0x0");
         atonomiStorage = EternalStorage(_storage);
     }

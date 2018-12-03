@@ -1,4 +1,4 @@
-import { TestApp } from 'zos'
+import { TestHelper } from 'zos'
 import { expect } from 'chai'
 const NetworkSettings = artifacts.require('NetworkSettings')
 const DeviceManager = artifacts.require('DeviceManager')
@@ -32,7 +32,7 @@ contract('Token Pool', accounts => {
   const repReward = 1 * multiplier
 
   beforeEach(async () => {
-    app = await TestApp({ from: ctx.actors.owner })
+    app = await TestHelper({ from: ctx.actors.owner })
     ctx.contracts.token = await init.getAtonomiTokenContract(ctx.actors.owner, ctx.actors.releaseAgent)
     ctx.contracts.storage = await init.getStorageContract(ctx.actors.owner)
     ctx.contracts.pool = await app.createProxy(TokenPool, 'TokenPool', 'initialize', [

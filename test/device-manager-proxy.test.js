@@ -1,4 +1,4 @@
-import { TestApp } from 'zos'
+import { TestHelper } from 'zos'
 import { expect } from 'chai'
 const DeviceManager = artifacts.require('DeviceManager')
 const errors = require('./helpers/errors')
@@ -31,10 +31,13 @@ contract('Device Manager', accounts => {
   const mfgReward = repReward - irnReward
 
   beforeEach(async () => {
-    app = await TestApp({ from: ctx.actors.owner })
+    console.log("1")
+    app = await TestHelper({ from: ctx.actors.owner })
+    console.log("2")
     ctx.contracts.token = await init.getAtonomiTokenContract(ctx.actors.owner, ctx.actors.releaseAgent)
     ctx.contracts.storage = await init.getStorageContract(ctx.actors.owner)
     ctx.contracts.settings = await init.getNetworkSettingsContract(app, ctx.actors.owner, ctx.contracts.storage.address)
+    console.log('ok')
     ctx.contracts.reputation = await init.getReputationManagerContract(app, ctx.actors.owner, ctx.contracts.storage.address, ctx.contracts.token.address)
     ctx.contracts.members = await init.getNetworkMemberContract(app, ctx.actors.owner, ctx.contracts.storage.address)
     ctx.contracts.devices = await init.getDevicesContract(

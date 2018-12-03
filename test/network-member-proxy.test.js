@@ -1,4 +1,4 @@
-import { TestApp } from 'zos'
+import { TestHelper } from 'zos'
 import { expect } from 'chai'
 const NetworkMemberManager = artifacts.require('NetworkMemberManager')
 const errors = require('./helpers/errors')
@@ -64,7 +64,7 @@ contract('Network Member', accounts => {
   }
 
   beforeEach(async () => {
-    app = await TestApp({ from: ctx.actors.owner })
+    app = await TestHelper({ from: ctx.actors.owner })
     ctx.contracts.storage = await init.getStorageContract(ctx.actors.owner)
     ctx.contracts.members = await init.getNetworkMemberContract(app, ctx.actors.owner, ctx.contracts.storage.address)
   })

@@ -1,6 +1,6 @@
 pragma solidity ^0.4.24;
 
-import "zos-lib/contracts/migrations/Migratable.sol";
+import "zos-lib/contracts/Initializable.sol";
 import "zeppelin-solidity/contracts/lifecycle/Pausable.sol";
 import "zeppelin-solidity/contracts/lifecycle/TokenDestructible.sol";
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
@@ -40,7 +40,7 @@ interface SettingsInterface {
 /// @dev Ownable: Owner governs the access of Atonomi Admins, Fees, and Rewards on the network
 /// @dev Pausable: Gives ability for Owner to pull emergency stop to prevent actions on the network
 /// @dev TokenDestructible: Gives owner ability to kill the contract and extract funds to a new contract
-contract DeviceManager is Migratable, Pausable, TokenDestructible {
+contract DeviceManager is Initializable, Pausable, TokenDestructible {
     using SafeMath for uint256;
 
     /// @title ATMI Token
@@ -129,7 +129,7 @@ contract DeviceManager is Migratable, Pausable, TokenDestructible {
         address _storage,
         address _token,
         address _settings)
-    public isInitializer("DeviceManager", "0.0.1") {
+    public initializer() {
         require(_owner != address(0), "owner cannot be 0x0");
         require(_storage != address(0), "storage address cannot be 0x0");
         require(_token != address(0), "token address cannot be 0x0");

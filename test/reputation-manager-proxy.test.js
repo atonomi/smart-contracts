@@ -1,4 +1,4 @@
-import { TestApp } from 'zos'
+import { TestHelper } from 'zos'
 import { expect } from 'chai'
 import { mineBlock } from './helpers/mine'
 const ReputationManager = artifacts.require('ReputationManager')
@@ -20,7 +20,7 @@ contract('Reputation Manager', accounts => {
   }
 
   beforeEach(async () => {
-    app = await TestApp({ from: ctx.actors.owner })
+    app = await TestHelper({ from: ctx.actors.owner })
     ctx.contracts.token = await init.getAtonomiTokenContract(ctx.actors.owner, ctx.actors.releaseAgent)
     ctx.contracts.storage = await init.getStorageContract(ctx.actors.owner)
     ctx.contracts.settings = await init.getNetworkSettingsContract(app, ctx.actors.owner, ctx.contracts.storage.address)

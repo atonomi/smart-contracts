@@ -1,11 +1,11 @@
 pragma solidity ^0.4.24;
 
-import "zos-lib/contracts/migrations/Migratable.sol";
+import "zos-lib/contracts/Initializable.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./EternalStorage.sol";
 
 
-contract NetworkMemberManager is Migratable, Ownable {
+contract NetworkMemberManager is Initializable, Ownable {
     /// @notice emitted on successful addition of network member address
     /// @param _sender ethereum account of participant that made the change
     /// @param _member address of added member
@@ -110,7 +110,7 @@ contract NetworkMemberManager is Migratable, Ownable {
     function initialize (
         address _owner,
         address _storage)
-    public isInitializer("NetworkMemberManager", "0.0.1") {
+    public initializer() {
         require(_owner != address(0), "owner cannot be 0x0");
         require(_storage != address(0), "storage address cannot be 0x0");
 

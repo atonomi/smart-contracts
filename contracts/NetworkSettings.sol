@@ -1,13 +1,13 @@
 pragma solidity ^0.4.24;
 
-import "zos-lib/contracts/migrations/Migratable.sol";
+import "zos-lib/contracts/Initializable.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./EternalStorage.sol";
 
 
 /// @title Atonomi Network Settings
 /// @notice This contract controls all owner configurable variables in the network
-contract NetworkSettings is Migratable, Ownable {
+contract NetworkSettings is Initializable, Ownable {
     
      /// @notice emitted everytime the registration fee changes
     /// @param _sender ethereum account of participant that made the change
@@ -67,7 +67,7 @@ contract NetworkSettings is Migratable, Ownable {
         uint256 _reputationIRNNodeShare,
         uint256 _blockThreshold,
         address _storage
-    ) public isInitializer("NetworkSettings", "0.0.1") {
+    ) public initializer() {
         require(_owner != address(0), "owner cannot be 0x0");
         require(_activationFee > 0, "activation fee must be greater than 0");
         require(_registrationFee > 0, "registration fee must be greater than 0");

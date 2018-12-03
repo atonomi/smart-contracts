@@ -1,6 +1,6 @@
 pragma solidity ^0.4.24;
 
-import "zos-lib/contracts/migrations/Migratable.sol";
+import "zos-lib/contracts/Initializable.sol";
 import "zeppelin-solidity/contracts/lifecycle/Pausable.sol";
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
 import "./EternalStorage.sol";
@@ -23,7 +23,7 @@ interface ERC20Interface {
 }
 
 
-contract ReputationManager is Migratable, Ownable, Pausable {
+contract ReputationManager is Initializable, Ownable, Pausable {
     using SafeMath for uint256;
 
     /// @title ATMI Token
@@ -155,7 +155,7 @@ contract ReputationManager is Migratable, Ownable, Pausable {
         address _owner,
         address _storage,
         address _token)
-    public isInitializer("ReputationManager", "0.0.1") {
+    public initializer() {
         require(_owner != address(0), "owner cannot be 0x0");
         require(_storage != address(0), "storage address cannot be 0x0");
         require(_token != address(0), "token address cannot be 0x0");

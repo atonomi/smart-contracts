@@ -1,12 +1,16 @@
 {
+  "zosversion": "2",
   "name": "atonomi-smart-contracts",
   "version": "0.1.0",
   "contracts": {
+    "DeviceManager": "DeviceManager",
+    "EternalStorage": "EternalStorage",
+    "NetworkMemberManager": "NetworkMemberManager",
     "NetworkSettings": "NetworkSettings",
     "ReputationManager": "ReputationManager",
-    "NetworkMemberManager": "NetworkMemberManager",
-    "TokenPool": "TokenPool",
-    "DeviceManager": "DeviceManager",
-    "EternalStorage": "EternalStorage"
+    "TokenPool": "TokenPool"
+  },
+  "dependencies": {
+    "openzeppelin-eth": "2.0.2"
   }
 }

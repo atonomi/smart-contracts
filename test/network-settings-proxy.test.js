@@ -1,4 +1,4 @@
-import { TestApp } from 'zos'
+import { TestHelper } from 'zos'
 import { expect } from 'chai'
 const NetworkSettings = artifacts.require('NetworkSettings')
 const errors = require('./helpers/errors')
@@ -24,7 +24,7 @@ contract('Network Settings', accounts => {
   const blockThreshold = 5760
 
   beforeEach(async () => {
-    app = await TestApp({ from: ctx.actors.owner })
+    app = await TestHelper({ from: ctx.actors.owner })
 
     ctx.contracts.storage = await init.getStorageContract(ctx.actors.owner)
 

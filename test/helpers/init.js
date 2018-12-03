@@ -35,7 +35,7 @@ export async function getAtonomiTokenContract (owner, releaseAgent) {
 
 export async function getNetworkSettingsContract (app, owner, storage) {
   const NetworkSettings = artifacts.require('NetworkSettings')
-
+  console.log('yes')
   return app.createProxy(NetworkSettings, 'NetworkSettings', 'initialize', [
     owner,
     regFee, actFee,
