@@ -1,0 +1,51 @@
+{
+  "contracts": {
+    "NetworkSettings": {
+      "address": "0x4f333246e78d5f1fbb36154605cbcd89be7cf859",
+      "constructorCode": "608060405233600160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff160217905550613183806100546000396000f300",
+      "bodyBytecodeHash": "525669bd936a79b3f351cfe055cc051c31625d48fe637420a199ba554e991c86",
+      "bytecodeHash": "1209d22dd81ee02c468f59d86494c96eef0121dee949fc5c3ddcb01a9636c325"
+    },
+    "ReputationManager": {
+      "address": "0x56b987752a3b08e35325e1d33d54896de39c46a6",
+      "constructorCode": "60806040526000600160146101000a81548160ff02191690831515021790555033600160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055506139c28061006f6000396000f300",
+      "bodyBytecodeHash": "d35a6f642802a78b8f8e017a9386469d08eeecf5c119432e6d4eb7496a43a107",
+      "bytecodeHash": "83a2dee11e44bc71c6884e8c1d346b619d0e35a7dd8694789d31330a89633d53"
+    },
+    "NetworkMemberManager": {
+      "address": "0xb56cca2a01f0450db1d45c39c51a73c259bbfc39",
+      "constructorCode": "608060405233600160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff160217905550613906806100546000396000f300",
+      "bodyBytecodeHash": "a4d93d1f83cd8a14d66d3d178067c6f0ddbad9bc1d73c1c8d8e6b427c3cce7fb",
+      "bytecodeHash": "09d7ffa63a9ca5aa9f2ae91c22087f04480fd6eaa714bde04556fb6031f45008"
+    },
+    "TokenPool": {
+      "address": "0x0e30cea38cf57ff324de9347669ade382f7f4d4a",
+      "constructorCode": "60806040526000600160146101000a81548160ff02191690831515021790555033600160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055506147c78061006f6000396000f300",
+      "bodyBytecodeHash": "3cf9c37bef524f6b0c3c17c9d351bdcda309357f049c6798b1fe8366ea1bc10b",
+      "bytecodeHash": "0d33b9f35703e6463706b68721a05835529eca1e4cbb39d005377c25549dac66"
+    },
+    "DeviceManager": {
+      "address": "0x8941b1bfc41f0a29fadfea89e9865d0cdf71f839",
+      "constructorCode": "60806040526000600160146101000a81548160ff02191690831515021790555033600160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff16021790555061578e8061006f6000396000f300",
+      "bodyBytecodeHash": "9176cc906eb20e88e0bbdb5c85827623c54ef38ebea58178dd117f411a26d046",
+      "bytecodeHash": "65ab62a0888b3aa21aead3876514b73f6c53ec89660a55778672ceeb4e71e83f"
+    },
+    "EternalStorage": {
+      "address": "0x506e013357f7d5bab434852b8681d6d48ed614ae",
+      "constructorCode": "608060405234801561001057600080fd5b50610dff806100206000396000f300",
+      "bodyBytecodeHash": "7e5d9fce239d823e2141ab44ce2a3c01edf85730b5a689007341e3a15d4e904a",
+      "bytecodeHash": "8d25156d201d465bb29d1fc256f3b6b29d5ad771b90222579409b14088932dd9"
+    }
+  },
+  "proxies": {},
+  "app": {
+    "address": "0xd5b984a0bca7fd9343dcd37235503740aa7f0279"
+  },
+  "version": "0.1.0",
+  "package": {
+    "address": "0xcc56e5a548e277626712c97e916b61832c87f9e2"
+  },
+  "provider": {
+    "address": "0xb829e865a7217014b53d2ec8ab3d775e1caa33cb"
+  }
+}
