@@ -33,10 +33,16 @@ contract('Token Pool', accounts => {
   const repReward = 1 * multiplier
 
   beforeEach(async () => {
-    app = await TestApp({ from: ctx.actors.owner })
+    
+    console.log(2)
     ctx.contracts.token = await init.getAtonomiTokenContract(ctx.actors.owner, ctx.actors.releaseAgent)
+    console.log(3)
     ctx.contracts.registry = await init.getRegistryContract(ctx.actors.owner)
-    ctx.contracts.storage = await init.getStorageContract(ctx.contracts.registry.address, {from: ctx.actors.owner})
+
+    console.log("registry: " + ctx.contracts.registry.address)
+console.log(1)
+    app = await TestApp({ from: ctx.actors.owner })
+    ctx.contracts.storage = await init.getStorageContract(ctx.contracts.registry.address, ctx.actors.owner)
     
     ctx.contracts.pool = await app.createProxy(TokenPool, 'TokenPool', 'initialize', [
       ctx.contracts.storage.address]
