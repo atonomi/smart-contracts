@@ -74,7 +74,9 @@ export async function getRegistryContract (owner) {
 
 export async function getStorageContract (registry, owner) {
   const EternalStorage = artifacts.require('EternalStorage')
-  return EternalStorage.new(registry, {from: owner})
+  var c = await EternalStorage.new({from: owner})
+  c.setRegistryAddress(registry, {from:owner})
+  return c
 }
 
 export async function getDevicesContract (app, owner, storage, token, settings) {
