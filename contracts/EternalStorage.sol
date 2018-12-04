@@ -1,7 +1,8 @@
 pragma solidity ^0.4.24;
 import "./Registry.sol";
+import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 
-contract EternalStorage {
+contract EternalStorage is Ownable{
  
     /// @title Atonomi Storage
     Registry public registry;

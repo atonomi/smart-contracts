@@ -34,13 +34,9 @@ contract('Token Pool', accounts => {
 
   beforeEach(async () => {
     
-    console.log(2)
     ctx.contracts.token = await init.getAtonomiTokenContract(ctx.actors.owner, ctx.actors.releaseAgent)
-    console.log(3)
     ctx.contracts.registry = await init.getRegistryContract(ctx.actors.owner)
 
-    console.log("registry: " + ctx.contracts.registry.address)
-console.log(1)
     app = await TestApp({ from: ctx.actors.owner })
     ctx.contracts.storage = await init.getStorageContract(ctx.contracts.registry.address, ctx.actors.owner)
     
@@ -48,7 +44,7 @@ console.log(1)
       ctx.contracts.storage.address]
     )
     await ctx.contracts.registry.add(ctx.contracts.pool.address, {from: ctx.actors.owner})
-
+    
     ctx.contracts.member = await app.createProxy(NetworkMemberManager, 'NetworkMemberManager', 'initialize', [
       ctx.actors.owner,
       ctx.contracts.storage.address
@@ -61,7 +57,8 @@ console.log(1)
       ctx.contracts.token.address
     ])
     await ctx.contracts.registry.add(ctx.contracts.reputation.address, {from: ctx.actors.owner})
-
+    //the error is somewhere between here and next comment
+    
     ctx.contracts.settings = await app.createProxy(NetworkSettings, 'NetworkSettings', 'initialize', [
       ctx.actors.owner,
       regFee,
